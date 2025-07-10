@@ -1,0 +1,144 @@
+{
+    "plotEvents": [
+        {
+            "time": 0,
+            "eventType": "start",
+            "plotActors": ["A"],
+            "eventData": ["(0,0,0)"],
+            "significance": 10
+        },
+        {
+            "time": 1,
+            "eventType": "Waypoint",
+            "plotActors": ["A"],
+            "eventData": ["(0,1,0)"],
+            "significance": 1
+        },
+        {
+            "time": 2,
+            "eventType": "Waypoint",
+            "plotActors": ["A"],
+            "eventData": ["(0,2,0)"],
+            "significance": 1
+        },
+        {
+            "time": 3,
+            "eventType": "Waypoint",
+            "plotActors": ["A"],
+            "eventData": ["(0,3,0)"],
+            "significance": 1
+        },
+        {
+            "time": 1,
+            "eventType": "start",
+            "plotActors": ["B"],
+            "eventData": ["(-5,0,0)"],
+            "significance": 10
+        },
+        {
+            "time": 2,
+            "eventType": "Waypoint",
+            "plotActors": ["B"],
+            "eventData": ["(-4,1,0)"],
+            "significance": 1
+        },
+        {
+            "time": 3,
+            "eventType": "Waypoint",
+            "plotActors": ["B"],
+            "eventData": ["(-3,2,0)"],
+            "significance": 1
+        },
+        {
+            "time": 4,
+            "eventType": "Waypoint",
+            "plotActors": ["B"],
+            "eventData": ["(-2,3,0)"],
+            "significance": 1
+        },
+        {
+            "time": 5,
+            "eventType": "contact",
+            "plotActors": ["A", "B"],
+            "eventData": ["(0,4,0)", "(-1,4,0)"],
+            "significance": 5
+        },
+        {
+            "time": 6,
+            "eventType": "fire",
+            "plotActors": ["A", "B"],
+            "eventData": ["(0,4,0)"],
+            "significance": 5
+        },
+        {
+            "time": 7,
+            "eventType": "sink",
+            "plotActors": ["B"],
+            "eventData": ["(-1,4,0)"],
+            "significance": 10
+        },
+        {
+            "time": 1,
+            "eventType": "start",
+            "plotActors": ["C"],
+            "eventData": ["(-6,0,0)"],
+            "significance": 10
+        },
+        {
+            "time": 2,
+            "eventType": "Waypoint",
+            "plotActors": ["C"],
+            "eventData": ["(-6,1,0)"],
+            "significance": 1
+        },
+        {
+            "time": 3,
+            "eventType": "Waypoint",
+            "plotActors": ["C"],
+            "eventData": ["(-6,2,0)"],
+            "significance": 1
+        },
+        {
+            "time": 4,
+            "eventType": "Waypoint",
+            "plotActors": ["C"],
+            "eventData": ["(-6,3,0)"],
+            "significance": 1
+        },
+        {
+            "time": 5,
+            "eventType": "Waypoint",
+            "plotActors": ["C"],
+            "eventData": ["(-6,4,0)"],
+            "significance": 1
+        },             
+        {
+            "time": 6,
+            "eventType": "Waypoint",
+            "plotActors": ["C"],
+            "eventData": ["(-6,5,0)"],
+            "significance": 1
+        },
+        {
+            "time": 7,
+            "eventType": "Waypoint",
+            "plotActors": ["C"],
+            "eventData": ["(-6,6,0)"],
+            "significance": 1
+        },
+        {
+            "time": 8,
+            "eventType": "Waypoint",
+            "plotActors": ["C"],
+            "eventData": ["(-6,7,0)"],
+            "significance": 1
+        },
+        {
+            "time": 9,
+            "eventType": "Waypoint",
+            "plotActors": ["C"],
+            "eventData": ["(-6,8,0)"],
+            "significance": 1
+        }                 
+    ]
+}
