@@ -269,7 +269,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392d0ce7a62220442a177bdf4291b084, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  visualisationType: 2
+  visualisationType: 3
   oneD: {fileID: 0}
   twoD: {fileID: 1460102119}
   twoPointFiveD: {fileID: 1964939214}
