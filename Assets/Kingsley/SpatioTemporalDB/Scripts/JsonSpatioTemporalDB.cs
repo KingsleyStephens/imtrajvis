@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.PlayerLoop;
+using static SpatioTemporalDatabase.SpatioTemporalDB;
 
 namespace SpatioTemporalDatabase
 {
@@ -13,25 +15,26 @@ namespace SpatioTemporalDatabase
     public class JsonSpatioTemporalDB : SpatioTemporalDB
     {
         [System.Serializable]
-        public class MovingObjectPosition
+        public class PositionUpdate
         {
             public Vector3 position;
-            public Vector3 velocity;
+            public Vector3 orientation;
+            public float speed;
             public float time;
         }
 
         [System.Serializable]
-        private class MovingObjectTrajectory
+        private class MovingObject
         {
-            public string movingObjectId;
-            public List<MovingObjectPosition> trajectory;
+            public string id;
+            public List<PositionUpdate> trajectory = new List<PositionUpdate>();
         }
 
         [System.Serializable]
         private class JsonTable
         {
             public string name;
-            public List<MovingObjectTrajectory> trajectories;
+            public List<MovingObject> movingObjects = new List<MovingObject>();
         }
 
 
@@ -130,16 +133,16 @@ namespace SpatioTemporalDatabase
             JsonTable table = mDB.tables.Find(t => t.name == name);
             if (table != null)
             {
-                MovingObjectTrajectory movingObject = table.trajectories.Find(t => t.movingObjectId == movingObjectId);
+                MovingObject movingObject = table.movingObjects.Find(t => t.id == movingObjectId);
                 if (movingObject == null)
                 {
-                    movingObject = new MovingObjectTrajectory();
-                    movingObject.movingObjectId = movingObjectId;
-                    movingObject.trajectory = new List<MovingObjectPosition>();
-                    table.trajectories.Add(movingObject);
+                    movingObject = new MovingObject();
+                    movingObject.id = movingObjectId;
+                    table.movingObjects.Add(movingObject);
                 }
 
-                movingObject.trajectory.Add(new MovingObjectPosition() { position = positionUpdate.position, velocity = positionUpdate.velocity, time = positionUpdate.time });
+                movingObject.trajectory.Add(new PositionUpdate() { position = positionUpdate.position, orientation = positionUpdate.orientation, speed = positionUpdate.speed, time = positionUpdate.time });
+                return true;
             }
 
             return false; 
@@ -153,15 +156,23 @@ namespace SpatioTemporalDatabase
             JsonTable table = mDB.tables.Find(t => t.name == name);
             if (table != null)
             {
-                MovingObjectTrajectory movingObject = table.trajectories.Find(t => t.movingObjectId == movingObjectId);
+                MovingObject movingObject = table.movingObjects.Find(t => t.id == movingObjectId);
                 if (movingObject != null)
                 {
-                    List<MovingObjectPosition> positions = movingObject.trajectory.FindAll(t => t.time >= time && t.time <= time + timeRange);
-                    return positions.Select(p => new MovingObjectPositionUpdate() { position = p.position, velocity = p.velocity, time = p.time }).ToArray();
+                    List<PositionUpdate> positions = movingObject.trajectory.FindAll(t => t.time >= time && t.time <= time + timeRange);
+                    return positions.Select(p => new MovingObjectPositionUpdate() { position = p.position, orientation = p.orientation, speed = p.speed, time = p.time }).ToArray();
                 }
             }
 
-            return null;
+            return new MovingObjectPositionUpdate[0];
+        }
+
+        /**
+         * List the contents of a table
+         */
+        public override string[] ListTables()
+        {
+            return mDB.tables.Select(t => t.name).ToArray();
         }
 
         /**
@@ -172,10 +183,10 @@ namespace SpatioTemporalDatabase
             JsonTable table = mDB.tables.Find(t => t.name == name);
             if (table != null)
             {
-                return table.trajectories.Select(t => t.movingObjectId).ToArray();
+                return table.movingObjects.Select(t => t.id).ToArray();
             }
             
-            return null; 
+            return new string[0]; 
         }
 
     }

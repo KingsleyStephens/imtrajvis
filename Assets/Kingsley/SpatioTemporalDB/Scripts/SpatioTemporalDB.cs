@@ -11,7 +11,8 @@ namespace SpatioTemporalDatabase
         public class MovingObjectPositionUpdate
         {
             public Vector3 position;
-            public Vector3 velocity;
+            public Vector3 orientation;
+            public float speed;
             public float time;
         }
 
@@ -46,6 +47,11 @@ namespace SpatioTemporalDatabase
          * Read from a table
          */
         public abstract MovingObjectPositionUpdate[] ReadTable(string name, string movingObjectId, float time, float timeRange);
+
+        /**
+         * List all the tables
+         */
+        public abstract string[] ListTables();
 
         /**
          * List the contents of a table
