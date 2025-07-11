@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using KCore;
 
-namespace SATestbed
+namespace KSimulation
 { 
     [CreateAssetMenu(fileName = "SimulationBlackout", menuName = "SimulationBlackout", order = 1)]
     public class SimulationBlackout : Updateable
@@ -13,7 +14,7 @@ namespace SATestbed
             */
         public override void Init()
         {
-            Logger.LogMessage("SimulationBlackout LOAD");
+            KCore.Logger.LogMessage("SimulationBlackout LOAD");
             Enabled = true;
         }
 
@@ -22,7 +23,7 @@ namespace SATestbed
         */
         public override void BeginUpdating()
         {
-            Logger.LogMessage("SimulationBlackout BEGIN");
+            KCore.Logger.LogMessage("SimulationBlackout BEGIN");
         }
 
         /**
@@ -30,7 +31,7 @@ namespace SATestbed
             */
         public override void EndUpdating()
         {
-            Logger.LogMessage("SimulationBlackout END");
+            KCore.Logger.LogMessage("SimulationBlackout END");
         }
 
         protected override void DoUpdate(TimeSnapshot time) 

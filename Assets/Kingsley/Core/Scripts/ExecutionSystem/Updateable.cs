@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SATestbed
+namespace KCore
 {
     /**
      * Base class for something that can be updated

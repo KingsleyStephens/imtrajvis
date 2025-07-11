@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using KCore;
 
-namespace SATestbed
+namespace KVis
 {
     /**
      * A 0D locationless environment
@@ -24,7 +25,7 @@ namespace SATestbed
          */
         public override void Init()
         {
-            Logger.LogMessage("ThreeDEnvironment LOAD");
+            KCore.Logger.LogMessage("ThreeDEnvironment LOAD");
             Enabled = true;
         }
 
@@ -33,7 +34,7 @@ namespace SATestbed
         */
         public override void BeginUpdating()
         {
-            Logger.LogMessage("ThreeDEnvironment now exists");
+            KCore.Logger.LogMessage("ThreeDEnvironment now exists");
 
 
             foreach (string s in scenes)

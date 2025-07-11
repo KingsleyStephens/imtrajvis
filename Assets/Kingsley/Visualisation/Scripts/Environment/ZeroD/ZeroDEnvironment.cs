@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using KCore;
 
-namespace SATestbed
+namespace KVis
 {
     /**
      * A 0D locationless environment
@@ -22,7 +23,7 @@ namespace SATestbed
          */
         public override void Init()
         {
-            Logger.LogMessage("ZeroDEnvironment LOAD");
+            KCore.Logger.LogMessage("ZeroDEnvironment LOAD");
             Enabled = true;
         }
 
@@ -31,7 +32,7 @@ namespace SATestbed
         */
         public override void BeginUpdating()
         {
-            Logger.LogMessage("ZeroDEnvironment now exists");
+            KCore.Logger.LogMessage("ZeroDEnvironment now exists");
 
             mUI = Instantiate(uiPrefab);
             UIDocument doc = mUI.GetComponent<UIDocument>();

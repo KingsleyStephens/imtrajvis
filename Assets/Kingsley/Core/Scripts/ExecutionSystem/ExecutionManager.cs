@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SATestbed
+namespace KCore
 {
     /**
      * Monobehviour singleton class to manage execution of objects
@@ -61,7 +61,7 @@ namespace SATestbed
          */
         void Start()
         {
-            Logger.LogMessage("Starting SATestbed::ExecutionManager");
+            Logger.LogMessage("Starting KCore::ExecutionManager");
         }
 
         /**

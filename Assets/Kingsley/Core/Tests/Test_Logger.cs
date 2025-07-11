@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using SATestbed;
+using KCore;
 
 public class Test_Logger
 {
@@ -11,83 +11,83 @@ public class Test_Logger
     [Test]
     public void Test_LoggerDefaultsPasses()
     {
-        SATestbed.Logger.SetLogLevel(SATestbed.Logger.LogType.All);
+        KCore.Logger.SetLogLevel(KCore.Logger.LogType.All);
 
         LogAssert.Expect(LogType.Log, "LogMessage");
-        SATestbed.Logger.LogMessage("LogMessage");
+        KCore.Logger.LogMessage("LogMessage");
 
         LogAssert.Expect(LogType.Log, "LogMessage 0,1");
-        SATestbed.Logger.LogMessage("LogMessage {0},{1}", 0, 1);
+        KCore.Logger.LogMessage("LogMessage {0},{1}", 0, 1);
 
         LogAssert.Expect(LogType.Warning, "LogWarning");
-        SATestbed.Logger.LogWarning("LogWarning");
+        KCore.Logger.LogWarning("LogWarning");
         LogAssert.Expect(LogType.Warning, "LogWarning 0,1");
-        SATestbed.Logger.LogWarning("LogWarning {0},{1}", 0, 1);
+        KCore.Logger.LogWarning("LogWarning {0},{1}", 0, 1);
 
         LogAssert.Expect(LogType.Error, "LogError");
-        SATestbed.Logger.LogError("LogError");
+        KCore.Logger.LogError("LogError");
         LogAssert.Expect(LogType.Error, "LogError 0,1");
-        SATestbed.Logger.LogError("LogError {0},{1}", 0, 1);
+        KCore.Logger.LogError("LogError {0},{1}", 0, 1);
     }
 
     // Log levels
     [Test]
     public void Test_LoggerLevelAllPasses()
     {
-        SATestbed.Logger.SetLogLevel(SATestbed.Logger.LogType.All);
+        KCore.Logger.SetLogLevel(KCore.Logger.LogType.All);
 
         LogAssert.Expect(LogType.Log, "LogMessage");
-        SATestbed.Logger.LogMessage("LogMessage");
+        KCore.Logger.LogMessage("LogMessage");
     }
 
     [Test]
     public void Test_LoggerLevelNonePasses()
     {
-        SATestbed.Logger.SetLogLevel(SATestbed.Logger.LogType.None);
+        KCore.Logger.SetLogLevel(KCore.Logger.LogType.None);
         LogAssert.NoUnexpectedReceived();
-        SATestbed.Logger.LogMessage("LogMessage");
+        KCore.Logger.LogMessage("LogMessage");
     }
 
 
     [Test]
     public void Test_LoggerLevelArbitraryPasses()
     {
-        SATestbed.Logger.SetLogLevel(SATestbed.Logger.LogType.Warning);
+        KCore.Logger.SetLogLevel(KCore.Logger.LogType.Warning);
         LogAssert.NoUnexpectedReceived();
-        SATestbed.Logger.LogError("LogMessage");
+        KCore.Logger.LogError("LogMessage");
     }
 
     [Test]
     public void Test_LoggerCustomLevelPasses()
     {
-        SATestbed.Logger.SetLogLevel(SATestbed.Logger.LogType.All);
+        KCore.Logger.SetLogLevel(KCore.Logger.LogType.All);
 
         string customLevelName = "TEST_LEVEL";
-        uint customLevel = (uint)SATestbed.Logger.LogType.All + 100;
-        SATestbed.Logger.AddCustomLogLevel(customLevelName, customLevel);
+        uint customLevel = (uint)KCore.Logger.LogType.All + 100;
+        KCore.Logger.AddCustomLogLevel(customLevelName, customLevel);
 
         LogAssert.Expect(LogType.Log, "LogMessage");
-        SATestbed.Logger.LogMessage("LogMessage");
+        KCore.Logger.LogMessage("LogMessage");
 
-        SATestbed.Logger.SetLogLevel(SATestbed.Logger.LogType.All);
+        KCore.Logger.SetLogLevel(KCore.Logger.LogType.All);
         LogAssert.Expect(LogType.Log, "LogMessage");
-        SATestbed.Logger.LogMessage("LogMessage");
+        KCore.Logger.LogMessage("LogMessage");
 
-        SATestbed.Logger.SetCustomLogLevel(customLevelName);
+        KCore.Logger.SetCustomLogLevel(customLevelName);
         LogAssert.Expect(LogType.Log, "LogMessage");
-        SATestbed.Logger.DebugLog(customLevel, "LogMessage");
+        KCore.Logger.DebugLog(customLevel, "LogMessage");
 
-        SATestbed.Logger.SetLogLevel(SATestbed.Logger.LogType.Message);
+        KCore.Logger.SetLogLevel(KCore.Logger.LogType.Message);
         LogAssert.NoUnexpectedReceived();
-        SATestbed.Logger.DebugLog(customLevel, "LogMessage");
+        KCore.Logger.DebugLog(customLevel, "LogMessage");
 
-        SATestbed.Logger.SetLogLevel(SATestbed.Logger.LogType.None);
+        KCore.Logger.SetLogLevel(KCore.Logger.LogType.None);
         LogAssert.NoUnexpectedReceived();
-        SATestbed.Logger.DebugLog(customLevel, "LogMessage");
+        KCore.Logger.DebugLog(customLevel, "LogMessage");
 
-        SATestbed.Logger.SetLogLevel(SATestbed.Logger.LogType.All);
+        KCore.Logger.SetLogLevel(KCore.Logger.LogType.All);
         LogAssert.Expect(LogType.Log, "LogMessage");
-        SATestbed.Logger.DebugLog(customLevel, "LogMessage");
+        KCore.Logger.DebugLog(customLevel, "LogMessage");
     }
 
 }

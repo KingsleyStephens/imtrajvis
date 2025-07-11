@@ -2,8 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using KCore;
 
-namespace SATestbed
+namespace KSimulation
 {
 
     /**
@@ -17,7 +18,7 @@ namespace SATestbed
          */
         public override void Init()
         {
-            Logger.LogMessage("Simulation LOAD");
+            KCore.Logger.LogMessage("Simulation LOAD");
             Enabled = true;
         }
 
@@ -26,7 +27,7 @@ namespace SATestbed
         */
         public override void BeginUpdating()
         {
-            Logger.LogMessage("Simulation BEGIN");
+            KCore.Logger.LogMessage("Simulation BEGIN");
         }
 
         /**
@@ -34,12 +35,12 @@ namespace SATestbed
          */
         public override void EndUpdating()
         {
-            Logger.LogMessage("Simulation END");
+            KCore.Logger.LogMessage("Simulation END");
         }
 
         protected override void DoUpdate(TimeSnapshot time) 
         {
-            // Logger.LogMessage("Simulation update t:{0}, dt:{1}", time.time, time.deltaTime);
+            // KCore.Logger.LogMessage("Simulation update t:{0}, dt:{1}", time.time, time.deltaTime);
         }
     }
 

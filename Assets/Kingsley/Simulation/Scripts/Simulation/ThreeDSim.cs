@@ -2,6 +2,9 @@ using SATestbed;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using KSimulation;
+using KCore;
+using KVis;
 
 [CreateAssetMenu(fileName = "ThreeDSim", menuName = "ThreeDSim", order = 1)]
 public class ThreeDSim : Simulation
@@ -16,7 +19,7 @@ public class ThreeDSim : Simulation
      */
     public override void Init()
     {
-        SATestbed.Logger.LogMessage("ThreeDSim LOAD");
+        KCore.Logger.LogMessage("ThreeDSim LOAD");
         Enabled = true;
     }
 
@@ -25,7 +28,7 @@ public class ThreeDSim : Simulation
     */
     public override void BeginUpdating()
     {
-        SATestbed.Logger.LogMessage("ThreeDSim BEGIN");
+        KCore.Logger.LogMessage("ThreeDSim BEGIN");
         if (environment != null)
         {
             ExecutionManager.Instance.Add(environment);
@@ -42,7 +45,7 @@ public class ThreeDSim : Simulation
      */
     public override void EndUpdating()
     {
-        SATestbed.Logger.LogMessage("ThreeDSim END");
+        KCore.Logger.LogMessage("ThreeDSim END");
     }
 
     protected override void DoUpdate(TimeSnapshot time)

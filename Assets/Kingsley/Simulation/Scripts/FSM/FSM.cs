@@ -22,7 +22,7 @@ public class FSMTransition
 
 public class FSM<T, E> : FSMState<E> where T : Enum where E : Enum
 {
-    private Agent mAgent;
+    private new Agent mAgent;
     private T mDefaultState;
     private T mCurrentState;
 

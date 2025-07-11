@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using KCore;
 
-namespace SATestbed
+namespace KSimulation
 {
     /**
      * Class to load and initialise the sim
@@ -10,7 +11,7 @@ namespace SATestbed
     public class SimulationLoader : MonoBehaviour
     {
         [SerializeField]
-        private Logger.LogType logLevel = Logger.LogType.All;
+        private KCore.Logger.LogType logLevel = KCore.Logger.LogType.All;
 
         [SerializeField]
         private Simulation simulation;
@@ -20,13 +21,13 @@ namespace SATestbed
          */
         void Start()
         {
-            Logger.SetLogLevel(logLevel);
+            KCore.Logger.SetLogLevel(logLevel);
 
             gameObject.AddComponent<ExecutionManager>();
 
             if (simulation != null)
             {
-                Logger.LogMessage("Add simulation!");
+                KCore.Logger.LogMessage("Add simulation!");
                 ExecutionManager.Instance.Add(simulation);
             }
         }

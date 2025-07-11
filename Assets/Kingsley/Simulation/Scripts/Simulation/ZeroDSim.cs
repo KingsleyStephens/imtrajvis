@@ -2,6 +2,9 @@ using SATestbed;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using KSimulation;
+using KCore;
+using KVis;
 
 [CreateAssetMenu(fileName = "ZeroDSim", menuName = "ZeroDSim", order = 1)]
 public class ZeroDSim : Simulation
@@ -14,7 +17,7 @@ public class ZeroDSim : Simulation
      */
     public override void Init()
     {
-        SATestbed.Logger.LogMessage("ZeroDSim LOAD");
+        KCore.Logger.LogMessage("ZeroDSim LOAD");
         Enabled = true;
     }
 
@@ -23,7 +26,7 @@ public class ZeroDSim : Simulation
     */
     public override void BeginUpdating()
     {
-        SATestbed.Logger.LogMessage("ZeroDSim BEGIN");
+        KCore.Logger.LogMessage("ZeroDSim BEGIN");
         if (environment != null)
         {
             ExecutionManager.Instance.Add(environment);
@@ -35,12 +38,12 @@ public class ZeroDSim : Simulation
      */
     public override void EndUpdating()
     {
-        SATestbed.Logger.LogMessage("ZeroDSim END");
+        KCore.Logger.LogMessage("ZeroDSim END");
     }
 
     protected override void DoUpdate(TimeSnapshot time)
     {
-        //SATestbed.Logger.LogMessage("ZeroDSim update t:{0}, dt:{1}", time.time, time.deltaTime);
+        //KCore.Logger.LogMessage("ZeroDSim update t:{0}, dt:{1}", time.time, time.deltaTime);
     }
 
 
