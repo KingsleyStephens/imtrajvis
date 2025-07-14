@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using System.Linq;
-using UnityEngine.PlayerLoop;
-using static SpatioTemporalDatabase.SpatioTemporalDB;
+using KCore;
 
 namespace SpatioTemporalDatabase
 {
@@ -27,6 +26,7 @@ namespace SpatioTemporalDatabase
         private class MovingObject
         {
             public string id;
+            public float trajectoryDelta;
             public List<PositionUpdate> trajectory = new List<PositionUpdate>();
         }
 
@@ -151,7 +151,7 @@ namespace SpatioTemporalDatabase
         /**
          * Read from a table
          */
-        public override MovingObjectPositionUpdate[] ReadTable(string name, string movingObjectId, float time, float timeRange)
+        public override MovingObjectPositionUpdate ReadTable(string name, string movingObjectId, float time)
         {
             JsonTable table = mDB.tables.Find(t => t.name == name);
             if (table != null)
@@ -159,12 +159,59 @@ namespace SpatioTemporalDatabase
                 MovingObject movingObject = table.movingObjects.Find(t => t.id == movingObjectId);
                 if (movingObject != null)
                 {
-                    List<PositionUpdate> positions = movingObject.trajectory.FindAll(t => t.time >= time && t.time <= time + timeRange);
-                    return positions.Select(p => new MovingObjectPositionUpdate() { position = p.position, orientation = p.orientation, speed = p.speed, time = p.time }).ToArray();
+                    float halfTimeRange = movingObject.trajectoryDelta * 2.5f; // Take a sample of positions
+
+                    List<PositionUpdate> positions = movingObject.trajectory.FindAll(t => t.time >= time - halfTimeRange && t.time <= time + halfTimeRange);
+
+                    PositionUpdate positionUpdate = null;
+                    if (positions.Count == 1)
+                    {
+                        positionUpdate = positions[0];
+                    }
+                    else if (positions.Count == 2)
+                    {
+                        positionUpdate = InterpolatePositionUpdates(positions[0], positions[1], (time - positions[0].time) / (positions[1].time - positions[0].time));
+                    }
+                    else if (positions.Count == 3)
+                    {
+                        if (time < positions[1].time)
+                        {
+                            positionUpdate = InterpolatePositionUpdates(positions[0], positions[1], (time - positions[0].time) / (positions[1].time - positions[0].time));
+                        }
+                        else
+                        {
+                            positionUpdate = InterpolatePositionUpdates(positions[1], positions[2], (time - positions[1].time) / (positions[2].time - positions[1].time));
+                        }
+                    }
+                    else if (positions.Count >= 4)
+                    {
+                        if (time < positions[1].time)
+                        {
+                            positionUpdate = InterpolatePositionUpdates(positions[0], positions[1], (time - positions[0].time) / (positions[1].time - positions[0].time));
+                        }
+                        else if (time > positions[positions.Count - 2].time)
+                        {
+                            positionUpdate = InterpolatePositionUpdates(positions[positions.Count - 2], positions[positions.Count - 1], (time - positions[positions.Count - 2].time) / (positions[positions.Count - 1].time - positions[positions.Count - 2].time));
+                        }
+                        else
+                        {
+                            int count = 1;
+                            while ((count < positions.Count - 1) && (time < positions[count + 1].time))
+                            {
+                            }
+
+                            positionUpdate = InterpolatePositionUpdates(positions[positions.Count - 2], positions[positions.Count - 1], (time - positions[positions.Count - 2].time) / (positions[positions.Count - 1].time - positions[positions.Count - 2].time));
+                        }
+                    }
+
+                    if (positionUpdate != null)
+                    {
+                        return new MovingObjectPositionUpdate() { position = positionUpdate.position, orientation = positionUpdate.orientation, speed = positionUpdate.speed, time = positionUpdate.time };
+                    }
                 }
             }
 
-            return new MovingObjectPositionUpdate[0];
+            return null;
         }
 
         /**

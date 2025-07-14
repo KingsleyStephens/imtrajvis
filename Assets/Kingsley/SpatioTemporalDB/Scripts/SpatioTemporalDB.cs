@@ -46,7 +46,7 @@ namespace SpatioTemporalDatabase
         /**
          * Read from a table
          */
-        public abstract MovingObjectPositionUpdate[] ReadTable(string name, string movingObjectId, float time, float timeRange);
+        public abstract MovingObjectPositionUpdate ReadTable(string name, string movingObjectId, float time);
 
         /**
          * List all the tables
