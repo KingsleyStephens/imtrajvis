@@ -9,35 +9,6 @@ namespace KCore
      */
     public static class CatmullRomSpline
     {
-
-        /**
-         * Sample the spline over a list of control points
-         * 
-         * @param controlPoints The points to sample from
-         * @param segmentsPerCurve Resolution
-         */
-        public static List<Vector3> Sample(List<Vector3> controlPoints, int segmentsPerCurve)
-        {
-            List<Vector3> result = new List<Vector3>();
-
-            // Test if enough points for spline
-            if (controlPoints.Count >= 4)
-            {
-                for (int i = 0; i < controlPoints.Count - 3; i++)
-                {
-                    for (int j = 0; j <= segmentsPerCurve; j++)
-                    {
-                        float t = (float)j / (float)segmentsPerCurve;
-                        Vector3 point = Interpolate(controlPoints[i], controlPoints[i + 1], controlPoints[i + 2], controlPoints[i + 3], t);
-                        result.Add(point);
-                    }
-                }
-            }
-
-            return result;
-        }
-
-
         /**
          * Returns a point between p1 and p2 using Catmull-Rom interpolation
          * 

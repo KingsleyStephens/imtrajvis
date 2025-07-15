@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using static EventManager;
 
 public class FormationSpawner : MonoBehaviour
 {
@@ -31,6 +32,7 @@ public class FormationSpawner : MonoBehaviour
     public GameObject Spawn()
     {
         GameObject formation = Instantiate(formationPrefab, transform.position, transform.rotation);
+        formation.name = gameObject.name + "_formation";
         MoveableObject moveable = formation.GetComponent<MoveableObject>();
         if (moveable != null)
         {
@@ -52,6 +54,8 @@ public class FormationSpawner : MonoBehaviour
                 {
                     agent = Instantiate(agentPrefab, formationComponent.GetFormationPos(i), transform.rotation);
                 }
+
+                agent.name = gameObject.name + "_spawn_" + i.ToString();
 
                 MoveableObject agentMoveable = agent.GetComponent<MoveableObject>();
                 if (agentMoveable != null)

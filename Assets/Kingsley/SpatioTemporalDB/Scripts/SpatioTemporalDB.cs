@@ -10,8 +10,16 @@ namespace SpatioTemporalDatabase
     {
         public class MovingObjectPositionUpdate
         {
+            public MovingObjectPositionUpdate(Vector3 position, Quaternion orientation, float speed, float time)
+            {
+                this.position = position;
+                this.orientation = orientation;
+                this.speed = speed;
+                this.time = time;
+            }
+
             public Vector3 position;
-            public Vector3 orientation;
+            public Quaternion orientation;
             public float speed;
             public float time;
         }
@@ -42,6 +50,7 @@ namespace SpatioTemporalDatabase
          * Perform an update operation on a table
          */
         public abstract bool UpdateTable(string name, string movingObjectId, MovingObjectPositionUpdate positionUpdate);
+        public abstract bool UpdateTable(string name, string movingObjectId, float trajectoryDelta);
 
         /**
          * Read from a table

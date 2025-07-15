@@ -1,9 +1,9 @@
+using KCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 using System.Linq;
-using KCore;
+using UnityEngine;
 
 namespace SpatioTemporalDatabase
 {
@@ -17,7 +17,7 @@ namespace SpatioTemporalDatabase
         public class PositionUpdate
         {
             public Vector3 position;
-            public Vector3 orientation;
+            public Quaternion orientation;
             public float speed;
             public float time;
         }
@@ -149,6 +149,29 @@ namespace SpatioTemporalDatabase
         }
 
         /**
+         * Perform an update operation on a table
+         */
+        public override bool UpdateTable(string name, string movingObjectId, float trajectoryDelta)
+        {
+            JsonTable table = mDB.tables.Find(t => t.name == name);
+            if (table != null)
+            {
+                MovingObject movingObject = table.movingObjects.Find(t => t.id == movingObjectId);
+                if (movingObject == null)
+                {
+                    movingObject = new MovingObject();
+                    movingObject.id = movingObjectId;
+                    table.movingObjects.Add(movingObject);
+                }
+
+                movingObject.trajectoryDelta = trajectoryDelta;
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
          * Read from a table
          */
         public override MovingObjectPositionUpdate ReadTable(string name, string movingObjectId, float time)
@@ -160,53 +183,12 @@ namespace SpatioTemporalDatabase
                 if (movingObject != null)
                 {
                     float halfTimeRange = movingObject.trajectoryDelta * 2.5f; // Take a sample of positions
-
                     List<PositionUpdate> positions = movingObject.trajectory.FindAll(t => t.time >= time - halfTimeRange && t.time <= time + halfTimeRange);
 
-                    PositionUpdate positionUpdate = null;
-                    if (positions.Count == 1)
-                    {
-                        positionUpdate = positions[0];
-                    }
-                    else if (positions.Count == 2)
-                    {
-                        positionUpdate = InterpolatePositionUpdates(positions[0], positions[1], (time - positions[0].time) / (positions[1].time - positions[0].time));
-                    }
-                    else if (positions.Count == 3)
-                    {
-                        if (time < positions[1].time)
-                        {
-                            positionUpdate = InterpolatePositionUpdates(positions[0], positions[1], (time - positions[0].time) / (positions[1].time - positions[0].time));
-                        }
-                        else
-                        {
-                            positionUpdate = InterpolatePositionUpdates(positions[1], positions[2], (time - positions[1].time) / (positions[2].time - positions[1].time));
-                        }
-                    }
-                    else if (positions.Count >= 4)
-                    {
-                        if (time < positions[1].time)
-                        {
-                            positionUpdate = InterpolatePositionUpdates(positions[0], positions[1], (time - positions[0].time) / (positions[1].time - positions[0].time));
-                        }
-                        else if (time > positions[positions.Count - 2].time)
-                        {
-                            positionUpdate = InterpolatePositionUpdates(positions[positions.Count - 2], positions[positions.Count - 1], (time - positions[positions.Count - 2].time) / (positions[positions.Count - 1].time - positions[positions.Count - 2].time));
-                        }
-                        else
-                        {
-                            int count = 1;
-                            while ((count < positions.Count - 1) && (time < positions[count + 1].time))
-                            {
-                            }
-
-                            positionUpdate = InterpolatePositionUpdates(positions[positions.Count - 2], positions[positions.Count - 1], (time - positions[positions.Count - 2].time) / (positions[positions.Count - 1].time - positions[positions.Count - 2].time));
-                        }
-                    }
-
+                    PositionUpdate positionUpdate = InterpolateUpdate(positions, time);
                     if (positionUpdate != null)
                     {
-                        return new MovingObjectPositionUpdate() { position = positionUpdate.position, orientation = positionUpdate.orientation, speed = positionUpdate.speed, time = positionUpdate.time };
+                        return new MovingObjectPositionUpdate(positionUpdate.position, positionUpdate.orientation, positionUpdate.speed, positionUpdate.time);
                     }
                 }
             }
@@ -234,6 +216,57 @@ namespace SpatioTemporalDatabase
             }
             
             return new string[0]; 
+        }
+
+
+        private PositionUpdate InterpolateUpdate(List<PositionUpdate> positions, float time)
+        {
+            if (positions.Count == 0)
+            {
+                return null;
+            }
+
+            PositionUpdate positionUpdate = new PositionUpdate() { time = time };
+
+            int indexA = -1;
+            int indexB = positions.Count;
+            while (indexA + 1 != indexB)
+            {
+                if (time >= positions[indexA + 1].time)
+                {
+                    indexA++;
+                }
+
+                if (time < positions[indexB - 1].time)
+                {
+                    indexB--;
+                }
+            }
+
+            // Time off range of segments
+            if (indexA < 0 || indexB > positions.Count - 1)
+            {
+                return null;
+            }
+            else  // In the segments
+            {
+                float t = (time - positions[indexA].time) / (positions[indexB].time - positions[indexA].time);
+                positionUpdate.orientation = Quaternion.Slerp(positions[indexA].orientation, positions[indexB].orientation, t);
+                positionUpdate.speed = Mathf.Lerp(positions[indexA].speed, positions[indexB].speed, t);
+
+                // Time first or last segment otherwise at least three segments
+                if (indexA == 0 || indexB == positions.Count - 1)
+                {
+                    positionUpdate.position = Vector3.Lerp(positions[indexA].position, positions[indexB].position, t);
+                }
+                else
+                {
+                    // Spline interpolate position
+                    positionUpdate.position = CatmullRomSpline.Interpolate(positions[indexA - 1].position, positions[indexA].position, positions[indexB].position, positions[indexB + 1].position, t);
+                }
+            }
+
+            return positionUpdate;
         }
 
     }

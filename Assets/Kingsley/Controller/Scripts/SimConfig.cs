@@ -9,8 +9,8 @@ namespace Controller
      */
     public enum SimType
     {
-        Local,
-        Remote
+        LocalRecord,
+        LocalPlayback
     }
 
     /**
@@ -18,7 +18,7 @@ namespace Controller
      */
     public class SimConfig : ScriptableObject
     {
-        public SimType simType = SimType.Local;
+        public SimType simType = SimType.LocalRecord;
     }
 
 }

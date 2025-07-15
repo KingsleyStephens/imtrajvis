@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using KSimulation;
 
 public class MoveableObject : MonoBehaviour
 {
@@ -16,6 +17,11 @@ public class MoveableObject : MonoBehaviour
         InitMoveable();
     }
 
+    private void OnDestroy()
+    {
+        SimulationRecorder.Instance.RemoveMovingObject(this);
+    }
+
     void Update()
     {
 
@@ -25,6 +31,8 @@ public class MoveableObject : MonoBehaviour
     {
         Position = position;
         Orientation = orientation;
+
+        SimulationRecorder.Instance.AddMovingObject(this);
     }
 
     protected virtual void InitMoveable() { }
