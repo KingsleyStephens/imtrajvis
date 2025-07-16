@@ -718,6 +718,7 @@ GameObject:
   m_Component:
   - component: {fileID: 586958422}
   - component: {fileID: 586958423}
+  - component: {fileID: 586958424}
   m_Layer: 0
   m_Name: ThreeD
   m_TagString: Untagged
@@ -756,10 +757,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b5d4966beaa45448aafb66ae3cc8926, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scene: UnderwaterVis
   fog: 1
   fogColour: {r: 1, g: 1, b: 1, a: 1}
   fogDensity: 0.001
   skyboxMaterial: {fileID: 0}
+--- !u!114 &586958424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586958421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ae1e479b0ee95c429748e335f57a7f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectPrefab: {fileID: 5326158167213279261, guid: 66b841103770e25488cc5e83bdd1a1fb,
+    type: 3}
 --- !u!1001 &983866591
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1069,6 +1085,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1534996712}
   - component: {fileID: 1534996713}
+  - component: {fileID: 1534996714}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
@@ -1098,12 +1115,25 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1534996711}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa7968208b36b77469216b31dd567618, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   simConfig: {fileID: 11400000, guid: 7ed363f8e8b16e44bb964399ad128d2a, type: 2}
+--- !u!114 &1534996714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1534996711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa7968208b36b77469216b31dd567618, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  simConfig: {fileID: 11400000, guid: 052df225f82efb942aea9d578bc17d0e, type: 2}
 --- !u!1 &1639813872
 GameObject:
   m_ObjectHideFlags: 0
@@ -1452,6 +1482,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b5d4966beaa45448aafb66ae3cc8926, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scene: 
   fog: 0
   fogColour: {r: 0, g: 0, b: 0, a: 1}
   fogDensity: 0.01

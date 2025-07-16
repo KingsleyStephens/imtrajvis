@@ -1,9 +1,9 @@
 using KSimulation;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static KSimulation.SimulationPlayer;
+using System.Collections;
 
-namespace Controller
+namespace KController
 {
 
     /**
@@ -59,7 +59,6 @@ namespace Controller
                     case SimType.LocalPlayback:
                         {
                             LoadScene((simConfig as LocalSim).scene);
-                            mSimPlayer = GameObject.FindAnyObjectByType<SimulationPlayer>();
                             break;
                         }
                     default:
@@ -79,7 +78,38 @@ namespace Controller
         {
             if (!string.IsNullOrEmpty(name))
             {
-                SceneManager.LoadScene(name, LoadSceneMode.Additive);
+                StartCoroutine(LoadSceneCoroutine(name));
+            }
+        }
+
+        public void LoadSceneAsync(string sceneName)
+        {
+            StartCoroutine(LoadSceneCoroutine(sceneName));
+        }
+
+        private IEnumerator LoadSceneCoroutine(string sceneName)
+        {
+            AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+
+            while (!asyncLoad.isDone)
+            {
+                yield return null;
+            }
+
+            // Post-load logic
+            mSimPlayer = GameObject.FindAnyObjectByType<SimulationPlayer>();
+            if (mSimPlayer != null)
+            {
+                mSimPlayer.Attach(CallOnSpawned, CallOnDestructed);
+                
+                while (!mSimPlayer.Loaded)
+                {
+                    yield return null;
+                }
+
+                yield return new WaitForSeconds(0.1f);
+
+                StartSim();
             }
         }
 
@@ -87,10 +117,31 @@ namespace Controller
         {
             onSpawned += onSpawn;
             onDestructed += onDestruct;
-
-            mSimPlayer.Attach((n) => onSpawned(n), (n) => onDestructed(n));
         }
 
+        public void StartSim()
+        {
+            if (mSimPlayer != null)
+            {
+                mSimPlayer.OnAttach();
+            }
+        }
+
+        public void Detach(OnSpawn onSpawn, OnDestruct onDestruct)
+        {
+            onSpawned -= onSpawn;
+            onDestructed -= onDestruct;
+        }
+
+        private void CallOnSpawned(string name)
+        {
+            onSpawned?.Invoke(name);
+        }
+
+        private void CallOnDestructed(string name)
+        {
+            onDestructed?.Invoke(name);
+        }
 
         public string[] ListSimObjects()
         {
@@ -107,7 +158,10 @@ namespace Controller
             if (mSimPlayer != null)
             {
                 SimulationPlayer.MovingObjectUpdate update = mSimPlayer.GetSimObjectUpdate(name);
-                return new MovingObjectUpdate(update.position, update.orientation, update.speed);
+                if (update != null)
+                { 
+                    return new MovingObjectUpdate(update.position, update.orientation, update.speed);
+                }
             }
 
             return null;

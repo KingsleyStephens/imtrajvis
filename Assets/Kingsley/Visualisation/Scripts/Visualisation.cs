@@ -1,8 +1,11 @@
-using Controller;
+using KController;
+using KVisualisation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.XR;
+using UnityEngine.UIElements;
 
 
 
@@ -40,34 +43,41 @@ namespace SATestbed
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            GameObject[] dimensions = new GameObject[] { oneD, twoD, twoPointFiveD, threeD };
-            for (int i = 0; i < dimensions.Length; i++) {
-                if (dimensions[i] != null) {
-                    dimensions[i].SetActive(i == (int)visualisationType);
-                }
-            }
-
             mController = GameObject.FindAnyObjectByType<VisSimController>();
             if (mController != null)
             {
-                mController.Attach(OnMovingObjectSpawn, OnMovingObjectDestruct);
+                GameObject[] dimensions = new GameObject[] { oneD, twoD, twoPointFiveD, threeD };
+                for (int i = 0; i < dimensions.Length; i++)
+                {
+                    if (dimensions[i] != null)
+                    {
+                        VisClient visClient = dimensions[i].GetComponent<VisClient>();
+                        if (visClient != null)
+                        {
+                            visClient.SetController(mController);
+                        }
+                    }
+                }
+            }
+
+            ActivateVisualisation(visualisationType);
+        }
+
+        public void ActivateVisualisation(VisualisationType visType)
+        {
+            GameObject[] dimensions = new GameObject[] { oneD, twoD, twoPointFiveD, threeD };
+            for (int i = 0; i < dimensions.Length; i++)
+            {
+                if (dimensions[i] != null)
+                {
+                    dimensions[i].SetActive(i == (int)visType);
+                }
             }
         }
 
         // Update is called once per frame
         void Update()
         {
-
-        }
-
-        private void OnMovingObjectSpawn(string name)
-        {
-
-        }
-
-        private void OnMovingObjectDestruct(string name)
-        {
-
         }
     }
 

@@ -58,6 +58,8 @@ namespace KSimulation
 
         public float SimTime { get { return mSimTime; } }
 
+        public bool Loaded { get; private set; }
+
         private void Awake()
         {
             instance = this;
@@ -68,6 +70,8 @@ namespace KSimulation
         {
             mSimulationDB = OpenDb();
             SetSimTime(startTime);
+
+            Loaded = true;
         }
 
         private void OnDestroy()
@@ -80,6 +84,10 @@ namespace KSimulation
             onSpawned += onSpawn;
             onDestroyed += onDestroy;
 
+        }
+
+        public void OnAttach()
+        {
             SetUp();
         }
 
@@ -88,10 +96,7 @@ namespace KSimulation
             string[] objs = ListSimObjects();
             foreach (string obj in objs)
             {
-                if (GetSimObjectUpdate(obj) != null)
-                {
-                    onSpawned(obj);
-                }
+                onSpawned(obj);
             }
         }
 
@@ -100,10 +105,7 @@ namespace KSimulation
             string[] objs = ListSimObjects();
             foreach (string obj in objs)
             {
-                if (GetSimObjectUpdate(obj) != null)
-                {
-                    onDestroyed(obj);
-                }
+                onDestroyed(obj);
             }
         }
 

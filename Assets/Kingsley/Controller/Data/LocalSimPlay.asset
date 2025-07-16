@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2cdea41148847dd47ab7437c32428d23, type: 3}
-  m_Name: LocalSim
+  m_Name: LocalSimPlay
   m_EditorClassIdentifier: 
-  simType: 0
-  scene: Simulation
+  simType: 1
+  scene: SimulationPlayer

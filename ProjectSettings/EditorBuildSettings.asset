@@ -17,6 +17,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Kingsley/Simulation/Scenes/LiveSimulationRecorder.unity
     guid: 63f8399bae20ef7449c1c9af22d9df0d
+  - enabled: 1
+    path: Assets/Kingsley/Simulation/Scenes/SimulationPlayer.unity
+    guid: 77dba4ca5a3db3a4aa25dda202c8c2b8
+  - enabled: 1
+    path: Assets/Kingsley/Visualisation/Scenes/UnderwaterVis.unity
+    guid: 9bfce5df7c86ac14dbc498c87f9c3d32
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 8048dfe8c561a3b45ae47b05087d258c,
       type: 3}
