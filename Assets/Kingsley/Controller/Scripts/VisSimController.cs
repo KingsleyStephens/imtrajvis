@@ -37,6 +37,8 @@ namespace KController
         public delegate void OnDestruct(string name);
         private event OnDestruct onDestructed;
 
+        public bool Loaded { get; private set; }
+
         void Start()
         {
             LoadSim();
@@ -82,11 +84,6 @@ namespace KController
             }
         }
 
-        public void LoadSceneAsync(string sceneName)
-        {
-            StartCoroutine(LoadSceneCoroutine(sceneName));
-        }
-
         private IEnumerator LoadSceneCoroutine(string sceneName)
         {
             AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
@@ -100,30 +97,31 @@ namespace KController
             mSimPlayer = GameObject.FindAnyObjectByType<SimulationPlayer>();
             if (mSimPlayer != null)
             {
-                mSimPlayer.Attach(CallOnSpawned, CallOnDestructed);
-                
+
                 while (!mSimPlayer.Loaded)
                 {
                     yield return null;
                 }
 
-                yield return new WaitForSeconds(0.1f);
-
-                StartSim();
+                mSimPlayer.Attach(CallOnSpawned, CallOnDestructed);
             }
+
+            Loaded = true;
         }
 
         public void Attach(OnSpawn onSpawn, OnDestruct onDestruct)
         {
             onSpawned += onSpawn;
             onDestructed += onDestruct;
+
+            mSimPlayer.CheckSpawned((n) => onSpawn(n));
         }
 
         public void StartSim()
         {
             if (mSimPlayer != null)
             {
-                mSimPlayer.OnAttach();
+                mSimPlayer.OnStart();
             }
         }
 

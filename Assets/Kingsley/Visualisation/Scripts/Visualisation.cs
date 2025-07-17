@@ -38,13 +38,14 @@ namespace SATestbed
         [SerializeField]
         private GameObject threeD;
 
-        VisSimController mController;
+        public VisSimController controller;
+
+        private bool mActive = false;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            mController = GameObject.FindAnyObjectByType<VisSimController>();
-            if (mController != null)
+            if (controller != null)
             {
                 GameObject[] dimensions = new GameObject[] { oneD, twoD, twoPointFiveD, threeD };
                 for (int i = 0; i < dimensions.Length; i++)
@@ -54,13 +55,12 @@ namespace SATestbed
                         VisClient visClient = dimensions[i].GetComponent<VisClient>();
                         if (visClient != null)
                         {
-                            visClient.SetController(mController);
+                            visClient.SetController(controller);
                         }
                     }
                 }
             }
 
-            ActivateVisualisation(visualisationType);
         }
 
         public void ActivateVisualisation(VisualisationType visType)
@@ -70,6 +70,7 @@ namespace SATestbed
             {
                 if (dimensions[i] != null)
                 {
+                    KCore.Logger.LogMessage(i.ToString());
                     dimensions[i].SetActive(i == (int)visType);
                 }
             }
@@ -78,6 +79,11 @@ namespace SATestbed
         // Update is called once per frame
         void Update()
         {
+            if (!mActive && controller != null && controller.Loaded)
+            {
+                ActivateVisualisation(visualisationType);
+                mActive = true;
+            }
         }
     }
 

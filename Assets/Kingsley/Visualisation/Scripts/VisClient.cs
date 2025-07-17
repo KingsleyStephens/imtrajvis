@@ -10,7 +10,10 @@ namespace KVisualisation
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-
+            if (mVisSimController != null)
+            {
+                mVisSimController.StartSim();
+            }
         }
 
         // Update is called once per frame
@@ -19,15 +22,18 @@ namespace KVisualisation
             OnUpdate();
         }
 
-
-        public void SetController(VisSimController visSimController)
+        private void OnEnable()
         {
-            mVisSimController = visSimController;
-
             if (mVisSimController != null)
             {
                 mVisSimController.Attach(OnMovingObjectSpawn, OnMovingObjectDestruct);
             }
+        }
+
+
+        public void SetController(VisSimController visSimController)
+        {
+            mVisSimController = visSimController;
         }
 
         public virtual void OnUpdate()

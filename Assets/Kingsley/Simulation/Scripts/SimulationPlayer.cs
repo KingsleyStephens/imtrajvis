@@ -86,7 +86,7 @@ namespace KSimulation
 
         }
 
-        public void OnAttach()
+        public void OnStart()
         {
             SetUp();
         }
@@ -109,6 +109,14 @@ namespace KSimulation
             }
         }
 
+        public void CheckSpawned(OnSpawnMovingObject onSpawn)
+        {
+            string[] objs = ListSimObjects();
+            foreach (string obj in objs)
+            {
+                onSpawn(obj);
+            }
+        }
 
         public void ScrubTime(float time)
         {

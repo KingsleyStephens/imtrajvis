@@ -14,14 +14,15 @@ public class WeaponSystem : MonoBehaviour
     {
         if (HasAmmo)
         {
-            GameObject torperdoGO = Instantiate(torpedoPrefab, transform.position, transform.rotation);
-            MoveableObject moveable = torperdoGO.GetComponent<MoveableObject>();
+            GameObject torpeodoGO = Instantiate(torpedoPrefab, transform.position, transform.rotation);
+            torpeodoGO.name = gameObject.name + "_torpeodo_" + numTorpedos.ToString();
+            MoveableObject moveable = torpeodoGO.GetComponent<MoveableObject>();
             if (moveable != null)
             {
                 moveable.InitMoveableObject(transform.position, transform.rotation);
             }
 
-            Target targetComp = torperdoGO.GetComponent<Target>();
+            Target targetComp = torpeodoGO.GetComponent<Target>();
             if (targetComp != null)
             {
                 targetComp.TargetGameObject = target;
@@ -29,13 +30,13 @@ public class WeaponSystem : MonoBehaviour
 
             if (!EventManager.Instance.Visible)
             {
-                MeshRenderer mr = torperdoGO.GetComponentInChildren<MeshRenderer>();
+                MeshRenderer mr = torpeodoGO.GetComponentInChildren<MeshRenderer>();
                 if (mr != null)
                 {
                     mr.enabled = false;
                 }
 
-                TrailRenderer tr = torperdoGO.GetComponent<TrailRenderer>();
+                TrailRenderer tr = torpeodoGO.GetComponent<TrailRenderer>();
                 if (tr != null)
                 {
                     tr.enabled = false;
