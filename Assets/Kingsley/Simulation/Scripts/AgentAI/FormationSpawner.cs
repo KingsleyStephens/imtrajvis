@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using static EventManager;
 
@@ -32,6 +31,7 @@ public class FormationSpawner : MonoBehaviour
     public GameObject Spawn()
     {
         GameObject formation = Instantiate(formationPrefab, transform.position, transform.rotation);
+        AgentId formationId = formation.GetComponent<AgentId>();
         formation.name = gameObject.name + "_formation";
         MoveableObject moveable = formation.GetComponent<MoveableObject>();
         if (moveable != null)
@@ -53,6 +53,12 @@ public class FormationSpawner : MonoBehaviour
                 else
                 {
                     agent = Instantiate(agentPrefab, formationComponent.GetFormationPos(i), transform.rotation);
+                }
+
+                AgentId id = agent.GetComponent<AgentId>();
+                if (id != null && formationId != null)
+                {
+                    id.parentId = formationId.id;
                 }
 
                 agent.name = gameObject.name + "_spawn_" + i.ToString();

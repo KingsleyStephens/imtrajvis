@@ -181,7 +181,7 @@ MonoBehaviour:
   dbName: simulation
   sessionName: session
   record: 1
-  recordingTimestep: 0.5
+  recordingTimestep: 0.25
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

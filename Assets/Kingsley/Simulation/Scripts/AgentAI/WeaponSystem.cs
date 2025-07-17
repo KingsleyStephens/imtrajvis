@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static EventManager;
 
 public class WeaponSystem : MonoBehaviour
 {
@@ -15,6 +16,16 @@ public class WeaponSystem : MonoBehaviour
         if (HasAmmo)
         {
             GameObject torpeodoGO = Instantiate(torpedoPrefab, transform.position, transform.rotation);
+
+            AgentId torpeodoGOAgentId = torpeodoGO.GetComponent<AgentId>();
+            if (torpeodoGOAgentId != null)
+            {
+                AgentId parentAgentId = gameObject.GetComponent<AgentId>();
+                if (parentAgentId != null)
+                {
+                    torpeodoGOAgentId.parentId = parentAgentId.id;
+                }
+            }
             torpeodoGO.name = gameObject.name + "_torpeodo_" + numTorpedos.ToString();
             MoveableObject moveable = torpeodoGO.GetComponent<MoveableObject>();
             if (moveable != null)

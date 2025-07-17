@@ -10,18 +10,30 @@ namespace KVisualisation
     {
         [SerializeField]
         private GameObject objectPrefab;
+        [SerializeField]
+        private GameObject weaponPrefab;
 
-        private Dictionary<string, GameObject> mMovingObjects = new Dictionary<string, GameObject>();
-        private List<string> mAllObjectNames = new List<string>();
+        [SerializeField]
+        private Color[] agentColours;
+
+        [SerializeField]
+        private Color weaponColour;
+
+        private Dictionary<int, GameObject> mMovingObjects = new Dictionary<int, GameObject>();
+        private List<int> mAllObjectIds = new List<int>();
+
+        private Dictionary<int, int> formationColours = new Dictionary<int, int>();
+        private int nextColour = 0;
+
 
         public override void OnUpdate()
         {
-            foreach (string name in mAllObjectNames)
+            foreach (int id in mAllObjectIds)
             {
-                var update = mVisSimController.GetSimObjectUpdate(name);
+                var update = mVisSimController.GetSimObjectUpdate(id);
 
                 GameObject obj;
-                if (mMovingObjects.TryGetValue(name, out obj))
+                if (mMovingObjects.TryGetValue(id, out obj))
                 {
                     if (update != null)
                     {
@@ -30,49 +42,106 @@ namespace KVisualisation
                     }
                     else
                     {
-                        Destruct(name);
+                        Destruct(id);
                     }
                 }
                 else if (update != null)
                 {
-                    Spawn(name, update);
+                    Spawn(id);
                 }
             }
         }
 
 
-        public override void OnMovingObjectSpawn(string name)
+        public override void OnMovingObjectSpawn(int id)
         {
-            mAllObjectNames.Add(name);
+            mAllObjectIds.Add(id);
 
-            var update = mVisSimController.GetSimObjectUpdate(name);
-            if (update != null)
+            Spawn(id);
+        }
+
+        public override void OnMovingObjectDestruct(int id)
+        {
+            Destruct(id);
+        }
+
+        private int GetNextAgentColour()
+        {
+            int colour = nextColour;
+            nextColour++;
+            nextColour %= agentColours.Length;
+            return colour;
+        }
+
+        private void Spawn(int id)
+        {
+            var data = mVisSimController.GetSimObjectData(id);
+            var update = mVisSimController.GetSimObjectUpdate(id);
+            if (data != null && update != null)
             {
-                Spawn(name, update);
+                VisAgentData.AgentClass agentClass = System.Enum.Parse<VisAgentData.AgentClass>(data.objectClass);
+                GameObject pf = (agentClass == VisAgentData.AgentClass.MovingObject) ? objectPrefab : weaponPrefab;
+
+                GameObject instance = Instantiate(pf, transform);
+                instance.name = data.name;
+                instance.transform.position = update.position;
+                instance.transform.rotation = update.orientation;
+                VisAgentData agentData = instance.GetComponent<VisAgentData>();
+                if (agentData != null)
+                {
+                    agentData.id = data.id;
+                    agentData.parentId = data.parentId;
+                    agentData.agentClass = agentClass;
+
+                    if (data.parentId != -1)
+                    {
+                        Color c = Color.white;
+                        if (agentClass == VisAgentData.AgentClass.MovingObject)
+                        {
+                            if (!formationColours.ContainsKey(data.parentId))
+                            {
+                                formationColours[data.parentId] = GetNextAgentColour();
+                            }
+
+                            c = agentColours[formationColours[data.parentId]];
+                        }
+                        else
+                        {
+                            c = weaponColour;
+                        }
+                        
+                        MeshRenderer meshRenderer = instance.GetComponent<MeshRenderer>();
+                        if (meshRenderer != null)
+                        {
+                            KCore.Logger.LogMessage("Set colour " + c.ToString());
+
+                            var m = meshRenderer.material;
+                            m.SetColor("_BaseColor", c);
+                            m.SetColor("_WireColor", c);
+                            meshRenderer.material = m;
+                        }
+
+                        TrailRenderer trailRenderer = instance.GetComponentInChildren<TrailRenderer>();
+                        if (trailRenderer != null)
+                        {
+                            var m = trailRenderer.material;
+                            m.SetColor("_BaseColor", c);
+                            trailRenderer.material = m;
+                        }
+                    }
+                }
+
+                mMovingObjects.Add(id, instance);
             }
         }
 
-        public override void OnMovingObjectDestruct(string name)
-        {
-            Destruct(name);
-        }
-
-        private void Spawn(string name, VisSimController.MovingObjectUpdate update)
-        {
-            var instance = Instantiate(objectPrefab, transform);
-            instance.name = name;
-            instance.transform.position = update.position;
-            instance.transform.rotation = update.orientation;
-            mMovingObjects.Add(name, instance);
-        }
-
-        private void Destruct(string name)
+        private void Destruct(int id)
         {
             GameObject obj;
-            if (mMovingObjects.TryGetValue(name, out obj))
+            if (mMovingObjects.TryGetValue(id, out obj))
             {
                 Destroy(obj);
-                mMovingObjects.Remove(name);
+                mMovingObjects.Remove(id);
             }
         }
     }

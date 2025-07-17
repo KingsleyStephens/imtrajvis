@@ -11,6 +11,22 @@ namespace KController
      */
     public class VisSimController : MonoBehaviour
     {
+        public class MovingObjectData
+        {
+            public MovingObjectData(int id, int parentId, string objectClass, string name)
+            {
+                this.id = id;
+                this.parentId = parentId;
+                this.objectClass = objectClass;
+                this.name = name;
+            }
+
+            public int id;
+            public int parentId;
+            public string objectClass;
+            public string name;
+        }
+
         public class MovingObjectUpdate
         {
             public MovingObjectUpdate(Vector3 position, Quaternion orientation, float speed)
@@ -31,10 +47,10 @@ namespace KController
 
         private SimulationPlayer mSimPlayer;
 
-        public delegate void OnSpawn(string name);
+        public delegate void OnSpawn(int id);
         private event OnSpawn onSpawned;
 
-        public delegate void OnDestruct(string name);
+        public delegate void OnDestruct(int id);
         private event OnDestruct onDestructed;
 
         public bool Loaded { get; private set; }
@@ -114,7 +130,7 @@ namespace KController
             onSpawned += onSpawn;
             onDestructed += onDestruct;
 
-            mSimPlayer.CheckSpawned((n) => onSpawn(n));
+            mSimPlayer.CheckSpawned((id) => onSpawn(id));
         }
 
         public void StartSim()
@@ -131,17 +147,17 @@ namespace KController
             onDestructed -= onDestruct;
         }
 
-        private void CallOnSpawned(string name)
+        private void CallOnSpawned(int id)
         {
-            onSpawned?.Invoke(name);
+            onSpawned?.Invoke(id);
         }
 
-        private void CallOnDestructed(string name)
+        private void CallOnDestructed(int id)
         {
-            onDestructed?.Invoke(name);
+            onDestructed?.Invoke(id);
         }
 
-        public string[] ListSimObjects()
+        public int[] ListSimObjects()
         {
             if (mSimPlayer != null)
             {
@@ -151,11 +167,25 @@ namespace KController
             return null;
         }
 
-        public MovingObjectUpdate GetSimObjectUpdate(string name)
+        public MovingObjectData GetSimObjectData(int id)
         {
             if (mSimPlayer != null)
             {
-                SimulationPlayer.MovingObjectUpdate update = mSimPlayer.GetSimObjectUpdate(name);
+                SimulationPlayer.MovingObjectData data = mSimPlayer.GetSimObjectData(id);
+                if (data != null)
+                {
+                    return new MovingObjectData(data.id, data.parentId, data.objectClass, data.name);
+                }
+            }
+
+            return null;
+        }
+
+        public MovingObjectUpdate GetSimObjectUpdate(int id)
+        {
+            if (mSimPlayer != null)
+            {
+                SimulationPlayer.MovingObjectUpdate update = mSimPlayer.GetSimObjectUpdate(id);
                 if (update != null)
                 { 
                     return new MovingObjectUpdate(update.position, update.orientation, update.speed);

@@ -41,12 +41,12 @@ namespace KVisualisation
 
         }
 
-        public virtual void OnMovingObjectSpawn(string name)
+        public virtual void OnMovingObjectSpawn(int id)
         {
 
         }
 
-        public virtual void OnMovingObjectDestruct(string name)
+        public virtual void OnMovingObjectDestruct(int id)
         {
 
         }

@@ -32,7 +32,10 @@ public class MoveableObject : MonoBehaviour
         Position = position;
         Orientation = orientation;
 
-        SimulationRecorder.Instance.AddMovingObject(this);
+        if (gameObject.GetComponent<Formation>() == null)
+        {
+            SimulationRecorder.Instance.AddMovingObject(this);
+        }
     }
 
     protected virtual void InitMoveable() { }

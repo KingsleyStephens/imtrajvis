@@ -3,7 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using UnityEngine;
+using static SpatioTemporalDatabase.JsonSpatioTemporalDB;
+using static SpatioTemporalDatabase.SpatioTemporalDB;
 
 namespace SpatioTemporalDatabase
 {
@@ -25,7 +28,10 @@ namespace SpatioTemporalDatabase
         [System.Serializable]
         private class MovingObject
         {
-            public string id;
+            public int id;
+            public int parentId;
+            public string objectClass;
+            public string name;
             public float trajectoryDelta;
             public List<PositionUpdate> trajectory = new List<PositionUpdate>();
         }
@@ -128,7 +134,7 @@ namespace SpatioTemporalDatabase
         /**
          * Perform an update operation on a table
          */
-        public override bool UpdateTable(string name, string movingObjectId, MovingObjectPositionUpdate positionUpdate) 
+        public override bool UpdateTable(string name, int movingObjectId, MovingObjectPositionUpdate positionUpdate) 
         {
             JsonTable table = mDB.tables.Find(t => t.name == name);
             if (table != null)
@@ -151,7 +157,7 @@ namespace SpatioTemporalDatabase
         /**
          * Perform an update operation on a table
          */
-        public override bool UpdateTable(string name, string movingObjectId, float trajectoryDelta)
+        public override bool UpdateTable(string name, int movingObjectId, float trajectoryDelta)
         {
             JsonTable table = mDB.tables.Find(t => t.name == name);
             if (table != null)
@@ -171,10 +177,48 @@ namespace SpatioTemporalDatabase
             return false;
         }
 
+        public override bool UpdateTable(string name, int movingObjectId, MovingObjectData movingObjectData)
+        {
+            JsonTable table = mDB.tables.Find(t => t.name == name);
+            if (table != null)
+            {
+                MovingObject movingObject = table.movingObjects.Find(t => t.id == movingObjectId);
+                if (movingObject == null)
+                {
+                    movingObject = new MovingObject();
+                    movingObject.id = movingObjectId;
+                    table.movingObjects.Add(movingObject);
+                }
+
+                movingObject.parentId = movingObjectData.parentId;
+                movingObject.objectClass = movingObjectData.objectClass;
+                movingObject.name = movingObjectData.name;
+                return true;
+            }
+
+            return false;
+        }
+
+        public override MovingObjectData ReadTable(string name, int movingObjectId)
+        {
+            JsonTable table = mDB.tables.Find(t => t.name == name);
+            if (table != null)
+            {
+                MovingObject movingObject = table.movingObjects.Find(t => t.id == movingObjectId);
+                if (movingObject != null)
+                {
+                    return new MovingObjectData(movingObject.id, movingObject.parentId, movingObject.objectClass, movingObject.name);
+                }
+            }
+
+            return null;
+        }
+
+
         /**
          * Read from a table
          */
-        public override MovingObjectPositionUpdate ReadTable(string name, string movingObjectId, float time)
+        public override MovingObjectPositionUpdate ReadTable(string name, int movingObjectId, float time)
         {
             JsonTable table = mDB.tables.Find(t => t.name == name);
             if (table != null)
@@ -207,7 +251,7 @@ namespace SpatioTemporalDatabase
         /**
          * List the contents of a table
          */
-        public override string[] ListTable(string name) 
+        public override int[] ListTable(string name) 
         {
             JsonTable table = mDB.tables.Find(t => t.name == name);
             if (table != null)
@@ -215,7 +259,7 @@ namespace SpatioTemporalDatabase
                 return table.movingObjects.Select(t => t.id).ToArray();
             }
             
-            return new string[0]; 
+            return new int[0]; 
         }
 
 

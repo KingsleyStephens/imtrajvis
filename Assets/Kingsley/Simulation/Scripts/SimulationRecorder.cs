@@ -74,8 +74,20 @@ namespace KSimulation
                 {
                     foreach (MoveableObject obj in mNewMoveableObjects)
                     {
-                        mSimulationDB.UpdateTable(sessionName, obj.name, recordingTimestep);
-                        mSimulationDB.UpdateTable(sessionName, obj.name, new SpatioTemporalDB.MovingObjectPositionUpdate(obj.Position, obj.Orientation, obj.Velocity.magnitude, simTime));
+                        int objectId = -1;
+                        int parentId = -1;
+                        string objectClass = "";
+                        AgentId agentId = obj.gameObject.GetComponent<AgentId>();
+                        if (agentId != null)
+                        {
+                            objectId = agentId.id;
+                            parentId = agentId.parentId;
+                            objectClass = agentId.agentClass.ToString();
+                        }
+
+                        mSimulationDB.UpdateTable(sessionName, objectId, recordingTimestep);
+                        mSimulationDB.UpdateTable(sessionName, objectId, new SpatioTemporalDB.MovingObjectData(objectId, parentId, objectClass, obj.name));
+                        mSimulationDB.UpdateTable(sessionName, objectId, new SpatioTemporalDB.MovingObjectPositionUpdate(obj.Position, obj.Orientation, obj.Velocity.magnitude, simTime));
                         mMoveableObjects.Add(obj);
                     }
                     mNewMoveableObjects.Clear();
@@ -109,7 +121,17 @@ namespace KSimulation
         {
             foreach (MoveableObject obj in mMoveableObjects)
             {
-                mSimulationDB.UpdateTable(sessionName, obj.name, new SpatioTemporalDB.MovingObjectPositionUpdate(obj.Position, obj.Orientation, obj.Velocity.magnitude, time));
+                if (obj.gameObject.activeSelf)
+                {
+                    int objectId = -1;
+                    AgentId agentId = obj.gameObject.GetComponent<AgentId>();
+                    if (agentId != null)
+                    {
+                        objectId = agentId.id;
+                    }
+
+                    mSimulationDB.UpdateTable(sessionName, objectId, new SpatioTemporalDB.MovingObjectPositionUpdate(obj.Position, obj.Orientation, obj.Velocity.magnitude, time));
+                }
             }
         }
 

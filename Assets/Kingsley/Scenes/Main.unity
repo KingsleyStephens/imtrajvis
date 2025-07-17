@@ -903,6 +903,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectPrefab: {fileID: 5326158167213279261, guid: 66b841103770e25488cc5e83bdd1a1fb,
     type: 3}
+  weaponPrefab: {fileID: 2716253600753631341, guid: 54ced649ac7f3644da8ab28df989793f,
+    type: 3}
+  agentColours:
+  - {r: 0, g: 0.10007739, b: 1, a: 1}
+  - {r: 1, g: 1, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0.23313022, a: 1}
+  - {r: 1, g: 0, b: 0.93442965, a: 1}
+  - {r: 0, g: 1, b: 0.990005, a: 1}
+  - {r: 1, g: 0.5423229, b: 0, a: 1}
+  weaponColour: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1001 &983866591
 PrefabInstance:
   m_ObjectHideFlags: 0

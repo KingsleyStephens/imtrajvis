@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: -2471228720051699502}
   - component: {fileID: -7868186860116121528}
   - component: {fileID: -1571577591450473392}
+  - component: {fileID: -5245223106501071202}
   m_Layer: 0
   m_Name: FormationOfFormations
   m_TagString: Untagged
@@ -147,10 +148,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8035586876053882713}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -306,3 +307,17 @@ MonoBehaviour:
   energy: 0
   mass: 0
   power: 0
+--- !u!114 &-5245223106501071202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8035586876053882713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c234f74bdfa34ab4e894f9dfdf52ddea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentClass: 0
+  id: -1

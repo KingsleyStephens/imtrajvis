@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: -2471228720051699502}
   - component: {fileID: -7868186860116121528}
   - component: {fileID: -7810294954235585161}
+  - component: {fileID: 3576423114886706168}
   m_Layer: 0
   m_Name: SubFormation
   m_TagString: Untagged
@@ -52,6 +53,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78f20a23714c2104484ea72d546a4bd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  leaveWaypoints: 0
+  waypointTiming: 5
 --- !u!114 &7591176276839116672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98,6 +101,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Weight: 2
   collisionTestDistance: 50
+  numWhiskers: 3
+  whiskerAngle: 30
 --- !u!135 &4823574722440803198
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -126,10 +131,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8035586876053882713}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -164,6 +169,9 @@ TrailRenderer:
   m_ReflectionProbeUsage: 0
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -266,6 +274,7 @@ MonoBehaviour:
   targetRadius: 0.5
   slowRadius: 5
   timeToTarget: 1
+  mFormation: {fileID: 0}
 --- !u!114 &-7810294954235585161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,4 +289,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Position: {x: 0, y: 0, z: 0}
   Orientation: {x: 0, y: 0, z: 0}
+  TargetGameObject: {fileID: 0}
   debugScale: 1
+--- !u!114 &3576423114886706168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8035586876053882713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c234f74bdfa34ab4e894f9dfdf52ddea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentClass: 0
+  id: -1

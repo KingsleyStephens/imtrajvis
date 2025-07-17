@@ -8,6 +8,22 @@ namespace SpatioTemporalDatabase
      */
     public abstract class SpatioTemporalDB
     {
+        public class MovingObjectData
+        {
+            public MovingObjectData(int id, int parentId, string objectClass, string name)
+            {
+                this.id = id;
+                this.parentId = parentId;
+                this.objectClass = objectClass;
+                this.name = name;
+            }
+
+            public int id;
+            public int parentId;
+            public string objectClass;
+            public string name;
+        }
+
         public class MovingObjectPositionUpdate
         {
             public MovingObjectPositionUpdate(Vector3 position, Quaternion orientation, float speed, float time)
@@ -49,13 +65,15 @@ namespace SpatioTemporalDatabase
         /**
          * Perform an update operation on a table
          */
-        public abstract bool UpdateTable(string name, string movingObjectId, MovingObjectPositionUpdate positionUpdate);
-        public abstract bool UpdateTable(string name, string movingObjectId, float trajectoryDelta);
+        public abstract bool UpdateTable(string name, int movingObjectId, MovingObjectPositionUpdate positionUpdate);
+        public abstract bool UpdateTable(string name, int movingObjectId, float trajectoryDelta);
+        public abstract bool UpdateTable(string name, int movingObjectId, MovingObjectData movingObjectData);
 
         /**
          * Read from a table
          */
-        public abstract MovingObjectPositionUpdate ReadTable(string name, string movingObjectId, float time);
+        public abstract MovingObjectData ReadTable(string name, int movingObjectId);
+        public abstract MovingObjectPositionUpdate ReadTable(string name, int movingObjectId, float time);
 
         /**
          * List all the tables
@@ -65,7 +83,7 @@ namespace SpatioTemporalDatabase
         /**
          * List the contents of a table
          */
-        public abstract string[] ListTable(string name);
+        public abstract int[] ListTable(string name);
 
     }
 

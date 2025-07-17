@@ -11,6 +11,22 @@ namespace KSimulation
      */
     public class SimulationPlayer : MonoBehaviour
     {
+        public class MovingObjectData
+        {
+            public MovingObjectData(int id, int parentId, string objectClass, string name)
+            {
+                this.id = id;
+                this.parentId = parentId;
+                this.objectClass = objectClass;
+                this.name = name;
+            }
+
+            public int id;
+            public int parentId;
+            public string objectClass;
+            public string name;
+        }
+
         public class MovingObjectUpdate
         {
             public MovingObjectUpdate(Vector3 position, Quaternion orientation, float speed)
@@ -25,10 +41,10 @@ namespace KSimulation
             public float speed;
         }
 
-        public delegate void OnSpawnMovingObject(string name);
+        public delegate void OnSpawnMovingObject(int id);
         private event OnSpawnMovingObject onSpawned;
 
-        public delegate void OnDestroyMovingObject(string name);
+        public delegate void OnDestroyMovingObject(int id);
         private event OnDestroyMovingObject onDestroyed;
 
         [SerializeField]
@@ -93,8 +109,8 @@ namespace KSimulation
 
         private void SetUp()
         {
-            string[] objs = ListSimObjects();
-            foreach (string obj in objs)
+            int[] objs = ListSimObjects();
+            foreach (int obj in objs)
             {
                 onSpawned(obj);
             }
@@ -102,8 +118,8 @@ namespace KSimulation
 
         private void TearDown()
         {
-            string[] objs = ListSimObjects();
-            foreach (string obj in objs)
+            int[] objs = ListSimObjects();
+            foreach (int obj in objs)
             {
                 onDestroyed(obj);
             }
@@ -111,8 +127,8 @@ namespace KSimulation
 
         public void CheckSpawned(OnSpawnMovingObject onSpawn)
         {
-            string[] objs = ListSimObjects();
-            foreach (string obj in objs)
+            int[] objs = ListSimObjects();
+            foreach (int obj in objs)
             {
                 onSpawn(obj);
             }
@@ -133,14 +149,25 @@ namespace KSimulation
             mStartTimeReference = Time.time;
         }
 
-        public string[] ListSimObjects()
+        public int[] ListSimObjects()
         {
             return mSimulationDB.ListTable(sessionName);
         }
 
-        public MovingObjectUpdate GetSimObjectUpdate(string name)
+        public MovingObjectData GetSimObjectData(int id)
         {
-            SpatioTemporalDB.MovingObjectPositionUpdate update = mSimulationDB.ReadTable(sessionName, name, mSimTime);
+            SpatioTemporalDB.MovingObjectData data = mSimulationDB.ReadTable(sessionName, id);
+            if (data != null)
+            {
+                return new MovingObjectData(data.id, data.parentId, data.objectClass, data.name);
+            }
+
+            return null;
+        }
+
+        public MovingObjectUpdate GetSimObjectUpdate(int id)
+        {
+            SpatioTemporalDB.MovingObjectPositionUpdate update = mSimulationDB.ReadTable(sessionName, id, mSimTime);
             if (update != null)
             {
                 return new MovingObjectUpdate(update.position, update.orientation, update.speed);
