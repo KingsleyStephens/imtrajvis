@@ -3,6 +3,7 @@ Shader "Kingsley/AdditiveBlend"
     Properties
     {
         [MainColor] _BaseColor("Base Color", Color) = (1, 1, 1, 1)
+        _Alpha("Alpha", RANGE(0, 1)) = 1.0
         _FogFactor("Fog Factor", RANGE(0, 1)) = 0.01
 		_WireThickness ("Wire Thickness", RANGE(0, 800)) = 100
 		_WireSmoothness ("Wire Smoothness", RANGE(0, 20)) = 3
@@ -71,6 +72,7 @@ Shader "Kingsley/AdditiveBlend"
             float4 _WireColor = float4(0.0, 1.0, 0.0, 1.0);
             float4 _BaseColor = float4(0.0, 0.0, 0.0, 0.0);
             float _MaxTriSize = 25.0;
+            float _Alpha = 1.0;
 
             [maxvertexcount(3)]
             void geom(triangle v2g i[3], inout TriangleStream<g2f> triangleStream)
@@ -140,7 +142,7 @@ Shader "Kingsley/AdditiveBlend"
                 float t = exp2(_WireSmoothness * -1.0 * minDistanceToEdge * minDistanceToEdge);
                 half4 finalColor = lerp(_BaseColor, _WireColor, t);
                 finalColor.rgb = MixFog(finalColor.rgb, i.fogCoord);
-                return finalColor;
+                return finalColor * _Alpha;
             }
             ENDHLSL
         }

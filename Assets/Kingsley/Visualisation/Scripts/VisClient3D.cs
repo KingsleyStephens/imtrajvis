@@ -11,6 +11,12 @@ namespace KVisualisation
         [SerializeField]
         private GameObject objectPrefab;
         [SerializeField]
+        private GameObject meshPrefab;
+        [SerializeField]
+        private GameObject ghostPrefab;
+        [SerializeField]
+        private GameObject trailPrefab;
+        [SerializeField]
         private GameObject weaponPrefab;
 
         [SerializeField]
@@ -19,15 +25,45 @@ namespace KVisualisation
         [SerializeField]
         private Color weaponColour;
 
+        [SerializeField]
+        private GameObject densityMap;
+
+        private DensityMap3D densityMap3D;
+
         private Dictionary<int, GameObject> mMovingObjects = new Dictionary<int, GameObject>();
         private List<int> mAllObjectIds = new List<int>();
 
         private Dictionary<int, int> formationColours = new Dictionary<int, int>();
         private int nextColour = 0;
 
+        private float mLastDensityUpdateTime = 0.0f;
+
+        public override void OnStart()
+        {
+            if (movingObjectSettings.density)
+            {
+                if (densityMap != null)
+                {
+                    densityMap.SetActive(true);
+                    densityMap3D = densityMap.GetComponent<DensityMap3D>();
+                    densityMap3D.duration = movingObjectSettings.trailTime;
+                }
+            }
+        }
+
 
         public override void OnUpdate()
         {
+            bool updateDensity = false;
+            if (movingObjectSettings.density && densityMap3D != null)
+            {
+                if (Time.time > mLastDensityUpdateTime + movingObjectSettings.densityUpdateFrequence)
+                {
+                    updateDensity = true;
+                    mLastDensityUpdateTime = Time.time;
+                }
+            }
+
             foreach (int id in mAllObjectIds)
             {
                 var update = mVisSimController.GetSimObjectUpdate(id);
@@ -39,6 +75,11 @@ namespace KVisualisation
                     {
                         obj.transform.position = update.position;
                         obj.transform.rotation = update.orientation;
+
+                        if (updateDensity)
+                        {
+                            densityMap3D.UpdatePosition(obj.transform.position);
+                        }
                     }
                     else
                     {
@@ -79,55 +120,80 @@ namespace KVisualisation
             var update = mVisSimController.GetSimObjectUpdate(id);
             if (data != null && update != null)
             {
-                VisAgentData.AgentClass agentClass = System.Enum.Parse<VisAgentData.AgentClass>(data.objectClass);
-                GameObject pf = (agentClass == VisAgentData.AgentClass.MovingObject) ? objectPrefab : weaponPrefab;
-
-                GameObject instance = Instantiate(pf, transform);
+                GameObject instance = Instantiate(objectPrefab, transform);
                 instance.name = data.name;
                 instance.transform.position = update.position;
                 instance.transform.rotation = update.orientation;
                 VisAgentData agentData = instance.GetComponent<VisAgentData>();
                 if (agentData != null)
                 {
+                    VisAgentData.AgentClass agentClass = System.Enum.Parse<VisAgentData.AgentClass>(data.objectClass);
+
                     agentData.id = data.id;
                     agentData.parentId = data.parentId;
                     agentData.agentClass = agentClass;
 
-                    if (data.parentId != -1)
+                    if (agentClass == VisAgentData.AgentClass.MovingObject)
                     {
                         Color c = Color.white;
-                        if (agentClass == VisAgentData.AgentClass.MovingObject)
+                        if (data.parentId != -1)
                         {
-                            if (!formationColours.ContainsKey(data.parentId))
+                            if (agentClass == VisAgentData.AgentClass.MovingObject)
                             {
-                                formationColours[data.parentId] = GetNextAgentColour();
-                            }
+                                if (!formationColours.ContainsKey(data.parentId))
+                                {
+                                    formationColours[data.parentId] = GetNextAgentColour();
+                                }
 
-                            c = agentColours[formationColours[data.parentId]];
+                                c = agentColours[formationColours[data.parentId]];
+                            }
+                            else
+                            {
+                                c = weaponColour;
+                            }
                         }
-                        else
+
+                        if (movingObjectSettings.mesh)
                         {
-                            c = weaponColour;
+                            GameObject meshObject = Instantiate(meshPrefab, instance.transform);
+                            MeshRenderer meshRenderer = meshObject.GetComponent<MeshRenderer>();
+                            if (meshRenderer != null)
+                            {
+                                var m = meshRenderer.material;
+                                m.SetColor("_BaseColor", c);
+                                m.SetColor("_WireColor", c);
+                                meshRenderer.material = m;
+                            }
+                        }
+
+                        if (movingObjectSettings.trail)
+                        {
+                            GameObject trailObject = Instantiate(trailPrefab, instance.transform);
+
+                            TrailRenderer trailRenderer = trailObject.GetComponent<TrailRenderer>();
+                            if (trailRenderer != null)
+                            {
+                                trailRenderer.time = movingObjectSettings.trailTime;
+
+                                var m = trailRenderer.material;
+                                m.SetColor("_BaseColor", c);
+                                trailRenderer.material = m;
+                            }
                         }
                         
-                        MeshRenderer meshRenderer = instance.GetComponent<MeshRenderer>();
-                        if (meshRenderer != null)
+                        if (movingObjectSettings.ghosting)
                         {
-                            KCore.Logger.LogMessage("Set colour " + c.ToString());
-
-                            var m = meshRenderer.material;
-                            m.SetColor("_BaseColor", c);
-                            m.SetColor("_WireColor", c);
-                            meshRenderer.material = m;
+                            GhostSpawner ghostSpawner = instance.AddComponent<GhostSpawner>();
+                            ghostSpawner.ghostPrefab = ghostPrefab;
+                            ghostSpawner.ghostingDropType = movingObjectSettings.ghostingDrop;
+                            ghostSpawner.ghostingValue = movingObjectSettings.ghostingDropValue;
+                            ghostSpawner.colour = movingObjectSettings.overrideGhostColour ? movingObjectSettings.ghostColour : c;
+                            ghostSpawner.duration = movingObjectSettings.trailTime;
                         }
-
-                        TrailRenderer trailRenderer = instance.GetComponentInChildren<TrailRenderer>();
-                        if (trailRenderer != null)
-                        {
-                            var m = trailRenderer.material;
-                            m.SetColor("_BaseColor", c);
-                            trailRenderer.material = m;
-                        }
+                    }
+                    else if (agentClass == VisAgentData.AgentClass.Weapon)
+                    {
+                        Instantiate(weaponPrefab, instance.transform);
                     }
                 }
 
@@ -140,6 +206,19 @@ namespace KVisualisation
             GameObject obj;
             if (mMovingObjects.TryGetValue(id, out obj))
             {
+                VisAgentData agentData = obj.GetComponent<VisAgentData>();
+                if (agentData != null)
+                {
+                    if (agentData.agentClass == VisAgentData.AgentClass.MovingObject && movingObjectSettings.trail)
+                    {
+                        TrailRenderer tr = obj.GetComponentInChildren<TrailRenderer>();
+                        if (tr != null)
+                        {
+                            tr.transform.SetParent(obj.transform.parent, true);
+                        }
+                    }
+                }
+
                 Destroy(obj);
                 mMovingObjects.Remove(id);
             }

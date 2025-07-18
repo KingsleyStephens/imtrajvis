@@ -10,9 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6206443643158831250}
   - component: {fileID: 901043458855935064}
-  - component: {fileID: -6455583229206176977}
   m_Layer: 0
-  m_Name: Torpedo
+  m_Name: TorpedoMeshAndTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -141,21 +140,6 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
---- !u!114 &-6455583229206176977
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2716253600753631341}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c234f74bdfa34ab4e894f9dfdf52ddea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agentClass: 2
-  id: -1
-  parentId: -1
 --- !u!1 &8551363881916710802
 GameObject:
   m_ObjectHideFlags: 0
