@@ -20,6 +20,7 @@ Shader "Kingsley/AdditiveBlend"
         {
             HLSLPROGRAM
             #pragma target 4.5
+            #pragma require geometry
 
             // https://github.com/Chaser324/unity-wireframe/blob/master/Assets/Wireframe/Shaders/Wireframe.cginc
 
@@ -28,6 +29,8 @@ Shader "Kingsley/AdditiveBlend"
             #pragma fragment frag
             // make fog work
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+            #pragma instancing_options renderinglayer
 
             // The Core.hlsl file contains definitions of frequently used HLSL
             // macros and functions, and also contains #include references to other
@@ -37,12 +40,15 @@ Shader "Kingsley/AdditiveBlend"
             struct appdata
             {
                 float4 vertex : POSITION;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2g
             {
                 float4 projectionSpaceVertex : SV_POSITION;
                 float4 worldSpacePosition : TEXCOORD1;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                UNITY_VERTEX_OUTPUT_STEREO
             };
 
             struct g2f
@@ -52,11 +58,17 @@ Shader "Kingsley/AdditiveBlend"
                 float4 dist : TEXCOORD1;
                 float4 area : TEXCOORD2;
                 half  fogCoord : TEXCOORD3;
+                UNITY_VERTEX_OUTPUT_STEREO
             };
 
             v2g vert (appdata v)
             {
                 v2g o;
+
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+                UNITY_TRANSFER_INSTANCE_ID(v, o);
+
                 o.projectionSpaceVertex = TransformObjectToHClip(v.vertex.xyz);
                 o.worldSpacePosition = float4(TransformObjectToWorld(v.vertex), 1.0);
                 return o;
@@ -66,6 +78,7 @@ Shader "Kingsley/AdditiveBlend"
                 half4 _WireBaseColor;
             CBUFFER_END
             half _FogFactor;
+
 
             float _WireThickness = 100;
             float _WireSmoothness = 3;
@@ -108,6 +121,7 @@ Shader "Kingsley/AdditiveBlend"
                 o.dist.xyz = float3( (area / length(edge0)), 0.0, 0.0) * o.projectionSpaceVertex.w * wireThickness;
                 o.dist.w = 1.0 / o.projectionSpaceVertex.w;
                 o.fogCoord = InitializeInputDataFog(float4(o.worldSpacePosition.xyz, 1.0), _FogFactor);
+                UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(i[0], o);
                 triangleStream.Append(o);
 
                 o.worldSpacePosition = i[1].worldSpacePosition;
@@ -115,6 +129,7 @@ Shader "Kingsley/AdditiveBlend"
                 o.dist.xyz = float3(0.0, (area / length(edge1)), 0.0) * o.projectionSpaceVertex.w * wireThickness;
                 o.dist.w = 1.0 / o.projectionSpaceVertex.w;
                 o.fogCoord = InitializeInputDataFog(float4(o.worldSpacePosition.xyz, 1.0), _FogFactor);
+                UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(i[1], o);
                 triangleStream.Append(o);
 
                 o.worldSpacePosition = i[2].worldSpacePosition;
@@ -122,11 +137,14 @@ Shader "Kingsley/AdditiveBlend"
                 o.dist.xyz = float3(0.0, 0.0, (area / length(edge2))) * o.projectionSpaceVertex.w * wireThickness;
                 o.dist.w = 1.0 / o.projectionSpaceVertex.w;
                 o.fogCoord = InitializeInputDataFog(float4(o.worldSpacePosition.xyz, 1.0), _FogFactor);
+                UNITY_TRANSFER_VERTEX_OUTPUT_STEREO(i[2], o);
                 triangleStream.Append(o);
             }
 
             half4 frag (g2f i) : SV_Target
             {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
                 float minDistanceToEdge = min(i.dist[0], min(i.dist[1], i.dist[2])) * i.dist[3];
 
                 // Early out if we know we are not on a line segment.

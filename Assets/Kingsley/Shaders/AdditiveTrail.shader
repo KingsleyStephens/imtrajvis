@@ -21,6 +21,8 @@ Shader "Kingsley/AdditiveTrail"
             #pragma fragment frag
             // make fog work
             #pragma multi_compile_fog
+            #pragma multi_compile_instancing
+            #pragma instancing_options renderinglayer
 
             // The Core.hlsl file contains definitions of frequently used HLSL
             // macros and functions, and also contains #include references to other
@@ -30,12 +32,15 @@ Shader "Kingsley/AdditiveTrail"
             struct appdata
             {
                 float4 vertex : POSITION;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f
             {
                 float4 projectionSpaceVertex : SV_POSITION;
                 half  fogCoord : TEXCOORD2;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                UNITY_VERTEX_OUTPUT_STEREO
             };
             
             half _FogFactor;
@@ -44,6 +49,10 @@ Shader "Kingsley/AdditiveTrail"
             v2f vert (appdata v)
             {
                 v2f o;
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+                UNITY_TRANSFER_INSTANCE_ID(v, o);
+
                 o.projectionSpaceVertex = TransformObjectToHClip(v.vertex.xyz);
                 float4 worldSpacePosition = float4(TransformObjectToWorld(v.vertex), 1.0);
                 o.fogCoord = InitializeInputDataFog(worldSpacePosition, _FogFactor);
@@ -54,6 +63,8 @@ Shader "Kingsley/AdditiveTrail"
 
             half4 frag (v2f i) : SV_Target
             {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
+
                 half4 finalColor = _BaseColor;
                 finalColor.rgb = MixFog(finalColor.rgb, i.fogCoord);
                 return finalColor;
