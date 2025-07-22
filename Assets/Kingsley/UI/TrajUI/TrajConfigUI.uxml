@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; background-color: rgb(255, 255, 255);">
+        <ui:Label text="Trajectory Configuration" style="-unity-font-style: bold; font-size: 20px; -unity-text-align: upper-center;" />
+        <ui:Toggle label="Mesh" data-source-path="mesh" name="meshToggle" style="align-items: center; justify-content: space-between; flex-direction: row;" />
+        <ui:Toggle label="Trail" data-source-path="trail" name="trailToggle" />
+        <ui:Toggle label="Ghosting" data-source-path="ghosting" name="ghostingToggle" />
+        <ui:Toggle label="Density" data-source-path="density" name="densityToggle" />
+        <ui:Button text="Apply" name="applyButton" />
+    </ui:VisualElement>
+</ui:UXML>

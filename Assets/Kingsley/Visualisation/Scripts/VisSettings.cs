@@ -9,11 +9,13 @@ namespace SATestbed
 
     public class VisSettings : MonoBehaviour
     {
-        public string scene = "";
+        public GameObject scenePrefab;
         public bool fog = true;
         public Color fogColour = Color.black;
         public float fogDensity = 0.01f;
         public Material skyboxMaterial = null;
+
+        private GameObject instance;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -30,17 +32,18 @@ namespace SATestbed
 
         private void OnEnable()
         {
-            if (!string.IsNullOrEmpty(scene))
+            if (scenePrefab != null)
             {
-                SceneManager.LoadScene(scene, LoadSceneMode.Additive);
+                instance = Instantiate(scenePrefab, transform);
             }
         }
 
         private void OnDisable()
         {
-            if (!string.IsNullOrEmpty(scene))
+            if (instance != null)
             {
-                SceneManager.UnloadSceneAsync(scene);
+                Destroy(instance);
+                instance = null;
             }
         }
 

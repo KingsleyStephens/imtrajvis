@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="VisualElement" style="flex-grow: 1; background-color: rgb(255, 255, 255); width: 450px; height: 200px; align-self: center; position: relative; max-height: 200px; min-height: 200px; justify-content: flex-start; align-content: center; top: auto; left: auto; right: auto; transform-origin: center; translate: 0 50%;">
+        <ui:Label text="Launch Trajectory Visualisation" style="-unity-font-style: bold; font-size: 20px; -unity-text-align: upper-center;" />
+        <ui:DropdownField label="Client Count" name="clientCountDropdown" choices="1,2,3,4" index="0" style="top: auto;" />
+        <ui:Button text="Launch&#10;" name="launchButton" style="top: auto;" />
+    </ui:VisualElement>
+</ui:UXML>

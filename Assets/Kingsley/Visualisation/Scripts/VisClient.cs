@@ -22,13 +22,14 @@ namespace KVisualisation
             public float trailTime = 30.0f;
             public float densityUpdateFrequence = 2.0f;
 
-            public GhostingDrop ghostingDrop = GhostingDrop.Time;
-            public float ghostingDropValue = 1.0f;
+            public GhostingDrop ghostingDrop = GhostingDrop.Distance;
+            public float ghostingDropValue = 20.0f;
             public bool overrideGhostColour = false;
             public Color ghostColour = Color.white;
         }
 
-        public MovingObjectSettings movingObjectSettings = new MovingObjectSettings();
+        [SerializeField]
+        protected MovingObjectSettings movingObjectSettings = new MovingObjectSettings();
 
 
         protected VisSimController mVisSimController;
@@ -46,6 +47,12 @@ namespace KVisualisation
 
         public virtual void OnStart()
         { 
+        }
+
+        public void ApplySettings(MovingObjectSettings settings)
+        {
+            movingObjectSettings = settings;
+            OnSettingsUpdate();
         }
 
         // Update is called once per frame
@@ -66,6 +73,11 @@ namespace KVisualisation
         public void SetController(VisSimController visSimController)
         {
             mVisSimController = visSimController;
+        }
+
+        public virtual void OnSettingsUpdate()
+        {
+
         }
 
         public virtual void OnUpdate()

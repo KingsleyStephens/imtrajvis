@@ -29,11 +29,10 @@ namespace KVisualisation
             {
                 Material mat = meshRenderer.material;
 
-                float a = mat.color.a;
-
                 Color c = GetColour(density / maxDensity);
-                c.a = a;
-                mat.color = c;
+                c.a = 0.1f;
+
+                mat.SetColor("_BaseColor", c);
 
                 meshRenderer.material = mat;
             }

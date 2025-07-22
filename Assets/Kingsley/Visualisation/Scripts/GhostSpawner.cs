@@ -9,6 +9,8 @@ namespace KVisualisation
         public GameObject ghostPrefab;
         public Color colour = Color.white;
 
+        public Transform ghostParent;
+
         public VisClient.MovingObjectSettings.GhostingDrop ghostingDropType = VisClient.MovingObjectSettings.GhostingDrop.Distance;
         public float ghostingValue = 1.0f;
         public float duration = 30.0f;
@@ -46,8 +48,9 @@ namespace KVisualisation
 
         private void Spawn()
         {
-            GameObject ghostObj = Instantiate(ghostPrefab, transform);
-            ghostObj.transform.SetParent(transform.parent, true);
+            GameObject ghostObj = Instantiate(ghostPrefab, ghostParent);
+            ghostObj.transform.position = transform.position;
+            ghostObj.transform.rotation  = transform.rotation;
 
             DestructTimer destruct = ghostObj.AddComponent<DestructTimer>();
             destruct.duration = duration;

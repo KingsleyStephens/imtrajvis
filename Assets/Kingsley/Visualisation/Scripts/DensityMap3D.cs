@@ -68,7 +68,7 @@ namespace KVisualisation
 
             if (!cubes[x][y].ContainsKey(z))
             {
-                GameObject cube = Instantiate(cubePrefab, transform);
+                GameObject cube = Instantiate(cubePrefab, transform, true);
                 DensityCube densityCube = cube.GetComponent<DensityCube>();
                 if (densityCube != null)
                 {

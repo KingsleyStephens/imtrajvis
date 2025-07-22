@@ -85,6 +85,22 @@ namespace SATestbed
                 mActive = true;
             }
         }
+
+        public void ApplyConfig(VisClient.MovingObjectSettings settings)
+        {
+            GameObject[] dimensions = new GameObject[] { oneD, twoD, twoPointFiveD, threeD };
+            for (int i = 0; i < dimensions.Length; i++)
+            {
+                if (dimensions[i] != null && dimensions[i].activeSelf)
+                {
+                    VisClient visClient = dimensions[i].GetComponent<VisClient>();
+                    if (visClient != null)
+                    {
+                        visClient.ApplySettings(settings);
+                    }
+                }
+            }
+        }
     }
 
 }
