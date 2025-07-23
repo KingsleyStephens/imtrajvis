@@ -35,23 +35,23 @@ namespace KVisualisation
 
             int x = -1, y = -1, z = -1;
 
-            if (position.x > transform.position.x - halfWidth && position.x < transform.position.x + halfWidth)
+            if (position.x > transform.localPosition.x - halfWidth && position.x < transform.localPosition.x + halfWidth)
             {
-                float xRelative = position.x - (transform.position.x - halfWidth);
+                float xRelative = position.x - (transform.localPosition.x - halfWidth);
 
                 x = (int)(xRelative / cubeSize);
             }
 
-            if (position.y > transform.position.y - halfWidth && position.y < transform.position.y + halfWidth)
+            if (position.y > transform.localPosition.y - halfWidth && position.y < transform.localPosition.y + halfWidth)
             {
-                float yRelative = position.y - (transform.position.y - halfWidth);
+                float yRelative = position.y - (transform.localPosition.y - halfWidth);
 
                 y = (int)(yRelative / cubeSize);
             }
 
-            if (position.z > transform.position.z - halfWidth && position.z < transform.position.z + halfWidth)
+            if (position.z > transform.localPosition.z - halfWidth && position.z < transform.localPosition.z + halfWidth)
             {
-                float zRelative = position.z - (transform.position.z - halfWidth);
+                float zRelative = position.z - (transform.localPosition.z - halfWidth);
 
                 z = (int)(zRelative / cubeSize);
             }

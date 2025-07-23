@@ -50,6 +50,7 @@ namespace KVisualisation
             mGhostParent = ghostParent.transform;
             mGhostParent.localPosition = Vector3.zero;
             mGhostParent.localRotation = Quaternion.identity;
+            mGhostParent.localScale = Vector3.one;
 
             ApplySettings();
         }
@@ -258,6 +259,8 @@ namespace KVisualisation
                             var m = trailRenderer.material;
                             m.SetColor("_BaseColor", c);
                             trailRenderer.material = m;
+
+                            trailRenderer.widthMultiplier = transform.lossyScale.x;
                         }
                     }
 
@@ -267,6 +270,7 @@ namespace KVisualisation
                         ghostingObject.transform.SetParent(movingObject.transform);
                         ghostingObject.transform.localPosition = Vector3.zero;
                         ghostingObject.transform.localRotation = Quaternion.identity;
+                        ghostingObject.transform.localScale = Vector3.one;
 
                         GhostSpawner ghostSpawner = ghostingObject.AddComponent<GhostSpawner>();
                         ghostSpawner.ghostPrefab = ghostPrefab;

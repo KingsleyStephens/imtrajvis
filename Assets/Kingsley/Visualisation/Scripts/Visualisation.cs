@@ -40,6 +40,8 @@ namespace SATestbed
 
         public VisSimController controller;
 
+        public int instanceId = -1;
+
         private bool mActive = false;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created

@@ -182,11 +182,73 @@ PrefabInstance:
       propertyPath: m_Name
       value: UnderwaterVis
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 2098698411562293023, guid: f1c1600ea0975e143b4112989f1708da,
+        type: 3}
+      propertyPath: m_AllowAutoConnect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5583866814324627644, guid: f1c1600ea0975e143b4112989f1708da,
+        type: 3}
+      propertyPath: m_TerrainData
+      value: 
+      objectReference: {fileID: 15600000, guid: cefd1a2a0e01a344eb5e53050cb9c697,
+        type: 2}
+    m_RemovedComponents:
+    - {fileID: 2098698411562293023, guid: f1c1600ea0975e143b4112989f1708da, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7502641353360229747, guid: f1c1600ea0975e143b4112989f1708da,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6114014180747121629}
   m_SourcePrefab: {fileID: 100100000, guid: f1c1600ea0975e143b4112989f1708da, type: 3}
+--- !u!1 &6114014180747121628 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7502641353360229747, guid: f1c1600ea0975e143b4112989f1708da,
+    type: 3}
+  m_PrefabInstance: {fileID: 6114014180747121627}
+  m_PrefabAsset: {fileID: 0}
+--- !u!218 &6114014180747121629
+Terrain:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6114014180747121628}
+  m_Enabled: 1
+  serializedVersion: 6
+  m_TerrainData: {fileID: 15600000, guid: cefd1a2a0e01a344eb5e53050cb9c697, type: 2}
+  m_TreeDistance: 5000
+  m_TreeBillboardDistance: 50
+  m_TreeCrossFadeLength: 5
+  m_TreeMaximumFullLODCount: 50
+  m_DetailObjectDistance: 80
+  m_DetailObjectDensity: 1
+  m_HeightmapPixelError: 5
+  m_SplatMapDistance: 1000
+  m_HeightmapMinimumLODSimplification: 0
+  m_HeightmapMaximumLOD: 0
+  m_ShadowCastingMode: 2
+  m_DrawHeightmap: 1
+  m_DrawInstanced: 0
+  m_DrawTreesAndFoliage: 1
+  m_StaticShadowCaster: 0
+  m_IgnoreQualitySettings: 0
+  m_ReflectionProbeUsage: 1
+  m_MaterialTemplate: {fileID: 2100000, guid: b245b868c7a83da4aa4108fe2d3dbe0e, type: 2}
+  m_BakeLightProbesForTrees: 1
+  m_PreserveTreePrototypeLayers: 0
+  m_DeringLightProbesForTrees: 1
+  m_ReceiveGI: 1
+  m_ScaleInLightmap: 1
+  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
+  m_GroupingID: 0
+  m_RenderingLayerMask: 1
+  m_AllowAutoConnect: 0
+  m_EnableHeightmapRayTracing: 1
+  m_EnableTreesAndDetailsRayTracing: 0
+  m_TreeMotionVectorModeOverride: 3
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
