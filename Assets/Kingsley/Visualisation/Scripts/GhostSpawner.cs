@@ -30,10 +30,10 @@ namespace KVisualisation
         {
             if (ghostingDropType == VisClient.MovingObjectSettings.GhostingDrop.Distance)
             {
-                if (Vector3.Distance(transform.position, lastPosition) > ghostingValue)
+                if (Vector3.Distance(transform.parent.localPosition, lastPosition) > ghostingValue)
                 {
                     Spawn();
-                    lastPosition = transform.position;
+                    lastPosition = transform.parent.localPosition;
                 }
             }
             else if (ghostingDropType != VisClient.MovingObjectSettings.GhostingDrop.Time)

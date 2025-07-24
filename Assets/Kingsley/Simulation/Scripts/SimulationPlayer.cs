@@ -59,6 +59,7 @@ namespace KSimulation
         [SerializeField]
         private float playbackSpeed = 1.0f;
 
+        public float PlaybackSpeed { get; set; }
 
         private static SimulationPlayer instance;
 
@@ -69,16 +70,16 @@ namespace KSimulation
 
         private float mSimTime;
         private float mSimStartTime;
-        private float mStartTimeReference;
 
 
-        public float SimTime { get { return mSimTime; } }
+        public float SimTime { get { return mSimTime; } set { mSimTime = value; } }
 
         public bool Loaded { get; private set; }
 
         private void Awake()
         {
             instance = this;
+            PlaybackSpeed = playbackSpeed;
         }
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -104,7 +105,14 @@ namespace KSimulation
 
         public void OnStart()
         {
+            PlaybackSpeed = playbackSpeed;
+            SetSimTime(startTime);
             SetUp();
+        }
+
+        public void OnStop()
+        {
+            TearDown();
         }
 
         private void SetUp()
@@ -146,7 +154,6 @@ namespace KSimulation
         private void SetSimTime(float time)
         {
             mSimTime = mSimStartTime = time;
-            mStartTimeReference = Time.time;
         }
 
         public int[] ListSimObjects()
@@ -179,7 +186,7 @@ namespace KSimulation
         // Update is called once per frame
         void Update()
         {
-            mSimTime = mSimStartTime + Time.time * playbackSpeed - mStartTimeReference;
+            mSimTime += Time.deltaTime * PlaybackSpeed;
         }
 
         private JsonSpatioTemporalDB OpenDb()

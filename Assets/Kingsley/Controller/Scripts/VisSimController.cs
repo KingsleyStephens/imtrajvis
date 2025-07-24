@@ -55,9 +55,30 @@ namespace KController
 
         public bool Loaded { get; private set; }
 
+        public SimulationPlayer Player { get { return mSimPlayer; } private set { mSimPlayer = value; } }
+
         void Start()
         {
             LoadSim();
+        }
+
+        public void StartPlay()
+        {
+            if (mSimPlayer != null)
+            {
+                mSimPlayer.OnStart();
+            }
+        }
+
+        public void StopPlay()
+        {
+            if (mSimPlayer != null)
+            {
+                mSimPlayer.OnStop();
+            }
+
+            onSpawned = null;
+            onDestructed = null;
         }
 
         /**
@@ -113,7 +134,6 @@ namespace KController
             mSimPlayer = GameObject.FindAnyObjectByType<SimulationPlayer>();
             if (mSimPlayer != null)
             {
-
                 while (!mSimPlayer.Loaded)
                 {
                     yield return null;
@@ -131,14 +151,6 @@ namespace KController
             onDestructed += onDestruct;
 
             mSimPlayer.CheckSpawned((id) => onSpawn(id));
-        }
-
-        public void StartSim()
-        {
-            if (mSimPlayer != null)
-            {
-                mSimPlayer.OnStart();
-            }
         }
 
         public void Detach(OnSpawn onSpawn, OnDestruct onDestruct)

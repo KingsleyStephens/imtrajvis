@@ -14,7 +14,7 @@ Shader "Kingsley/AdditiveBlend"
     {
         Tags { "RenderType"="Transparent" "Queue" = "Transparent" "RenderPipeline" = "UniversalPipeline" "IgnoreProjector"="True"}
         LOD 100
-       // Blend One One
+        Blend SrcAlpha OneMinusSrcAlpha
          
         Pass
         {
@@ -153,14 +153,16 @@ Shader "Kingsley/AdditiveBlend"
                     half4 col = _WireColor;
                     // apply fog
                     col.rgb = MixFog(col.rgb, i.fogCoord);
-                    return _BaseColor; //col;
+                    col.a = _Alpha;
+                    return col;
                 }
 
                 // Smooth our line out
                 float t = exp2(_WireSmoothness * -1.0 * minDistanceToEdge * minDistanceToEdge);
                 half4 finalColor = lerp(_BaseColor, _WireColor, t);
-                //finalColor.rgb = MixFog(finalColor.rgb, i.fogCoord);
-                return _BaseColor; // finalColor;// * _Alpha;
+                finalColor.rgb = MixFog(finalColor.rgb, i.fogCoord);
+                finalColor.a = _Alpha;
+                return finalColor;
             }
             ENDHLSL
         }

@@ -8,7 +8,7 @@ using SATestbed;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 public class SceneFlowManager : MonoBehaviour
 {
@@ -32,7 +32,7 @@ public class SceneFlowManager : MonoBehaviour
     [SerializeField]
     private Vector3 visDimensions = new Vector3(1000.0f, 1000.0f, 1000.0f);
     [SerializeField]
-    private float smallMultipleScaleStep = 0.25f;
+    private float smallMultipleScale = 0.25f;
 
     [SerializeField]
     private GameObject launchUI;
@@ -41,8 +41,12 @@ public class SceneFlowManager : MonoBehaviour
     private GameObject trajConfigUI;
 
     [SerializeField]
+    private GameObject cameraRig;
+
+    [SerializeField]
     private Camera mainCamera;
 
+    public VisSimController Controller { get; private set; }
 
     private class SmallMultipleConfig
     {
@@ -56,7 +60,14 @@ public class SceneFlowManager : MonoBehaviour
         public Vector3 position;
     }
 
-    private Dictionary<int, List<SmallMultipleConfig>> mSmallMultiples = new Dictionary<int, List<SmallMultipleConfig>>();
+    private class SmallMultipleGroup
+    {
+        public List<SmallMultipleConfig> config = new List<SmallMultipleConfig>();
+        public Vector3 startPos = Vector3.zero;
+    }
+
+
+    private Dictionary<int, SmallMultipleGroup> mSmallMultiples = new Dictionary<int, SmallMultipleGroup>();
 
     private List<GameObject> visClients = new List<GameObject>();
 
@@ -64,29 +75,122 @@ public class SceneFlowManager : MonoBehaviour
 
     private List<VisClient.MovingObjectSettings> clientConfigs = new List<VisClient.MovingObjectSettings>();
 
+    public float PlaybackSpeed { get { return Controller.Player.PlaybackSpeed; } set { Controller.Player.PlaybackSpeed = value;  } }
+    public float SimTime { get { return Controller.Player.SimTime; } set { Controller.Player.SimTime = value; } }
+
+    [SerializeField]
+    private float speedChangeDelta = 0.01f;
+
+    private bool mTimeSpeedControl = true;
+
+    private float mPrevPlaybackSpeed = 1.0f;
+
+    public bool IncreaseTime { get; set; } = false;
+    public bool DecreaseTime { get; set; } = false;
+
+    private void ResetTimeControls()
+    {
+        mTimeSpeedControl = true;
+        mPrevPlaybackSpeed = 1.0f;
+        IncreaseTime = false;
+        DecreaseTime = false;
+    }
+
+    public void TimeControlToggle()
+    {
+        mTimeSpeedControl = !mTimeSpeedControl;
+
+        if (mTimeSpeedControl)
+        {
+            PlaybackSpeed = mPrevPlaybackSpeed;
+        }
+        else
+        {
+            mPrevPlaybackSpeed = PlaybackSpeed;
+            PlaybackSpeed = 0.0f;
+        }
+    }
+
+    public void TimeIncrease()
+    {
+        if (mTimeSpeedControl)
+        {
+            IncreasePlaybackSpeed();
+        }
+        else
+        {
+            IncreaseSimTime();
+        }
+    }
+
+    public void TimeDecrease()
+    {
+        if (mTimeSpeedControl)
+        {
+            DecreasePlaybackSpeed();
+        }
+        else
+        {
+            DecreaseSimTime();
+        }
+    }
+
+    public void IncreasePlaybackSpeed()
+    {
+        ChangePlaybackSpeed(speedChangeDelta);
+    }
+    public void DecreasePlaybackSpeed()
+    {
+        ChangePlaybackSpeed(-speedChangeDelta);
+    }
+
+    public void ChangePlaybackSpeed(float delta)
+    {
+        PlaybackSpeed += delta;
+    }
+
+
+    public void IncreaseSimTime()
+    {
+        ChangeSimTime(mPrevPlaybackSpeed);
+    }
+    public void DecreaseSimTime()
+    {
+        ChangeSimTime(-mPrevPlaybackSpeed);
+    }
+    public void ChangeSimTime(float delta)
+    {
+        SimTime += delta;
+    }
+
+
     private void Awake()
     {
+        float height = 40.0f;
+
         List<SmallMultipleConfig> config1 = new List<SmallMultipleConfig>();
         config1.Add(new SmallMultipleConfig(Vector3.one, Vector3.zero));
-        mSmallMultiples.Add(1, config1);
+        mSmallMultiples.Add(1, new SmallMultipleGroup() { config = config1, startPos = new Vector3(0.0f, height, 0.0f)});
+
+        height *= smallMultipleScale;
 
         List<SmallMultipleConfig> config2 = new List<SmallMultipleConfig>();
-        config2.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScaleStep, new Vector3(-visDimensions.x * smallMultipleScaleStep * 0.5f, 0.0f, visDimensions.z * smallMultipleScaleStep * 0.5f)));
-        config2.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScaleStep, new Vector3(visDimensions.x * smallMultipleScaleStep * 0.5f, 0.0f, visDimensions.z * smallMultipleScaleStep * 0.5f)));
-        mSmallMultiples.Add(2, config2);
+        config2.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(-visDimensions.x * smallMultipleScale * 0.5f, 0.0f, 0.0f)));
+        config2.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(visDimensions.x * smallMultipleScale * 0.5f, 0.0f, 0.0f)));
+        mSmallMultiples.Add(2, new SmallMultipleGroup() { config = config2, startPos = new Vector3(0.0f, height, 0.0f) });
 
         List<SmallMultipleConfig> config3 = new List<SmallMultipleConfig>();
-        config3.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScaleStep * 0.5f, new Vector3(-visDimensions.x * smallMultipleScaleStep * 0.25f, 0.0f, visDimensions.z * smallMultipleScaleStep * 0.25f)));
-        config3.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScaleStep * 0.5f, new Vector3(visDimensions.x * smallMultipleScaleStep * 0.25f, 0.0f, visDimensions.z * smallMultipleScaleStep * 0.25f)));
-        config3.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScaleStep * 0.5f, new Vector3(0.0f, 0.0f, 3.0f * visDimensions.z * smallMultipleScaleStep * 0.25f)));
-        mSmallMultiples.Add(3, config3);
+        config3.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(-visDimensions.x * smallMultipleScale * 0.5f, 0.0f, -visDimensions.z * smallMultipleScale * 0.5f)));
+        config3.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(visDimensions.x * smallMultipleScale * 0.5f, 0.0f, -visDimensions.z * smallMultipleScale * 0.5f)));
+        config3.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(0.0f, 0.0f, visDimensions.z * smallMultipleScale * 0.5f)));
+        mSmallMultiples.Add(3, new SmallMultipleGroup() { config = config3, startPos = new Vector3(0.0f, height, 0.0f) });
 
         List<SmallMultipleConfig> config4 = new List<SmallMultipleConfig>();
-        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScaleStep * 0.5f, new Vector3(-visDimensions.x * smallMultipleScaleStep * 0.25f, 0.0f, visDimensions.z * smallMultipleScaleStep * 0.25f)));
-        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScaleStep * 0.5f, new Vector3(visDimensions.x * smallMultipleScaleStep * 0.25f, 0.0f, visDimensions.z * smallMultipleScaleStep * 0.25f)));
-        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScaleStep * 0.5f, new Vector3(-visDimensions.x * smallMultipleScaleStep * 0.25f, 0.0f, 3.0f * visDimensions.z * smallMultipleScaleStep * 0.25f)));
-        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScaleStep * 0.5f, new Vector3(visDimensions.x * smallMultipleScaleStep * 0.25f, 0.0f, 3.0f * visDimensions.z * smallMultipleScaleStep * 0.25f)));
-        mSmallMultiples.Add(4, config4);
+        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(-visDimensions.x * smallMultipleScale * 0.5f, 0.0f, -visDimensions.z * smallMultipleScale * 0.5f)));
+        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(visDimensions.x * smallMultipleScale * 0.5f, 0.0f, -visDimensions.z * smallMultipleScale * 0.5f)));
+        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(-visDimensions.x * smallMultipleScale * 0.5f, 0.0f, visDimensions.z * smallMultipleScale * 0.5f)));
+        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(visDimensions.x * smallMultipleScale * 0.5f, 0.0f, visDimensions.z * smallMultipleScale * 0.5f)));
+        mSmallMultiples.Add(4, new SmallMultipleGroup() { config = config4, startPos = new Vector3(0.0f, height, 0.0f) });
     }
 
 
@@ -107,7 +211,7 @@ public class SceneFlowManager : MonoBehaviour
                 {
                     if (launchUI != null)
                     {
-                        launchUI.SetActive(true);
+                        ActivateLaunchMenu();
                     }
                     break;
                 }
@@ -115,6 +219,86 @@ public class SceneFlowManager : MonoBehaviour
                 {
                     break;
                 }
+        }
+    }
+
+    public void MoveToNextClient()
+    {
+        MoveToClient(1);
+    }
+
+    public void MoveToPrevClient()
+    {
+        MoveToClient(-1);
+    }
+
+
+    private void MoveToClient(int direction)
+    {
+        int currentClient = -1;
+
+        Collider[] overlaps = Physics.OverlapSphere(mainCamera.transform.position, 10.0f, 1 << LayerMask.NameToLayer("VisInstance"));
+        if (overlaps.Length > 0)
+        {
+            Visualisation vis = overlaps[0].gameObject.GetComponent<Visualisation>();
+            if (vis != null)
+            {
+                currentClient = vis.instanceId;
+            }
+        }
+        else
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(mainCamera.transform.position, Vector3.down, out hit, 10000.0f, 1 << LayerMask.NameToLayer("VisInstance")))
+            {
+                Visualisation vis = hit.transform.gameObject.GetComponent<Visualisation>();
+                if (vis != null)
+                {
+                    currentClient = vis.instanceId;
+                }
+            }
+        }
+
+        if (currentClient >= 0)
+        {
+            Vector3 realtivePos = cameraRig.transform.position - visClients[currentClient].transform.position;
+
+            int nextClient = currentClient + direction;
+            if (nextClient < 0)
+            {
+                nextClient = visClients.Count - 1;
+            }
+            else if (nextClient >= visClients.Count)
+            {
+                nextClient = 0;
+            }
+            cameraRig.transform.position = visClients[nextClient].transform.position + realtivePos;
+        }
+    }
+
+    public void ActivateLaunchMenu()
+    {
+        if (player != null)
+        {
+            Controller = player.GetComponent<VisSimController>();
+
+            if (Controller != null)
+            {
+                Controller.StopPlay();
+            }
+            player.SetActive(false);
+        }
+
+        foreach (var vis in visClients)
+        {
+            Destroy(vis);
+        }
+        visClients.Clear();
+        clientConfigs.Clear();
+
+        if (launchUI != null)
+        {
+            launchUI.SetActive(true);
         }
     }
 
@@ -128,42 +312,47 @@ public class SceneFlowManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-/*        if (NumClients > 0 && trajConfigUI != null && !trajConfigUI.activeSelf && Mouse.current.rightButton.wasPressedThisFrame)
+        if (IncreaseTime)
         {
-            if (mainCamera != null)
-            {
-                Vector2 screenPos = new Vector2(Mouse.current.position.x.value, Mouse.current.position.y.value);
+            TimeIncrease();
+        }
+        if (DecreaseTime)
+        {
+            TimeDecrease();
+        }
 
-                Ray ray = mainCamera.ScreenPointToRay(screenPos);
-
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit, 10000.0f, 1 << LayerMask.NameToLayer("VisInstance")))
+        /*        if (NumClients > 0 && trajConfigUI != null && !trajConfigUI.activeSelf && Mouse.current.rightButton.wasPressedThisFrame)
                 {
-                    Visualisation vis = hit.transform.gameObject.GetComponent<Visualisation>();
-                    if (vis != null)
+                    if (mainCamera != null)
                     {
-                        ShowConfigScreen(vis.instanceId);
-                    }
-                }
+                        Vector2 screenPos = new Vector2(Mouse.current.position.x.value, Mouse.current.position.y.value);
 
-            }
-        }*/
+                        Ray ray = mainCamera.ScreenPointToRay(screenPos);
+
+                        RaycastHit hit;
+                        if (Physics.Raycast(ray, out hit, 10000.0f, 1 << LayerMask.NameToLayer("VisInstance")))
+                        {
+                            Visualisation vis = hit.transform.gameObject.GetComponent<Visualisation>();
+                            if (vis != null)
+                            {
+                                ShowConfigScreen(vis.instanceId);
+                            }
+                        }
+
+                    }
+                }*/
     }
 
     private int mCurrentClient = -1;
 
     public void ShowConfigScreen(int currentClient)
     {
-        Debug.Log("ShowConfigScreen " + currentClient.ToString());
-
-        if (currentClient >= clientConfigs.Count)
+        if (currentClient >= clientConfigs.Count || trajConfigUI.activeSelf)
         {
             return;
         }
 
         mCurrentClient = currentClient;
-
-        var currentConfig = clientConfigs[currentClient];
 
         trajConfigUI.SetActive(true);
 
@@ -178,22 +367,22 @@ public class SceneFlowManager : MonoBehaviour
         var toggleSearch = toggles.First((t) => t.name == "MeshToggle");
         if (toggleSearch != null)
         {
-            toggleSearch.value = currentConfig.mesh;
+            toggleSearch.isOn = Mesh;
         }
         toggleSearch = toggles.First((t) => t.name == "TrailsToggle");
         if (toggleSearch != null)
         {
-            toggleSearch.value = currentConfig.trail;
+            toggleSearch.isOn = Trails;
         }
         toggleSearch = toggles.First((t) => t.name == "GhostingToggle");
         if (toggleSearch != null)
         {
-            toggleSearch.value = currentConfig.ghosting;
+            toggleSearch.isOn = Ghosting;
         }
         toggleSearch = toggles.First((t) => t.name == "DensityToggle");
         if (toggleSearch != null)
         {
-            toggleSearch.value = currentConfig.density;
+            toggleSearch.isOn = Density;
         }
 
         /*        UIDocument doc = trajConfigUI.GetComponent<UIDocument>();
@@ -272,20 +461,34 @@ public class SceneFlowManager : MonoBehaviour
 
     public void LaunchSim(int clientCount)
     {
+        ResetTimeControls();
+
         SpawnClients(clientCount);
+
+        Vector3 startPos = mSmallMultiples[clientCount].startPos;
+        if (cameraRig != null)
+        {
+            cameraRig.transform.position = startPos;
+            cameraRig.transform.rotation = Quaternion.identity;
+        }
 
         if (player != null)
         {
             player.SetActive(true);
 
-            foreach (var client in visClients)
+            if (Controller != null)
             {
-                Visualisation vis = client.GetComponent<Visualisation>();
-                if (vis != null)
+                foreach (var client in visClients)
                 {
-                    vis.controller = player.GetComponent<VisSimController>();
+                    Visualisation vis = client.GetComponent<Visualisation>();
+                    if (vis != null)
+                    {
+                        vis.controller = Controller;
+                    }
+                    client.SetActive(true);
                 }
-                client.SetActive(true);
+
+                Controller.StartPlay();
             }
         }
     }
@@ -299,7 +502,7 @@ public class SceneFlowManager : MonoBehaviour
 
         if (mSmallMultiples.ContainsKey(clientCount))
         {
-            List<SmallMultipleConfig> smallMultipleConfigs = mSmallMultiples[clientCount];
+            List<SmallMultipleConfig> smallMultipleConfigs = mSmallMultiples[clientCount].config;
 
             for (int i = 0; i < clientCount; i++)
             {
