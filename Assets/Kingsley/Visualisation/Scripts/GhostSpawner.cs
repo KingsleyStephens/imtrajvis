@@ -32,7 +32,7 @@ namespace KVisualisation
             {
                 if (Vector3.Distance(transform.parent.localPosition, lastPosition) > ghostingValue)
                 {
-                    Spawn();
+                    Spawn(transform.parent.localPosition, transform.parent.localRotation, duration);
                     lastPosition = transform.parent.localPosition;
                 }
             }
@@ -40,20 +40,23 @@ namespace KVisualisation
             {
                 if (Time.time - lastTime > ghostingValue)
                 {
-                    Spawn();
+                    Spawn(transform.parent.localPosition, transform.parent.localRotation, duration);
                     lastTime = Time.time;
                 }
             }
         }
 
-        private void Spawn()
+        public void Spawn(Vector3 pos, Quaternion rot, float t)
         {
             GameObject ghostObj = Instantiate(ghostPrefab, ghostParent);
-            ghostObj.transform.position = transform.position;
-            ghostObj.transform.rotation  = transform.rotation;
+            ghostObj.transform.localPosition = pos;
+            ghostObj.transform.localRotation  = rot;
 
-            DestructTimer destruct = ghostObj.AddComponent<DestructTimer>();
-            destruct.duration = duration;
+            if (t >= 0.0f)
+            {
+                DestructTimer destruct = ghostObj.AddComponent<DestructTimer>();
+                destruct.duration = t;
+            }
 
             MeshRenderer meshRenderer = ghostObj.GetComponent<MeshRenderer>();
             if (meshRenderer != null)

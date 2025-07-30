@@ -10,6 +10,11 @@ namespace KVisualisation
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
+            Resize();
+        }
+
+        public void Resize()
+        {
             Terrain terrain = gameObject.GetComponent<Terrain>();
             if (terrain != null)
             {

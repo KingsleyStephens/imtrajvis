@@ -462,6 +462,7 @@ MonoBehaviour:
     trail: 0
     ghosting: 0
     density: 0
+    timeType: 0
     trailTime: 30
     densityUpdateFrequence: 1
     ghostingDrop: 1
@@ -475,6 +476,8 @@ MonoBehaviour:
   ghostPrefab: {fileID: 5326158167213279261, guid: effc14ad0ac87f546a1f5abb21662cf6,
     type: 3}
   trailPrefab: {fileID: 2627913536600491904, guid: 7c8697e7478c94a4c8c394190c78cf63,
+    type: 3}
+  linePrefab: {fileID: 2627913536600491904, guid: d294b08b87cb3bd4e82b221e52dc4fb1,
     type: 3}
   weaponPrefab: {fileID: 2716253600753631341, guid: 54ced649ac7f3644da8ab28df989793f,
     type: 3}

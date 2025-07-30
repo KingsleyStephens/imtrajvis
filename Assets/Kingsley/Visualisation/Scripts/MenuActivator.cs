@@ -18,11 +18,11 @@ namespace KVisualisation
             Collider[] collisions = Physics.OverlapSphere(transform.position, 1.0f);
             if (collisions.Length > 0)
             {
-                Visualisation vis = collisions[0].gameObject.GetComponent<Visualisation>();
+/*                Visualisation vis = collisions[0].gameObject.GetComponent<Visualisation>();
                 if (vis != null && manager != null)
                 {
                     manager.ShowConfigScreen(vis.instanceId);
-                }
+                }*/
             }
         }
     }

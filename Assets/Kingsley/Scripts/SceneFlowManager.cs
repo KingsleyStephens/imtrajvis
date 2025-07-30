@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using KController;
 using KVisualisation;
-using Oculus.Interaction;
 using SATestbed;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Oculus.Interaction.Locomotion;
 
 public class SceneFlowManager : MonoBehaviour
 {
@@ -25,6 +24,9 @@ public class SceneFlowManager : MonoBehaviour
     private GameObject recorder;
     [SerializeField]
     private GameObject player;
+
+    [SerializeField]
+    private Transform visRoot;
 
     [SerializeField]
     private GameObject visPrefab;
@@ -47,6 +49,38 @@ public class SceneFlowManager : MonoBehaviour
     private Camera mainCamera;
 
     public VisSimController Controller { get; private set; }
+
+    [Serializable]
+    private class ViewConfig
+    {
+        public Vector3 position;
+        public Vector3 scale;
+        public GameObject interaction;
+    }
+
+    [SerializeField]
+    private ViewConfig tableTopViewConfig;
+    [SerializeField]
+    private ViewConfig roomViewConfig;
+
+    public enum ViewConfigType
+    {
+        Tabletop,
+        Room
+    }
+
+    private ViewConfigType mViewConfigType = ViewConfigType.Room;
+
+    public bool TableTopView { get { return mViewConfigType == ViewConfigType.Tabletop; } set { SetCurrentViewConfig(ViewConfigType.Tabletop, value); } }
+    public bool RoomView { get { return mViewConfigType == ViewConfigType.Room; } set { SetCurrentViewConfig(ViewConfigType.Room, value); } }
+
+    public void SetCurrentViewConfig(ViewConfigType configType, bool on)
+    {
+        if (on)
+        {
+            ApplyViewConfig(configType);
+        }
+    }
 
     private class SmallMultipleConfig
     {
@@ -71,11 +105,14 @@ public class SceneFlowManager : MonoBehaviour
 
     private List<GameObject> visClients = new List<GameObject>();
 
-    public int NumClients { get; set; } = 0;
+
+    private int mNumClients = 1;
+
+    public int NumClientsUIOption { get { return mNumClients - 1; } set { mNumClients = value + 1; } }
 
     private List<VisClient.MovingObjectSettings> clientConfigs = new List<VisClient.MovingObjectSettings>();
 
-    public float PlaybackSpeed { get { return Controller.Player.PlaybackSpeed; } set { Controller.Player.PlaybackSpeed = value;  } }
+    public float PlaybackSpeed { get { return Controller.Player.PlaybackSpeed; } set { Controller.Player.PlaybackSpeed = value; } }
     public float SimTime { get { return Controller.Player.SimTime; } set { Controller.Player.SimTime = value; } }
 
     [SerializeField]
@@ -87,6 +124,113 @@ public class SceneFlowManager : MonoBehaviour
 
     public bool IncreaseTime { get; set; } = false;
     public bool DecreaseTime { get; set; } = false;
+
+    private void ApplyViewConfig(ViewConfigType config)
+    {
+        if (visRoot == null)
+        {
+            return;
+        }
+
+        ViewConfig currentConfig = null;
+        switch (mViewConfigType)
+        {
+            case ViewConfigType.Tabletop:
+                {
+                    currentConfig = tableTopViewConfig;
+                    break;
+                }
+            case ViewConfigType.Room:
+                {
+                    currentConfig = roomViewConfig;
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
+        }
+        if (currentConfig != null)
+        {
+            currentConfig.interaction.SetActive(false);
+        }
+
+        mViewConfigType = config;
+
+        ActivateCurrentViewConfig();
+    }
+
+    private void ActivateCurrentViewConfig()
+    {
+        if (visRoot == null)
+        {
+            return;
+        }
+
+        ViewConfig currentConfig = null;
+        switch (mViewConfigType)
+        {
+            case ViewConfigType.Tabletop:
+                {
+                    currentConfig = tableTopViewConfig;
+
+                    if (cameraRig != null)
+                    {
+                        VRFlyCamera oldCam = cameraRig.GetComponentInChildren<VRFlyCamera>();
+                        if (oldCam != null)
+                        {
+                            oldCam.enabled = false;
+                        }
+
+                        VROrbitCamera newCam = cameraRig.GetComponentInChildren<VROrbitCamera>();
+                        if (newCam != null)
+                        {
+                            newCam.SetPivotPos(Vector3.zero, visRoot);
+                            newCam.enabled = true;
+                        }
+                    }
+
+                    break;
+                }
+            case ViewConfigType.Room:
+                {
+                    currentConfig = roomViewConfig;
+
+
+                    if (cameraRig != null)
+                    {
+                        VROrbitCamera oldCam = cameraRig.GetComponentInChildren<VROrbitCamera>();
+                        if (oldCam != null)
+                        {
+                            oldCam.enabled = false;
+                        }
+
+                        VRFlyCamera newCam = cameraRig.GetComponentInChildren<VRFlyCamera>();
+                        if (newCam != null)
+                        {
+                            newCam.enabled = true;
+                        }
+                    }
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
+        }
+        if (currentConfig != null)
+        {
+            currentConfig.interaction.SetActive(true);
+            visRoot.position = currentConfig.position;
+            visRoot.localScale = currentConfig.scale;
+
+            VisRoot root = visRoot.GetComponent<VisRoot>();
+            if (root != null)
+            {
+                root.OnResize();
+            }
+        }
+    }
 
     private void ResetTimeControls()
     {
@@ -170,7 +314,7 @@ public class SceneFlowManager : MonoBehaviour
 
         List<SmallMultipleConfig> config1 = new List<SmallMultipleConfig>();
         config1.Add(new SmallMultipleConfig(Vector3.one, Vector3.zero));
-        mSmallMultiples.Add(1, new SmallMultipleGroup() { config = config1, startPos = new Vector3(0.0f, height, 0.0f)});
+        mSmallMultiples.Add(1, new SmallMultipleGroup() { config = config1, startPos = new Vector3(0.0f, height, 0.0f) });
 
         height *= smallMultipleScale;
 
@@ -278,6 +422,11 @@ public class SceneFlowManager : MonoBehaviour
 
     public void ActivateLaunchMenu()
     {
+        if (trajConfigUI != null && trajConfigUI.activeSelf)
+        {
+            trajConfigUI.SetActive(false);
+        }
+
         if (player != null)
         {
             Controller = player.GetComponent<VisSimController>();
@@ -295,6 +444,7 @@ public class SceneFlowManager : MonoBehaviour
         }
         visClients.Clear();
         clientConfigs.Clear();
+        mCurrentClient = 0;
 
         if (launchUI != null)
         {
@@ -304,7 +454,7 @@ public class SceneFlowManager : MonoBehaviour
 
     public void Launch()
     {
-        LaunchSim(NumClients + 1);
+        LaunchSim(mNumClients);
         launchUI.SetActive(false);
     }
 
@@ -343,108 +493,93 @@ public class SceneFlowManager : MonoBehaviour
                 }*/
     }
 
-    private int mCurrentClient = -1;
+    private int mCurrentClient = 0;
 
-    public void ShowConfigScreen(int currentClient)
+    public int CurrentClientConfig { get { return mCurrentClient; } set { mCurrentClient = value; SetClientConfigUI(mCurrentClient);  } }
+
+
+    public void ShowConfigScreen()
     {
-        if (currentClient >= clientConfigs.Count || trajConfigUI.activeSelf)
+        if (trajConfigUI.activeSelf)
         {
             return;
         }
 
-        mCurrentClient = currentClient;
-
         trajConfigUI.SetActive(true);
 
-        TextMeshProUGUI[] texts = trajConfigUI.GetComponentsInChildren<TextMeshProUGUI>();
-        var search = texts.First((t) => t.name == "ClientNumber");
-        if (search != null)
+        TMP_Dropdown[] dropDowns = trajConfigUI.GetComponentsInChildren<TMP_Dropdown>();
+        if (dropDowns.Length > 0)
         {
-            search.text = (currentClient + 1).ToString();
+            var dropDownSearch = dropDowns.First((t) => t.name == "ClientInstanceDropdown");
+            if (dropDownSearch != null)
+            {
+                dropDownSearch.options.Clear();
+
+                for (int i = 0; i < mNumClients; i++)
+                {
+                    dropDownSearch.options.Add(new TMP_Dropdown.OptionData((i + 1).ToString()));
+                }
+
+                dropDownSearch.value = mCurrentClient;
+                SetClientConfigUI(mCurrentClient);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No Dropdowns found in trajConfigUI");
+        }
+    }
+
+    private void SetClientConfigUI(int client)
+    {
+        TMP_Dropdown[] dropDowns = trajConfigUI.GetComponentsInChildren<TMP_Dropdown>();
+        if (dropDowns.Length > 0)
+        {
+            var dropDownSearch = dropDowns.First((t) => t.name == "ClientInstanceDropdown");
+            if (dropDownSearch != null)
+            {
+                dropDownSearch.value = mCurrentClient;
+            }
+
+            dropDownSearch = dropDowns.First((t) => t.name == "TimeDropdown");
+            if (dropDownSearch != null)
+            {
+                dropDownSearch.value = TimeType;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No Dropdowns found in trajConfigUI");
         }
 
         Toggle[] toggles = trajConfigUI.GetComponentsInChildren<Toggle>();
-        var toggleSearch = toggles.First((t) => t.name == "MeshToggle");
-        if (toggleSearch != null)
+        if (toggles.Length > 0)
         {
-            toggleSearch.isOn = Mesh;
+            var toggleSearch = toggles.First((t) => t.name == "MeshToggle");
+            if (toggleSearch != null)
+            {
+                toggleSearch.isOn = Mesh;
+            }
+            toggleSearch = toggles.First((t) => t.name == "TrailsToggle");
+            if (toggleSearch != null)
+            {
+                toggleSearch.isOn = Trails;
+            }
+            toggleSearch = toggles.First((t) => t.name == "GhostingToggle");
+            if (toggleSearch != null)
+            {
+                toggleSearch.isOn = Ghosting;
+            }
+            toggleSearch = toggles.First((t) => t.name == "DensityToggle");
+            if (toggleSearch != null)
+            {
+                toggleSearch.isOn = Density;
+            }
         }
-        toggleSearch = toggles.First((t) => t.name == "TrailsToggle");
-        if (toggleSearch != null)
+        else
         {
-            toggleSearch.isOn = Trails;
+            Debug.LogWarning("No Toggles found in trajConfigUI");
         }
-        toggleSearch = toggles.First((t) => t.name == "GhostingToggle");
-        if (toggleSearch != null)
-        {
-            toggleSearch.isOn = Ghosting;
-        }
-        toggleSearch = toggles.First((t) => t.name == "DensityToggle");
-        if (toggleSearch != null)
-        {
-            toggleSearch.isOn = Density;
-        }
-
-        /*        UIDocument doc = trajConfigUI.GetComponent<UIDocument>();
-                if (doc != null)
-                {
-                    var root = doc.rootVisualElement;
-
-                    Label clientIdLabel = root.Q<Label>("clientIdLabel");
-                    if (clientIdLabel != null)
-                    {
-                        clientIdLabel.text = currentClient.ToString();
-                    }
-
-                    Toggle meshToggle = root.Q<Toggle>("meshToggle");
-                    if (meshToggle != null)
-                    {
-                        meshToggle.value = currentConfig.mesh;
-                        meshToggle.RegisterValueChangedCallback<bool>(e =>
-                        {
-                            currentConfig.mesh = e.newValue;
-                        });
-                    }
-
-                    Toggle trailToggle = root.Q<Toggle>("trailToggle");
-                    if (trailToggle != null)
-                    {
-                        trailToggle.value = currentConfig.trail;
-                        trailToggle.RegisterValueChangedCallback<bool>(e =>
-                        {
-                            currentConfig.trail = e.newValue;
-                        });
-                    }
-
-                    Toggle ghostingToggle = root.Q<Toggle>("ghostingToggle");
-                    if (ghostingToggle != null)
-                    {
-                        ghostingToggle.value = currentConfig.ghosting;
-                        ghostingToggle.RegisterValueChangedCallback<bool>(e =>
-                        {
-                            currentConfig.ghosting = e.newValue;
-                        });
-                    }
-
-                    Toggle densityToggle = root.Q<Toggle>("densityToggle");
-                    if (densityToggle != null)
-                    {
-                        densityToggle.value = currentConfig.density;
-                        densityToggle.RegisterValueChangedCallback<bool>(e =>
-                        {
-                            currentConfig.density = e.newValue;
-                        });
-                    }
-
-                    Button applyButton = root.Q<Button>("applyButton");
-                    if (applyButton != null)
-                    {
-                        applyButton.clicked += () => {
-                            ApplyClientConfig(visClients[currentClient].GetComponent<Visualisation>(), currentConfig);
-                            trajConfigUI.SetActive(false);
-                        };
-                    }*/
-        // }
     }
 
 
@@ -452,10 +587,16 @@ public class SceneFlowManager : MonoBehaviour
     public bool Trails { get { return clientConfigs[mCurrentClient].trail; } set { clientConfigs[mCurrentClient].trail = value; } }
     public bool Ghosting { get { return clientConfigs[mCurrentClient].ghosting; } set { clientConfigs[mCurrentClient].ghosting = value; } }
     public bool Density { get { return clientConfigs[mCurrentClient].density; } set { clientConfigs[mCurrentClient].density = value; } }
+    public int TimeType { get { return (int)clientConfigs[mCurrentClient].timeType; } set { clientConfigs[mCurrentClient].timeType = (VisClient.MovingObjectSettings.TimeType)value; } }
+
+
+    public void ApplyCurrentConfig()
+    {
+        ApplyClientConfig(visClients[mCurrentClient].GetComponent<Visualisation>(), clientConfigs[mCurrentClient]);
+    }
 
     public void CloseConfigScreen()
     {
-        ApplyClientConfig(visClients[mCurrentClient].GetComponent<Visualisation>(), clientConfigs[mCurrentClient]);
         trajConfigUI.SetActive(false);
     }
 
@@ -463,6 +604,7 @@ public class SceneFlowManager : MonoBehaviour
     {
         ResetTimeControls();
 
+        ActivateCurrentViewConfig();
         SpawnClients(clientCount);
 
         Vector3 startPos = mSmallMultiples[clientCount].startPos;
@@ -510,9 +652,9 @@ public class SceneFlowManager : MonoBehaviour
                 {
                     SmallMultipleConfig smConfig = smallMultipleConfigs[i];
 
-                    GameObject vis = Instantiate(visPrefab);
-                    vis.transform.position = smConfig.position;
-                    vis.transform.rotation = Quaternion.identity;
+                    GameObject vis = Instantiate(visPrefab, visRoot);
+                    vis.transform.localPosition = smConfig.position;
+                    vis.transform.localRotation = Quaternion.identity;
                     vis.transform.localScale = smConfig.scale;
                     visClients.Add(vis);
 
@@ -525,11 +667,11 @@ public class SceneFlowManager : MonoBehaviour
                         ApplyClientConfig(visComponent, config);
                     }
 
-                    InteractableUnityEventWrapper interaction = vis.GetComponent<InteractableUnityEventWrapper>();
+/*                    InteractableUnityEventWrapper interaction = vis.GetComponent<InteractableUnityEventWrapper>();
                     if (interaction != null)
                     {
                         interaction.WhenSelect.AddListener(() => ShowConfigScreen(interaction.gameObject.GetComponent<Visualisation>().instanceId));
-                    }
+                    }*/
                 }
             }
         }

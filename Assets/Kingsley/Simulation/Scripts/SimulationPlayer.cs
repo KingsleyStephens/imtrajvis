@@ -183,6 +183,61 @@ namespace KSimulation
             return null;
         }
 
+        public MovingObjectUpdate[] SampleObjectPath(int id, float startTime, float endTime, float timeStep)
+        {
+            List<MovingObjectUpdate> samples = new List<MovingObjectUpdate>();
+
+            if (endTime < 0.0f)
+            {
+                float t = startTime;
+                SpatioTemporalDB.MovingObjectPositionUpdate update = mSimulationDB.ReadTable(sessionName, id, t);
+                while (update != null)
+                {
+                    samples.Add(new MovingObjectUpdate(update.position, update.orientation, update.speed));
+                    t += timeStep;
+                    update = mSimulationDB.ReadTable(sessionName, id, t);
+                }
+            }
+            else
+            {
+                for (float t = startTime; t <= endTime; t += timeStep)
+                {
+                    SpatioTemporalDB.MovingObjectPositionUpdate update = mSimulationDB.ReadTable(sessionName, id, t);
+                    if (update != null)
+                    {
+                        samples.Add(new MovingObjectUpdate(update.position, update.orientation, update.speed));
+                    }
+                }
+            }
+
+            return samples.ToArray();
+        }
+
+        public MovingObjectUpdate[] SampleObjectPathDistance(int id, float startTime, float endTime, float timeStep, float distanceStep)
+        {
+            List<MovingObjectUpdate> samples = new List<MovingObjectUpdate>();
+
+            MovingObjectUpdate[] timePath = SampleObjectPath(id, startTime, endTime, timeStep);
+            if (timePath != null && timePath.Length > 0)
+            {
+                Vector3 lastPos = timePath[0].position;
+                samples.Add(timePath[0]);
+
+                for (int i = 1; i < timePath.Length; i++)
+                {
+                    var update = timePath[i];
+
+                    if (Vector3.Distance(lastPos, update.position) >= distanceStep)
+                    {
+                        samples.Add(timePath[i]);
+                        lastPos = update.position;
+                    }
+                }
+            }
+
+            return samples.ToArray();
+        }
+
         // Update is called once per frame
         void Update()
         {

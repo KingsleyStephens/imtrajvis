@@ -14,10 +14,18 @@ namespace KVisualisation
                 Distance
             }
 
+            public enum TimeType
+            {
+                Dynamic,
+                Static
+            }
+
             public bool mesh = true;
             public bool trail = false;
             public bool ghosting = false;
             public bool density = false;
+
+            public TimeType timeType = TimeType.Dynamic;
 
             public float trailTime = 30.0f;
             public float densityUpdateFrequence = 2.0f;
@@ -26,6 +34,22 @@ namespace KVisualisation
             public float ghostingDropValue = 20.0f;
             public bool overrideGhostColour = false;
             public Color ghostColour = Color.white;
+
+            public MovingObjectSettings() { }
+            public MovingObjectSettings(MovingObjectSettings other)
+            {
+                mesh = other.mesh;
+                trail = other.trail;
+                ghosting = other.ghosting;
+                density = other.density;
+                timeType = other.timeType;
+                trailTime = other.trailTime;
+                densityUpdateFrequence = other.densityUpdateFrequence;
+                ghostingDrop = other.ghostingDrop;
+                ghostingDropValue= other.ghostingDropValue;
+                overrideGhostColour = other.overrideGhostColour;
+                ghostColour = other.ghostColour;
+            }
         }
 
         [SerializeField]
@@ -44,9 +68,14 @@ namespace KVisualisation
         { 
         }
 
+        public virtual void SpawnAll()
+        { 
+        }
+
         public void ApplySettings(MovingObjectSettings settings)
         {
-            movingObjectSettings = settings;
+            movingObjectSettings = new MovingObjectSettings(settings);
+                
             OnSettingsUpdate();
         }
 

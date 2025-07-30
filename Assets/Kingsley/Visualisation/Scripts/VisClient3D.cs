@@ -1,11 +1,8 @@
-using KController;
-using KCore;
-using NUnit.Framework.Constraints;
+using KSimulation;
 using System.Collections.Generic;
-using Unity.Android.Gradle.Manifest;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
-using static Oculus.Interaction.Context;
+
 
 namespace KVisualisation
 {
@@ -19,6 +16,8 @@ namespace KVisualisation
         private GameObject ghostPrefab;
         [SerializeField]
         private GameObject trailPrefab;
+        [SerializeField]
+        private GameObject linePrefab;
         [SerializeField]
         private GameObject weaponPrefab;
 
@@ -42,6 +41,7 @@ namespace KVisualisation
         private float mLastDensityUpdateTime = 0.0f;
 
         private Transform mGhostParent;
+        private Transform mLineParent;
 
         public override void OnStart()
         {
@@ -52,47 +52,70 @@ namespace KVisualisation
             mGhostParent.localRotation = Quaternion.identity;
             mGhostParent.localScale = Vector3.one;
 
+            GameObject lineParent = new GameObject("LineParent");
+            lineParent.transform.parent = transform;
+            mLineParent = lineParent.transform;
+            mLineParent.localPosition = Vector3.zero;
+            mLineParent.localRotation = Quaternion.identity;
+            mLineParent.localScale = Vector3.one;
+
             ApplySettings();
         }
 
 
+        public override void SpawnAll()
+        {
+            mAllObjectIds.Clear();
+            mMovingObjects.Clear();
+
+            int[] allIds = mVisSimController.ListSimObjects();
+            foreach (int id in allIds)
+            {
+                mAllObjectIds.Add(id);
+                Spawn(id);
+            }
+        }
+
         public override void OnUpdate()
         {
-            bool updateDensity = false;
-            if (movingObjectSettings.density && densityMap3D != null)
+            if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic)
             {
-                if (Time.time > mLastDensityUpdateTime + movingObjectSettings.densityUpdateFrequence)
+                bool updateDensity = false;
+                if (movingObjectSettings.density && densityMap3D != null)
                 {
-                    updateDensity = true;
-                    mLastDensityUpdateTime = Time.time;
-                }
-            }
-
-            foreach (int id in mAllObjectIds)
-            {
-                var update = mVisSimController.GetSimObjectUpdate(id);
-
-                GameObject obj;
-                if (mMovingObjects.TryGetValue(id, out obj))
-                {
-                    if (update != null)
+                    if (Time.time > mLastDensityUpdateTime + movingObjectSettings.densityUpdateFrequence)
                     {
-                        obj.transform.localPosition = update.position;
-                        obj.transform.localRotation = update.orientation;
+                        updateDensity = true;
+                        mLastDensityUpdateTime = Time.time;
+                    }
+                }
 
-                        if (updateDensity)
+                foreach (int id in mAllObjectIds)
+                {
+                    var update = mVisSimController.GetSimObjectUpdate(id);
+
+                    GameObject obj;
+                    if (mMovingObjects.TryGetValue(id, out obj))
+                    {
+                        if (update != null)
                         {
-                            densityMap3D.UpdatePosition(obj.transform.localPosition);
+                            obj.transform.localPosition = update.position;
+                            obj.transform.localRotation = update.orientation;
+
+                            if (updateDensity)
+                            {
+                                densityMap3D.UpdatePosition(obj.transform.localPosition);
+                            }
+                        }
+                        else
+                        {
+                            Destruct(id);
                         }
                     }
-                    else
+                    else if (update != null)
                     {
-                        Destruct(id);
+                        Spawn(id);
                     }
-                }
-                else if (update != null)
-                {
-                    Spawn(id);
                 }
             }
         }
@@ -126,13 +149,21 @@ namespace KVisualisation
         private void Spawn(int id)
         {
             var data = mVisSimController.GetSimObjectData(id);
-            var update = mVisSimController.GetSimObjectUpdate(id);
-            if (data != null && update != null)
+            if (data != null)
             {
                 GameObject instance = Instantiate(objectPrefab, transform);
                 instance.name = data.name;
-                instance.transform.localPosition = update.position;
-                instance.transform.localRotation = update.orientation;
+
+                if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic)
+                { 
+                    var update = mVisSimController.GetSimObjectUpdate(id);
+                    if (update != null)
+                    {
+                        instance.transform.localPosition = update.position;
+                        instance.transform.localRotation = update.orientation;
+                    }
+                }
+
                 VisAgentData agentData = instance.GetComponent<VisAgentData>();
                 if (agentData != null)
                 {
@@ -144,7 +175,7 @@ namespace KVisualisation
 
                     ApplySettingsToMovingObject(instance);
 
-                    if (agentClass == VisAgentData.AgentClass.Weapon)
+                    if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic && agentClass == VisAgentData.AgentClass.Weapon)
                     {
                         Instantiate(weaponPrefab, instance.transform.parent);
                     }
@@ -198,9 +229,31 @@ namespace KVisualisation
                 }
             }
 
-            foreach (var id in mMovingObjects.Keys)
+            if (!movingObjectSettings.trail && movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
             {
-                ApplySettingsToMovingObject(mMovingObjects[id]);
+                foreach (Transform child in mLineParent)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+
+            if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
+            {
+                foreach (var id in mMovingObjects.Keys)
+                {
+                    GameObject go = mMovingObjects[id];
+                    Destroy(go);
+                }
+                mMovingObjects.Clear();
+
+                SpawnAll();
+            }
+            else
+            {
+                foreach (var id in mMovingObjects.Keys)
+                {
+                    ApplySettingsToMovingObject(mMovingObjects[id]);
+                }
             }
         }
 
@@ -234,6 +287,17 @@ namespace KVisualisation
                         }
                     }
 
+                    SimulationPlayer.MovingObjectUpdate[] path = null;
+                    if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
+                    {
+                        path = mVisSimController.Player.SampleObjectPath(agentData.id, 0.0f, 60.0f * 10.0f, 0.5f);
+                        if (path != null && path.Length > 0)
+                        {
+                            movingObject.transform.localPosition = path[path.Length - 1].position;
+                            movingObject.transform.localRotation = path[path.Length - 1].orientation;
+                        }
+                    }
+
                     if (movingObjectSettings.mesh)
                     {
                         GameObject meshObject = Instantiate(meshPrefab, movingObject.transform);
@@ -249,18 +313,41 @@ namespace KVisualisation
 
                     if (movingObjectSettings.trail)
                     {
-                        GameObject trailObject = Instantiate(trailPrefab, movingObject.transform);
-
-                        TrailRenderer trailRenderer = trailObject.GetComponent<TrailRenderer>();
-                        if (trailRenderer != null)
+                        if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
                         {
-                            trailRenderer.time = movingObjectSettings.trailTime;
+                            if (path != null)
+                            {
+                                GameObject lineObject = Instantiate(linePrefab, mLineParent);
 
-                            var m = trailRenderer.material;
-                            m.SetColor("_BaseColor", c);
-                            trailRenderer.material = m;
+                                LineRenderer lineRenderer = lineObject.GetComponent<LineRenderer>();
+                                if (lineRenderer != null)
+                                {
+                                    var m = lineRenderer.material;
+                                    m.SetColor("_BaseColor", c);
+                                    lineRenderer.material = m;
 
-                            trailRenderer.widthMultiplier = transform.lossyScale.x;
+                                    lineRenderer.widthMultiplier = transform.lossyScale.x;
+
+                                    lineRenderer.positionCount = path.Length;
+                                    lineRenderer.SetPositions(path.Select((a) => a.position).ToArray());
+                                }
+                            }
+                        }
+                        else
+                        {
+                            GameObject trailObject = Instantiate(trailPrefab, movingObject.transform);
+
+                            TrailRenderer trailRenderer = trailObject.GetComponent<TrailRenderer>();
+                            if (trailRenderer != null)
+                            {
+                                var m = trailRenderer.material;
+                                m.SetColor("_BaseColor", c);
+                                trailRenderer.material = m;
+
+                                trailRenderer.widthMultiplier = transform.lossyScale.x;
+
+                                trailRenderer.time = movingObjectSettings.trailTime;
+                            }
                         }
                     }
 
@@ -279,6 +366,27 @@ namespace KVisualisation
                         ghostSpawner.ghostingValue = movingObjectSettings.ghostingDropValue;
                         ghostSpawner.colour = movingObjectSettings.overrideGhostColour ? movingObjectSettings.ghostColour : c;
                         ghostSpawner.duration = movingObjectSettings.trailTime;
+
+                        if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
+                        {
+                            SimulationPlayer.MovingObjectUpdate[] ghostPath = null;
+                            if (ghostSpawner.ghostingDropType == MovingObjectSettings.GhostingDrop.Distance)
+                            {
+                                ghostPath = mVisSimController.Player.SampleObjectPathDistance(agentData.id, 0.0f, 60.0f * 10.0f, 0.5f, movingObjectSettings.ghostingDropValue);
+                            }
+                            else
+                            {
+                                ghostPath = mVisSimController.Player.SampleObjectPath(agentData.id, 0.0f, 60.0f * 10.0f, movingObjectSettings.ghostingDropValue);
+                            }
+
+                            if (ghostPath != null && ghostPath.Length > 0)
+                            { 
+                                foreach (var p in ghostPath)
+                                {
+                                    ghostSpawner.Spawn(p.position, p.orientation, -1.0f);
+                                }
+                            }
+                        }
                     }
                 }
             }

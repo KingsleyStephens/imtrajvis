@@ -72,7 +72,6 @@ namespace SATestbed
             {
                 if (dimensions[i] != null)
                 {
-                    KCore.Logger.LogMessage(i.ToString());
                     dimensions[i].SetActive(i == (int)visType);
                 }
             }
