@@ -101,7 +101,7 @@ namespace Oculus.Interaction.Locomotion
         [SerializeField]
         private float minZoom = 1.0f;
         [SerializeField]
-        private float maxZoom = 200.0f;
+        private float maxZoom = 100.0f;
 
 
         [SerializeField]
@@ -115,6 +115,15 @@ namespace Oculus.Interaction.Locomotion
 
         private float mOrbitDist = 0.0f;
         private float mOrbitHeight = 0.0f;
+
+        private bool mPanning = false;
+
+        public bool Panning { get { return mPanning; } set { mPanning = value; } }
+
+        public void TogglePanning()
+        {
+            mPanning = !mPanning;
+        }
 
         public void SetPivotPos(Vector3 pos, Transform parent)
         {
@@ -143,19 +152,80 @@ namespace Oculus.Interaction.Locomotion
         {
             camPosDummy.localPosition = Vector3.zero;
             camPosDummy.localRotation = Quaternion.identity;
-            camPosDummy.Translate(-camPosDummy.forward * mOrbitDist);
-            camPosDummy.Translate(camPosDummy.up * mOrbitHeight);
+            camPosDummy.Translate(-camPosDummy.forward * mOrbitDist, Space.World);
+            camPosDummy.Translate(Vector3.up * mOrbitHeight * mOrbitDist / orbitDistance, Space.World);
             camPosDummy.LookAt(pivot.position);
+
+            _playerOrigin.position = camPosDummy.position;
+            _playerOrigin.rotation = Quaternion.Euler(0.0f, camPosDummy.rotation.eulerAngles.y, 0.0f);
         }
+
+        public void StickUp()
+        {
+            if (mPanning)
+            {
+                PanUp();
+            }
+            else
+            {
+                ZoomIn();
+            }
+        }
+
+        public void StickDown()
+        {
+            if (mPanning)
+            {
+                PanDown();
+            }
+            else
+            {
+                ZoomOut();
+            }
+        }
+
+
+        public void StickRight()
+        {
+            if (mPanning)
+            {
+                PanRight();
+            }
+            else
+            {
+                OrbitRight();
+            }
+        }
+
+        public void StickLeft()
+        {
+            if (mPanning)
+            {
+                PanLeft();
+            }
+            else
+            {
+                OrbitLeft();
+            }
+        }
+
+
+        public void StickRelease()
+        {
+            StopPan();
+            StopZoom();
+            StopOrbit();
+        }
+
 
         public void ZoomIn()
         {
-            Zoom(1);
+            Zoom(-1);
         }
 
         public void ZoomOut()
         {
-            Zoom(-1);
+            Zoom(1);
         }
 
         public void StopZoom()
@@ -171,12 +241,12 @@ namespace Oculus.Interaction.Locomotion
 
         public void OrbitRight()
         {
-            Orbit(1);
+            Orbit(-1);
         }
 
         public void OrbitLeft()
         {
-            Orbit(-1);
+            Orbit(1);
         }
 
         public void StopOrbit()
@@ -192,12 +262,12 @@ namespace Oculus.Interaction.Locomotion
 
         public void PanRight()
         {
-            Pan(new Vector2(1.0f, 0.0f));
+            Pan(new Vector2(-1.0f, 0.0f));
         }
 
         public void PanLeft()
         {
-            Pan(new Vector2(-1.0f, 0.0f));
+            Pan(new Vector2(1.0f, 0.0f));
         }
 
         public void PanUp()
@@ -276,7 +346,7 @@ namespace Oculus.Interaction.Locomotion
 
             //UpdateVelocity();
 
-            Pose startPose = _characterController.Pose;
+            //Pose startPose = _characterController.Pose;
 
             if (pivot != null && camPosDummy != null && (_panDir != Vector2.zero || _orbitDir != 0 || _zoomDir != 0 || _raiseDir != 0))
             {
@@ -284,21 +354,26 @@ namespace Oculus.Interaction.Locomotion
                 mOrbitDist += _zoomDir * zoomSpeed * dt;
                 mOrbitDist = Mathf.Clamp(mOrbitDist, minZoom, maxZoom);
 
-                //pivot.Rotate(Vector3.up, _orbitDir * orbitSpeed * dt);
-                //pivot.Translate((pivot.right * _panDir.x + pivot.forward * _panDir.y).normalized * panSpeed * dt);
+                pivot.Rotate(Vector3.up, _orbitDir * orbitSpeed * dt);
+
+                Vector3 dummyForward = camPosDummy.forward;
+                dummyForward.y = 0.0f;
+                dummyForward.Normalize();
+                Vector3 dummyRight = Vector3.Cross(dummyForward, Vector3.up);
+
+                pivot.Translate((dummyRight * _panDir.x + dummyForward * _panDir.y).normalized * panSpeed * dt, Space.World);
                 mOrbitHeight += _raiseDir * verticleSpeed * dt;
-                mOrbitHeight = Mathf.Clamp(mOrbitHeight, 0.0f, orbitHeight);
+                mOrbitHeight = Mathf.Clamp(mOrbitHeight, 0.0f, orbitHeight * orbitDistance / mOrbitDist);
 
                 UpdateCameraPos();
-
             }
 
-            Vector3 delta = _velocity * _deltaTimeProvider.Invoke();
-            _characterController.Move(delta);
+            //Vector3 delta = _velocity * _deltaTimeProvider.Invoke();
+            //_characterController.Move(delta);
 
 
-            Pose endPose = _characterController.Pose;
-            AccumulateDelta(ref _accumulatedDeltaFrame, startPose, endPose);
+            //Pose endPose = _characterController.Pose;
+            //AccumulateDelta(ref _accumulatedDeltaFrame, startPose, endPose);
 
         }
 

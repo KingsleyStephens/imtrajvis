@@ -125,6 +125,7 @@ public class SceneFlowManager : MonoBehaviour
     public bool IncreaseTime { get; set; } = false;
     public bool DecreaseTime { get; set; } = false;
 
+
     private void ApplyViewConfig(ViewConfigType config)
     {
         if (visRoot == null)
@@ -425,6 +426,8 @@ public class SceneFlowManager : MonoBehaviour
         if (trajConfigUI != null && trajConfigUI.activeSelf)
         {
             trajConfigUI.SetActive(false);
+
+            mViewConfigType = ViewConfigType.Room;
         }
 
         if (player != null)
