@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5416942407419194889}
   - component: {fileID: 4552699002356404413}
+  - component: {fileID: 2204966143799761869}
   m_Layer: 0
   m_Name: Trail
   m_TagString: Untagged
@@ -56,7 +57,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 358a5d72030902f4cb1b5f925325eb59, type: 2}
+  - {fileID: 2100000, guid: e9bc5ba7bd0133e489f76a6da53737b6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -87,7 +88,7 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
+        value: 0.51851845
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -133,9 +134,23 @@ TrailRenderer:
     textureMode: 0
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
-    generateLightingData: 0
+    generateLightingData: 1
   m_MinVertexDistance: 0.1
   m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &2204966143799761869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2627913536600491904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f162495db07686429ee5d19a3374acb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hoverMaterial: {fileID: 2100000, guid: 18c36790dc615304eaedc017863e353b, type: 2}
+  selectMaterial: {fileID: 2100000, guid: 28a8ccb6f60101d4dbc2c20b9769f52a, type: 2}

@@ -135,25 +135,39 @@ namespace Oculus.Interaction.Locomotion
             ConsumeDeferredLocomotionEvents();
         }
 
-        public void MoveForward()
+        public void MoveForward(float speedMultiplier)
         {
-            _velocity = _playerEyes.forward * moveSpeed;
+            _velocity = _playerEyes.forward * moveSpeed * speedMultiplier;
         }
 
-        public void MoveBackward()
+        public void MoveBackward(float speedMultiplier)
         {
-            _velocity = _playerEyes.forward * -moveSpeed;
+            _velocity = _playerEyes.forward * -moveSpeed * speedMultiplier;
         }
+
+        private bool _hasVerticalSnapped = false;
 
         public void MoveUp()
         {
-
-            _velocity = Vector3.up * moveSpeed;
+            if (!_hasVerticalSnapped)
+            {
+                HandleLocomotionEvent(new LocomotionEvent(0, Vector3.up * moveSpeed, LocomotionEvent.TranslationType.Relative));
+                _hasVerticalSnapped = true;
+            }
         }
 
         public void MoveDown()
         {
-            _velocity = Vector3.up * -moveSpeed;
+            if (!_hasVerticalSnapped)
+            {
+                HandleLocomotionEvent(new LocomotionEvent(0, Vector3.up * -moveSpeed, LocomotionEvent.TranslationType.Relative));
+                _hasVerticalSnapped = true;
+            }
+        }
+
+        public void StopVerticalMovement()
+        {
+            _hasVerticalSnapped = false;
         }
 
         public void Stop()

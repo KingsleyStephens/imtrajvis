@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - CAMERA_MANAGER
+  - InstanceID
   layers:
   - Default
   - TransparentFX
@@ -16,7 +17,7 @@ TagManager:
   - TwoPointFiveD
   - VisInstance
   - Overlay UI
-  - 
+  - WorldUI
   - 
   - 
   - 

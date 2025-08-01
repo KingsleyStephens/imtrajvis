@@ -1,4 +1,5 @@
 using KController;
+using Oculus.Interaction.DebugTree;
 using UnityEngine;
 
 namespace KVisualisation
@@ -20,10 +21,20 @@ namespace KVisualisation
                 Static
             }
 
+            public enum FilterType
+            {
+                None,
+                InverseSelection,
+                Selection,
+                Clear
+            }
+
             public bool mesh = true;
             public bool trail = false;
             public bool ghosting = false;
             public bool density = false;
+
+            public FilterType filter = FilterType.None;
 
             public TimeType timeType = TimeType.Dynamic;
 
@@ -42,6 +53,7 @@ namespace KVisualisation
                 trail = other.trail;
                 ghosting = other.ghosting;
                 density = other.density;
+                filter = other.filter;
                 timeType = other.timeType;
                 trailTime = other.trailTime;
                 densityUpdateFrequence = other.densityUpdateFrequence;
@@ -58,6 +70,8 @@ namespace KVisualisation
 
         protected VisSimController mVisSimController;
 
+        protected int mId = -1;
+
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
@@ -72,8 +86,9 @@ namespace KVisualisation
         { 
         }
 
-        public void ApplySettings(MovingObjectSettings settings)
+        public void ApplySettings(int id, MovingObjectSettings settings)
         {
+            mId = id;
             movingObjectSettings = new MovingObjectSettings(settings);
                 
             OnSettingsUpdate();

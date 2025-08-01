@@ -33,8 +33,6 @@ public class SceneFlowManager : MonoBehaviour
 
     [SerializeField]
     private Vector3 visDimensions = new Vector3(1000.0f, 1000.0f, 1000.0f);
-    [SerializeField]
-    private float smallMultipleScale = 0.25f;
 
     [SerializeField]
     private GameObject launchUI;
@@ -55,13 +53,17 @@ public class SceneFlowManager : MonoBehaviour
     {
         public Vector3 position;
         public Vector3 scale;
-        public GameObject interaction;
     }
 
     [SerializeField]
-    private ViewConfig tableTopViewConfig;
+    private GameObject tableTopInteraction;
     [SerializeField]
-    private ViewConfig roomViewConfig;
+    private GameObject roomViewInteraction;
+
+    [SerializeField]
+    private ViewConfig[] tableTopViewConfig;
+    [SerializeField]
+    private ViewConfig[] roomViewConfig;
 
     public enum ViewConfigType
     {
@@ -138,22 +140,20 @@ public class SceneFlowManager : MonoBehaviour
         {
             case ViewConfigType.Tabletop:
                 {
-                    currentConfig = tableTopViewConfig;
+                    currentConfig = tableTopViewConfig[mNumClients - 1];
+                    tableTopInteraction.SetActive(false);
                     break;
                 }
             case ViewConfigType.Room:
                 {
-                    currentConfig = roomViewConfig;
+                    currentConfig = roomViewConfig[mNumClients - 1];
+                    roomViewInteraction.SetActive(false);
                     break;
                 }
             default:
                 {
                     break;
                 }
-        }
-        if (currentConfig != null)
-        {
-            currentConfig.interaction.SetActive(false);
         }
 
         mViewConfigType = config;
@@ -173,7 +173,7 @@ public class SceneFlowManager : MonoBehaviour
         {
             case ViewConfigType.Tabletop:
                 {
-                    currentConfig = tableTopViewConfig;
+                    currentConfig = tableTopViewConfig[mNumClients - 1];
 
                     if (cameraRig != null)
                     {
@@ -191,11 +191,13 @@ public class SceneFlowManager : MonoBehaviour
                         }
                     }
 
+                    tableTopInteraction.SetActive(true);
+
                     break;
                 }
             case ViewConfigType.Room:
                 {
-                    currentConfig = roomViewConfig;
+                    currentConfig = roomViewConfig[mNumClients - 1];
 
 
                     if (cameraRig != null)
@@ -212,6 +214,9 @@ public class SceneFlowManager : MonoBehaviour
                             newCam.enabled = true;
                         }
                     }
+
+                    roomViewInteraction.SetActive(true);
+
                     break;
                 }
             default:
@@ -221,7 +226,6 @@ public class SceneFlowManager : MonoBehaviour
         }
         if (currentConfig != null)
         {
-            currentConfig.interaction.SetActive(true);
             visRoot.position = currentConfig.position;
             visRoot.localScale = currentConfig.scale;
 
@@ -230,7 +234,16 @@ public class SceneFlowManager : MonoBehaviour
             {
                 root.OnResize();
             }
+
+            StartCoroutine(DeferApplyConfig());
         }
+    }
+
+    private System.Collections.IEnumerator DeferApplyConfig()
+    {
+        yield return new WaitForEndOfFrame();
+
+        ApplyCurrentConfig();
     }
 
     private void ResetTimeControls()
@@ -317,25 +330,29 @@ public class SceneFlowManager : MonoBehaviour
         config1.Add(new SmallMultipleConfig(Vector3.one, Vector3.zero));
         mSmallMultiples.Add(1, new SmallMultipleGroup() { config = config1, startPos = new Vector3(0.0f, height, 0.0f) });
 
-        height *= smallMultipleScale;
+        float scale = 0.5f;
+        float h = height * scale;
 
         List<SmallMultipleConfig> config2 = new List<SmallMultipleConfig>();
-        config2.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(-visDimensions.x * smallMultipleScale * 0.5f, 0.0f, 0.0f)));
-        config2.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(visDimensions.x * smallMultipleScale * 0.5f, 0.0f, 0.0f)));
-        mSmallMultiples.Add(2, new SmallMultipleGroup() { config = config2, startPos = new Vector3(0.0f, height, 0.0f) });
+        config2.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, 0.0f)));
+        config2.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, 0.0f)));
+        mSmallMultiples.Add(2, new SmallMultipleGroup() { config = config2, startPos = new Vector3(0.0f, h, 0.0f) });
+
+        scale = 0.25f;
+        h = height * scale;
 
         List<SmallMultipleConfig> config3 = new List<SmallMultipleConfig>();
-        config3.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(-visDimensions.x * smallMultipleScale * 0.5f, 0.0f, -visDimensions.z * smallMultipleScale * 0.5f)));
-        config3.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(visDimensions.x * smallMultipleScale * 0.5f, 0.0f, -visDimensions.z * smallMultipleScale * 0.5f)));
-        config3.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(0.0f, 0.0f, visDimensions.z * smallMultipleScale * 0.5f)));
-        mSmallMultiples.Add(3, new SmallMultipleGroup() { config = config3, startPos = new Vector3(0.0f, height, 0.0f) });
+        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * 0.25f * 0.5f)));
+        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * 0.25f * 0.5f)));
+        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(0.0f, 0.0f, visDimensions.z * scale * 0.5f)));
+        mSmallMultiples.Add(3, new SmallMultipleGroup() { config = config3, startPos = new Vector3(0.0f, h, 0.0f) });
 
         List<SmallMultipleConfig> config4 = new List<SmallMultipleConfig>();
-        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(-visDimensions.x * smallMultipleScale * 0.5f, 0.0f, -visDimensions.z * smallMultipleScale * 0.5f)));
-        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(visDimensions.x * smallMultipleScale * 0.5f, 0.0f, -visDimensions.z * smallMultipleScale * 0.5f)));
-        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(-visDimensions.x * smallMultipleScale * 0.5f, 0.0f, visDimensions.z * smallMultipleScale * 0.5f)));
-        config4.Add(new SmallMultipleConfig(Vector3.one * smallMultipleScale, new Vector3(visDimensions.x * smallMultipleScale * 0.5f, 0.0f, visDimensions.z * smallMultipleScale * 0.5f)));
-        mSmallMultiples.Add(4, new SmallMultipleGroup() { config = config4, startPos = new Vector3(0.0f, height, 0.0f) });
+        config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * scale * 0.5f)));
+        config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * scale * 0.5f)));
+        config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, visDimensions.z * scale * 0.5f)));
+        config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, visDimensions.z * scale * 0.5f)));
+        mSmallMultiples.Add(4, new SmallMultipleGroup() { config = config4, startPos = new Vector3(0.0f, h, 0.0f) });
     }
 
 
@@ -531,6 +548,16 @@ public class SceneFlowManager : MonoBehaviour
         {
             Debug.LogWarning("No Dropdowns found in trajConfigUI");
         }
+
+        Toggle[] toggles = trajConfigUI.GetComponentsInChildren<Toggle>();
+        if (toggles.Length > 0)
+        {
+            var toggleSearch = toggles.First((t) => t.name == "RoomScaleToggle");
+            if (toggleSearch != null)
+            {
+                toggleSearch.isOn = mViewConfigType == ViewConfigType.Room;
+            }
+        }
     }
 
     private void SetClientConfigUI(int client)
@@ -578,6 +605,11 @@ public class SceneFlowManager : MonoBehaviour
             {
                 toggleSearch.isOn = Density;
             }
+            toggleSearch = toggles.First((t) => t.name == "NoChangeToggle");
+            if (toggleSearch != null)
+            {
+                toggleSearch.isOn = true;
+            }
         }
         else
         {
@@ -591,11 +623,15 @@ public class SceneFlowManager : MonoBehaviour
     public bool Ghosting { get { return clientConfigs[mCurrentClient].ghosting; } set { clientConfigs[mCurrentClient].ghosting = value; } }
     public bool Density { get { return clientConfigs[mCurrentClient].density; } set { clientConfigs[mCurrentClient].density = value; } }
     public int TimeType { get { return (int)clientConfigs[mCurrentClient].timeType; } set { clientConfigs[mCurrentClient].timeType = (VisClient.MovingObjectSettings.TimeType)value; } }
+    public int Filter { get { return (int)clientConfigs[mCurrentClient].filter; } set { clientConfigs[mCurrentClient].filter = (VisClient.MovingObjectSettings.FilterType)value; } }
 
 
     public void ApplyCurrentConfig()
     {
-        ApplyClientConfig(visClients[mCurrentClient].GetComponent<Visualisation>(), clientConfigs[mCurrentClient]);
+        if (mCurrentClient >= 0 && mCurrentClient < visClients.Count)
+        {
+            ApplyClientConfig(visClients[mCurrentClient].GetComponent<Visualisation>(), clientConfigs[mCurrentClient]);
+        }
     }
 
     public void CloseConfigScreen()
@@ -667,6 +703,9 @@ public class SceneFlowManager : MonoBehaviour
                     if (visComponent != null)
                     {
                         visComponent.instanceId = i;
+
+
+
                         ApplyClientConfig(visComponent, config);
                     }
 

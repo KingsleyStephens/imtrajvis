@@ -1,7 +1,10 @@
 using KSimulation;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
+using static KVisualisation.VisClient;
+using static Oculus.Interaction.Context;
 
 
 namespace KVisualisation
@@ -42,6 +45,9 @@ namespace KVisualisation
 
         private Transform mGhostParent;
         private Transform mLineParent;
+        private Transform mWeaponParent;
+
+        public TextMeshProUGUI clientIdLabel;
 
         public override void OnStart()
         {
@@ -59,9 +65,23 @@ namespace KVisualisation
             mLineParent.localRotation = Quaternion.identity;
             mLineParent.localScale = Vector3.one;
 
+            EnsureWeaponParent();
+
             ApplySettings();
         }
 
+        private void EnsureWeaponParent()
+        {
+            if (mWeaponParent == null)
+            {
+                GameObject weaponParent = new GameObject("WeaponParent");
+                weaponParent.transform.parent = transform;
+                mWeaponParent = weaponParent.transform;
+                mWeaponParent.localPosition = Vector3.zero;
+                mWeaponParent.localRotation = Quaternion.identity;
+                mWeaponParent.localScale = Vector3.one;
+            }
+        }
 
         public override void SpawnAll()
         {
@@ -177,7 +197,9 @@ namespace KVisualisation
 
                     if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic && agentClass == VisAgentData.AgentClass.Weapon)
                     {
-                        Instantiate(weaponPrefab, instance.transform.parent);
+                        EnsureWeaponParent();
+
+                        Instantiate(weaponPrefab, mWeaponParent);
                     }
                 }
 
@@ -237,6 +259,13 @@ namespace KVisualisation
                 }
             }
 
+            // Weapons
+            foreach (Transform child in mWeaponParent)
+            {
+                Destroy(child.gameObject);
+            }
+
+
             if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
             {
                 foreach (var id in mMovingObjects.Keys)
@@ -255,6 +284,13 @@ namespace KVisualisation
                     ApplySettingsToMovingObject(mMovingObjects[id]);
                 }
             }
+
+            movingObjectSettings.filter = MovingObjectSettings.FilterType.None;
+
+            if (clientIdLabel != null)
+            {
+                clientIdLabel.text = (mId + 1).ToString();
+            }
         }
 
         private void ApplySettingsToMovingObject(GameObject movingObject)
@@ -262,6 +298,56 @@ namespace KVisualisation
             foreach (Transform child in movingObject.transform)
             {
                 Destroy(child.gameObject);
+            }
+
+            bool isSelected = false;
+
+            SelectableObject selectable = movingObject.GetComponent<SelectableObject>();
+            if (selectable != null)
+            {
+                isSelected = selectable.State == SelectableObject.StateType.Selected;
+                selectable.State = SelectableObject.StateType.None;
+            }
+
+            Filterable filterable = movingObject.GetComponent<Filterable>();
+            if (filterable != null)
+            {
+                switch (movingObjectSettings.filter)
+                {
+                    case MovingObjectSettings.FilterType.Clear:
+                        {
+                            if (filterable.Filtered)
+                            {
+                                filterable.Filtered = false;
+                            }
+                            break;
+                        }
+                    case MovingObjectSettings.FilterType.InverseSelection:
+                        {
+                            if (!filterable.Filtered)
+                            {
+                                filterable.Filtered = !isSelected;
+                            }
+                            break;
+                        }
+                    case MovingObjectSettings.FilterType.Selection:
+                        {
+                            if (!filterable.Filtered)
+                            {
+                                filterable.Filtered = isSelected;
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
+                }
+                                                    
+                if (filterable.Filtered)
+                {
+                    return;
+                }
             }
 
             VisAgentData agentData = movingObject.GetComponent<VisAgentData>();

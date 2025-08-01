@@ -239,6 +239,8 @@ namespace Oculus.Interaction.Locomotion
             _zoomDir = direction;
         }
 
+        private bool _hasOrbitSnapped = false;
+
         public void OrbitRight()
         {
             Orbit(-1);
@@ -252,11 +254,13 @@ namespace Oculus.Interaction.Locomotion
         public void StopOrbit()
         {
             Orbit(0);
+            _hasOrbitSnapped = false;
         }
+
 
         public void Orbit(int direction)
         {
-            _orbitDir = direction;
+           _orbitDir = direction;
         }
 
 
@@ -289,6 +293,8 @@ namespace Oculus.Interaction.Locomotion
             _panDir = pan;
         }
 
+        private bool _hasVerticalSnapped = false;
+
         public void RaiseUp()
         {
             Raise(1);
@@ -302,6 +308,7 @@ namespace Oculus.Interaction.Locomotion
         public void StopRaise()
         {
             Raise(0);
+            _hasVerticalSnapped = false;
         }
 
 
@@ -354,16 +361,25 @@ namespace Oculus.Interaction.Locomotion
                 mOrbitDist += _zoomDir * zoomSpeed * dt;
                 mOrbitDist = Mathf.Clamp(mOrbitDist, minZoom, maxZoom);
 
-                pivot.Rotate(Vector3.up, _orbitDir * orbitSpeed * dt);
-
+                if (_orbitDir != 0 && !_hasOrbitSnapped)
+                {
+                    pivot.Rotate(Vector3.up, _orbitDir * orbitSpeed);
+                    _hasOrbitSnapped = true;
+                }
+                
                 Vector3 dummyForward = camPosDummy.forward;
                 dummyForward.y = 0.0f;
                 dummyForward.Normalize();
                 Vector3 dummyRight = Vector3.Cross(dummyForward, Vector3.up);
 
                 pivot.Translate((dummyRight * _panDir.x + dummyForward * _panDir.y).normalized * panSpeed * dt, Space.World);
-                mOrbitHeight += _raiseDir * verticleSpeed * dt;
-                mOrbitHeight = Mathf.Clamp(mOrbitHeight, 0.0f, orbitHeight * orbitDistance / mOrbitDist);
+
+                if (_raiseDir != 0 && !_hasVerticalSnapped)
+                {
+                    mOrbitHeight += _raiseDir * verticleSpeed;
+                    mOrbitHeight = Mathf.Clamp(mOrbitHeight, 0.0f, orbitHeight * orbitDistance / mOrbitDist);
+                    _hasVerticalSnapped = true;
+                }
 
                 UpdateCameraPos();
             }

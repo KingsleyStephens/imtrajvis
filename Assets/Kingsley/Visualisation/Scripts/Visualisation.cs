@@ -97,7 +97,7 @@ namespace SATestbed
                     VisClient visClient = dimensions[i].GetComponent<VisClient>();
                     if (visClient != null)
                     {
-                        visClient.ApplySettings(settings);
+                        visClient.ApplySettings(instanceId, settings);
                     }
                 }
             }
