@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using UnityEngine;
 using static KVisualisation.SelectableObject;
 
@@ -13,13 +13,29 @@ namespace KVisualisation
         [SerializeField]
         private Material selectMaterial;
 
-
         private Material baseMaterial;
 
         private MeshRenderer meshRenderer;
         private LineRenderer lineRenderer;
 
         private SelectableObject parentSelectable;
+
+        private float doubleTapTime = 1.0f;
+
+
+        private class History
+        {
+            public History(StateType state, float time)
+            {
+                this.state = state;
+                this.time = time;
+            }
+
+            public StateType state = StateType.None;
+            public float time = 0.0f;
+        }
+
+        private List<History> history = new List<History>();
 
         public void SetState(StateType state)
         {
@@ -100,11 +116,31 @@ namespace KVisualisation
         {
             if (parentSelectable.State != StateType.Selected)
             {
-                parentSelectable.State = StateType.Selected;
+                if (history.Count == 1 && Time.time - history[0].time < doubleTapTime)
+                { 
+                    parentSelectable.State = StateType.GroupDeselected;
+                    history.Clear();
+                }
+                else
+                {
+                    history.Clear();
+                    parentSelectable.State = StateType.Selected;
+                    history.Add(new History(StateType.Selected, Time.time));
+                }
             }
-            else if (parentSelectable.State == StateType.Selected)
+            else
             {
-                parentSelectable.State = StateType.Hover;
+                if (history.Count == 1 && Time.time - history[0].time < doubleTapTime)
+                {
+                    parentSelectable.State = StateType.GroupSelected;
+                    history.Clear();
+                }
+                else
+                {
+                    history.Clear();
+                    parentSelectable.State = StateType.Hover;
+                    history.Add(new History(StateType.Hover, Time.time));
+                }
             }
         }
 

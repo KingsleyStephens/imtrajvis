@@ -235,6 +235,7 @@ public class SceneFlowManager : MonoBehaviour
                 root.OnResize();
             }
 
+
             StartCoroutine(DeferApplyConfig());
         }
     }
@@ -242,7 +243,7 @@ public class SceneFlowManager : MonoBehaviour
     private System.Collections.IEnumerator DeferApplyConfig()
     {
         yield return new WaitForEndOfFrame();
-
+        ApplyViewChange();
         ApplyCurrentConfig();
     }
 
@@ -631,6 +632,18 @@ public class SceneFlowManager : MonoBehaviour
         if (mCurrentClient >= 0 && mCurrentClient < visClients.Count)
         {
             ApplyClientConfig(visClients[mCurrentClient].GetComponent<Visualisation>(), clientConfigs[mCurrentClient]);
+        }
+    }
+
+    public void ApplyViewChange()
+    {
+        if (mCurrentClient >= 0 && mCurrentClient < visClients.Count)
+        {
+            Visualisation vis = visClients[mCurrentClient].GetComponent<Visualisation>();
+            if (vis != null)
+            {
+                vis.ApplyViewChange();
+            }
         }
     }
 

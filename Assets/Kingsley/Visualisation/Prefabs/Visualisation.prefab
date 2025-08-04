@@ -573,7 +573,7 @@ MonoBehaviour:
     type: 3}
   ghostPrefab: {fileID: 5326158167213279261, guid: effc14ad0ac87f546a1f5abb21662cf6,
     type: 3}
-  trailPrefab: {fileID: 2627913536600491904, guid: 7c8697e7478c94a4c8c394190c78cf63,
+  trailPrefab: {fileID: 2627913536600491904, guid: 2d795732f41c3f84c842018f0f43a689,
     type: 3}
   linePrefab: {fileID: 2627913536600491904, guid: d294b08b87cb3bd4e82b221e52dc4fb1,
     type: 3}

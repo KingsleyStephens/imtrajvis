@@ -74,6 +74,7 @@ namespace SpatioTemporalDatabase
          */
         public abstract MovingObjectData ReadTable(string name, int movingObjectId);
         public abstract MovingObjectPositionUpdate ReadTable(string name, int movingObjectId, float time);
+        public abstract Vector2 ReadTableTimePeriod(string name, int movingObjectId);
 
         /**
          * List all the tables

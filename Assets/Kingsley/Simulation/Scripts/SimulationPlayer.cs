@@ -13,18 +13,20 @@ namespace KSimulation
     {
         public class MovingObjectData
         {
-            public MovingObjectData(int id, int parentId, string objectClass, string name)
+            public MovingObjectData(int id, int parentId, string objectClass, string name, Vector2 timePeriod)
             {
                 this.id = id;
                 this.parentId = parentId;
                 this.objectClass = objectClass;
                 this.name = name;
+                this.timePeriod = timePeriod;
             }
 
             public int id;
             public int parentId;
             public string objectClass;
             public string name;
+            public Vector2 timePeriod;
         }
 
         public class MovingObjectUpdate
@@ -46,6 +48,9 @@ namespace KSimulation
 
         public delegate void OnDestroyMovingObject(int id);
         private event OnDestroyMovingObject onDestroyed;
+
+        public delegate void OnTimeScrub(float fromTime, float toTime);
+        private event OnTimeScrub onTimeScrubbed;
 
         [SerializeField]
         private string dbName = "simulation";
@@ -71,8 +76,13 @@ namespace KSimulation
         private float mSimTime;
         private float mSimStartTime;
 
+        private Vector2 mTimeExtents = Vector2.zero;
 
-        public float SimTime { get { return mSimTime; } set { mSimTime = value; } }
+        public float SimTime { get { return mSimTime; } set {
+                float oldValue = mSimTime;
+                mSimTime = value;
+                onTimeScrubbed(oldValue, mSimTime);
+            } }
 
         public bool Loaded { get; private set; }
 
@@ -88,7 +98,25 @@ namespace KSimulation
             mSimulationDB = OpenDb();
             SetSimTime(startTime);
 
+            int[] objs = ListSimObjects();
+            foreach (int obj in objs)
+            {
+                UpdateTimeExtents(mSimulationDB.ReadTableTimePeriod(sessionName, obj));
+            }
+
             Loaded = true;
+        }
+
+        private void UpdateTimeExtents(Vector2 objPeriod)
+        {
+            if (mTimeExtents.x > objPeriod.x)
+            {
+                mTimeExtents.x = objPeriod.x;
+            }
+            if (mTimeExtents.y < objPeriod.y)
+            {
+                mTimeExtents.y = objPeriod.y;
+            }
         }
 
         private void OnDestroy()
@@ -96,11 +124,11 @@ namespace KSimulation
             mSimulationDB.Close();
         }
 
-        public void Attach(OnSpawnMovingObject onSpawn, OnDestroyMovingObject onDestroy)
+        public void Attach(OnSpawnMovingObject onSpawn, OnDestroyMovingObject onDestroy, OnTimeScrub onScrub)
         {
             onSpawned += onSpawn;
             onDestroyed += onDestroy;
-
+            onTimeScrubbed += onScrub;
         }
 
         public void OnStart()
@@ -120,6 +148,8 @@ namespace KSimulation
             int[] objs = ListSimObjects();
             foreach (int obj in objs)
             {
+                UpdateTimeExtents(mSimulationDB.ReadTableTimePeriod(sessionName, obj));
+
                 onSpawned(obj);
             }
         }
@@ -144,11 +174,14 @@ namespace KSimulation
 
         public void ScrubTime(float time)
         {
-            TearDown();
+            if (time >= mTimeExtents.x && time <= mTimeExtents.y)
+            {
+                TearDown();
 
-            SetSimTime(time);
+                SetSimTime(time);
 
-            SetUp();
+                SetUp();
+            }
         }
 
         private void SetSimTime(float time)
@@ -166,7 +199,9 @@ namespace KSimulation
             SpatioTemporalDB.MovingObjectData data = mSimulationDB.ReadTable(sessionName, id);
             if (data != null)
             {
-                return new MovingObjectData(data.id, data.parentId, data.objectClass, data.name);
+                Vector2 timePeriod = mSimulationDB.ReadTableTimePeriod(sessionName, id);
+
+                return new MovingObjectData(data.id, data.parentId, data.objectClass, data.name, timePeriod);
             }
 
             return null;
@@ -242,6 +277,9 @@ namespace KSimulation
         void Update()
         {
             mSimTime += Time.deltaTime * PlaybackSpeed;
+            mSimTime = Mathf.Clamp(mSimTime, mTimeExtents.x, mTimeExtents.y);
+
+            Debug.Log("K3 UPDATE " + mTimeExtents.ToString());
         }
 
         private JsonSpatioTemporalDB OpenDb()

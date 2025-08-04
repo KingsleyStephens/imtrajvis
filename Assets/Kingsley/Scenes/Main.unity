@@ -3824,7 +3824,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &528270375
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5905,22 +5905,16 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!1 &875793119 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7648305833078134582, guid: 0a7d2469f24041c4284c66706f84c45e,
+--- !u!114 &875793126 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4080277042268158424, guid: 0a7d2469f24041c4284c66706f84c45e,
     type: 3}
   m_PrefabInstance: {fileID: 1223047550}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &875793124
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 875793119}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c24c368f87d3324f91ff7cea95a4170, type: 3}
+  m_Script: {fileID: 11500000, guid: 4733c5f009d26ad49b3685117b8d3eb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &883449666
@@ -7192,6 +7186,16 @@ PrefabInstance:
       propertyPath: _centerEyeCamera
       value: 
       objectReference: {fileID: 421945463}
+    - target: {fileID: 2789249795387024411, guid: 0a7d2469f24041c4284c66706f84c45e,
+        type: 3}
+      propertyPath: _maxRayVisualLength
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 2789249795387024411, guid: 0a7d2469f24041c4284c66706f84c45e,
+        type: 3}
+      propertyPath: _hideWhenNoInteractable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3845164589554561886, guid: 0a7d2469f24041c4284c66706f84c45e,
         type: 3}
       propertyPath: _controller
@@ -7296,7 +7300,7 @@ PrefabInstance:
         type: 3}
       propertyPath: _activeState
       value: 
-      objectReference: {fileID: 875793124}
+      objectReference: {fileID: 0}
     - target: {fileID: 4080277042268158424, guid: 0a7d2469f24041c4284c66706f84c45e,
         type: 3}
       propertyPath: _maxRayLength
@@ -7362,6 +7366,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4629893435701969339, guid: 0a7d2469f24041c4284c66706f84c45e,
+        type: 3}
+      propertyPath: '_interactors.Array.data[10]'
+      value: 
+      objectReference: {fileID: 875793126}
     - target: {fileID: 4642739463428799902, guid: 0a7d2469f24041c4284c66706f84c45e,
         type: 3}
       propertyPath: _comparison
@@ -7443,6 +7452,8 @@ PrefabInstance:
     - {fileID: 3903482226191059925, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
     - {fileID: 2948845962881663820, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
     - {fileID: 4771475775409541943, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
+    - {fileID: 876019485324780581, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
+    - {fileID: 4642739463428799902, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
     m_RemovedGameObjects:
     - {fileID: 3903482226209413050, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
     m_AddedGameObjects:
@@ -7459,10 +7470,6 @@ PrefabInstance:
         type: 3}
       insertIndex: 1
       addedObject: {fileID: 1223047553}
-    - targetCorrespondingSourceObject: {fileID: 7648305833078134582, guid: 0a7d2469f24041c4284c66706f84c45e,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 875793124}
     - targetCorrespondingSourceObject: {fileID: 3903482225804038116, guid: 0a7d2469f24041c4284c66706f84c45e,
         type: 3}
       insertIndex: -1
@@ -7475,14 +7482,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1223047564}
-    - targetCorrespondingSourceObject: {fileID: 3903482226191059931, guid: 0a7d2469f24041c4284c66706f84c45e,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1925978461}
-    - targetCorrespondingSourceObject: {fileID: 3903482226191059931, guid: 0a7d2469f24041c4284c66706f84c45e,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1925978460}
     - targetCorrespondingSourceObject: {fileID: 3903482226191059931, guid: 0a7d2469f24041c4284c66706f84c45e,
         type: 3}
       insertIndex: -1
@@ -7604,7 +7603,8 @@ MonoBehaviour:
   _playerOrigin: {fileID: 1635954689}
   _playerEyes: {fileID: 421945462}
   moveSpeed: 20
-  rotateSnapAngle: 25
+  rotateSnapAngle: 15
+  verticalSnapSpeed: 10
 --- !u!114 &1223047560
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7638,10 +7638,10 @@ MonoBehaviour:
   orbitHeight: 20
   minZoom: 1
   maxZoom: 40
-  orbitSpeed: 30
+  orbitSpeed: 15
   zoomSpeed: 10
   panSpeed: 10
-  verticleSpeed: 10
+  verticleSpeed: 2.5
 --- !u!1 &1232272575
 GameObject:
   m_ObjectHideFlags: 0
@@ -11739,55 +11739,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 990692c9edb7a214d9b122856cf44929, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1925978460
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925978449}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d2705674196dfc4da9c25fbacda72d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _activeState: {fileID: 1925978461}
-  _whenActivated:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1223047556}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: MoveBackward
-        m_Mode: 4
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 1
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  _whenDeactivated:
-    m_PersistentCalls:
-      m_Calls: []
-  _emitOnFirstUpdate: 0
---- !u!114 &1925978461
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925978449}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 592ac3f1a010f3d48970c5beb7e4f68f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _inputAxis: {fileID: 1925978453}
-  _checkAxis: 2
-  _comparison: 1
-  _absoluteValues: 0
-  _thresold: {x: 0, y: -0.5}
 --- !u!114 &1925978464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12098,19 +12049,7 @@ MonoBehaviour:
         m_CallState: 2
   _whenDeactivated:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1223047556}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: MoveBackward
-        m_Mode: 4
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 1
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   _emitOnFirstUpdate: 0
 --- !u!114 &1925978488
 MonoBehaviour:
@@ -12159,19 +12098,7 @@ MonoBehaviour:
         m_CallState: 2
   _whenDeactivated:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1223047556}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: MoveForward
-        m_Mode: 4
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 1
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   _emitOnFirstUpdate: 0
 --- !u!114 &1925978490
 MonoBehaviour:

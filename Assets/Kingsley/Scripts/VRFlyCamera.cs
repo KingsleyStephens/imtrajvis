@@ -39,7 +39,8 @@ namespace Oculus.Interaction.Locomotion
 
         [SerializeField]
         private float rotateSnapAngle = 25.0f;
-
+        [SerializeField]
+        private float verticalSnapSpeed = 10.0f;
 
         private Func<float> _deltaTimeProvider = () => Time.deltaTime;
         public void SetDeltaTimeProvider(Func<float> deltaTimeProvider)
@@ -151,7 +152,7 @@ namespace Oculus.Interaction.Locomotion
         {
             if (!_hasVerticalSnapped)
             {
-                HandleLocomotionEvent(new LocomotionEvent(0, Vector3.up * moveSpeed, LocomotionEvent.TranslationType.Relative));
+                HandleLocomotionEvent(new LocomotionEvent(0, Vector3.up * verticalSnapSpeed, LocomotionEvent.TranslationType.Relative));
                 _hasVerticalSnapped = true;
             }
         }
@@ -160,7 +161,7 @@ namespace Oculus.Interaction.Locomotion
         {
             if (!_hasVerticalSnapped)
             {
-                HandleLocomotionEvent(new LocomotionEvent(0, Vector3.up * -moveSpeed, LocomotionEvent.TranslationType.Relative));
+                HandleLocomotionEvent(new LocomotionEvent(0, Vector3.up * -verticalSnapSpeed, LocomotionEvent.TranslationType.Relative));
                 _hasVerticalSnapped = true;
             }
         }

@@ -240,6 +240,24 @@ namespace SpatioTemporalDatabase
             return null;
         }
 
+        public override Vector2 ReadTableTimePeriod(string name, int movingObjectId)
+        {
+            JsonTable table = mDB.tables.Find(t => t.name == name);
+            if (table != null)
+            {
+                MovingObject movingObject = table.movingObjects.Find(t => t.id == movingObjectId);
+                if (movingObject != null)
+                {
+                    if (movingObject.trajectory.Count > 0)
+                    {
+                        return new Vector2(movingObject.trajectory[0].time, movingObject.trajectory[movingObject.trajectory.Count - 1].time);
+                    }
+                }
+            }
+
+            return Vector2.zero;
+        }
+
         /**
          * List the contents of a table
          */

@@ -104,7 +104,7 @@ namespace KVisualisation
         {
             if (mVisSimController != null)
             {
-                mVisSimController.Attach(OnMovingObjectSpawn, OnMovingObjectDestruct);
+                mVisSimController.Attach(OnMovingObjectSpawn, OnMovingObjectDestruct, OnTimeScrub);
             }
         }
 
@@ -115,6 +115,11 @@ namespace KVisualisation
         }
 
         public virtual void OnSettingsUpdate()
+        {
+
+        }
+
+        public virtual void OnViewChange()
         {
 
         }
@@ -130,6 +135,11 @@ namespace KVisualisation
         }
 
         public virtual void OnMovingObjectDestruct(int id)
+        {
+
+        }
+
+        public virtual void OnTimeScrub(float fromTime, float toTime)
         {
 
         }

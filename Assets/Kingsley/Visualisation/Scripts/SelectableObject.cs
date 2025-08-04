@@ -10,12 +10,32 @@ namespace KVisualisation
         {
             None,
             Hover,
-            Selected
+            Selected,
+            GroupSelected,
+            GroupDeselected
         }
 
         private StateType state = StateType.None;
 
-        public StateType State { get { return state; } set { state = value; UpdateChildren(state); } }
+        public StateType State { get { return state; } 
+            set {
+                if (state != value)
+                {
+                    if (value == StateType.GroupSelected)
+                    {
+                        UpdateGroup(StateType.Selected);
+                    }
+                    else if (value == StateType.GroupDeselected)
+                    {
+                        UpdateGroup(StateType.None);
+                    }
+                    else
+                    {
+                        state = value;
+                        UpdateChildren(state);
+                    }
+                }
+            } }
 
 
         public void UpdateChildren(StateType state)
@@ -24,6 +44,33 @@ namespace KVisualisation
             foreach (SelectableChildObject soObj in so)
             {
                 soObj.SetState(state);
+            }
+        }
+
+        public void UpdateGroup(StateType state)
+        {
+            VisAgentData data = gameObject.GetComponent<VisAgentData>();
+            if (data != null)
+            {
+                if (data.parentId >= 0)
+                {
+                    GameObject[] formation = VisClient3D.Instance.GetAllOjectsOfFormation(data.parentId);
+                    foreach (var f in formation)
+                    {
+                        VisAgentData fData = f.GetComponent<VisAgentData>();
+                        if (fData  != null)
+                        {
+                            if (fData.id != data.id)
+                            {
+                                SelectableObject formationObject = f.GetComponent<SelectableObject>();
+                                if (formationObject != null)
+                                {
+                                    formationObject.State = state;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 

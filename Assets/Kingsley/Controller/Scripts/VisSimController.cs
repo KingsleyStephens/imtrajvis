@@ -13,18 +13,20 @@ namespace KController
     {
         public class MovingObjectData
         {
-            public MovingObjectData(int id, int parentId, string objectClass, string name)
+            public MovingObjectData(int id, int parentId, string objectClass, string name, Vector2 timePeriod)
             {
                 this.id = id;
                 this.parentId = parentId;
                 this.objectClass = objectClass;
                 this.name = name;
+                this.timePeriod = timePeriod;
             }
 
             public int id;
             public int parentId;
             public string objectClass;
             public string name;
+            public Vector2 timePeriod;
         }
 
         public class MovingObjectUpdate
@@ -53,6 +55,9 @@ namespace KController
         public delegate void OnDestruct(int id);
         private event OnDestruct onDestructed;
 
+        public delegate void OnTimeScrub(float fromTime, float toTime);
+        private event OnTimeScrub onTimeScrubed;
+
         public bool Loaded { get; private set; }
 
         public SimulationPlayer Player { get { return mSimPlayer; } private set { mSimPlayer = value; } }
@@ -79,6 +84,7 @@ namespace KController
 
             onSpawned = null;
             onDestructed = null;
+            onTimeScrubed = null;
         }
 
         /**
@@ -139,24 +145,26 @@ namespace KController
                     yield return null;
                 }
 
-                mSimPlayer.Attach(CallOnSpawned, CallOnDestructed);
+                mSimPlayer.Attach(CallOnSpawned, CallOnDestructed, CallOnTimeScrubbed);
             }
 
             Loaded = true;
         }
 
-        public void Attach(OnSpawn onSpawn, OnDestruct onDestruct)
+        public void Attach(OnSpawn onSpawn, OnDestruct onDestruct, OnTimeScrub onScrub)
         {
             onSpawned += onSpawn;
             onDestructed += onDestruct;
+            onTimeScrubed += onScrub;
 
             mSimPlayer.CheckSpawned((id) => onSpawn(id));
         }
 
-        public void Detach(OnSpawn onSpawn, OnDestruct onDestruct)
+        public void Detach(OnSpawn onSpawn, OnDestruct onDestruct, OnTimeScrub onScrub)
         {
             onSpawned -= onSpawn;
             onDestructed -= onDestruct;
+            onTimeScrubed -= onScrub;
         }
 
         private void CallOnSpawned(int id)
@@ -167,6 +175,11 @@ namespace KController
         private void CallOnDestructed(int id)
         {
             onDestructed?.Invoke(id);
+        }
+
+        private void CallOnTimeScrubbed(float fromTime, float toTime)
+        {
+            onTimeScrubed?.Invoke(fromTime, toTime);
         }
 
         public int[] ListSimObjects()
@@ -186,7 +199,7 @@ namespace KController
                 SimulationPlayer.MovingObjectData data = mSimPlayer.GetSimObjectData(id);
                 if (data != null)
                 {
-                    return new MovingObjectData(data.id, data.parentId, data.objectClass, data.name);
+                    return new MovingObjectData(data.id, data.parentId, data.objectClass, data.name, data.timePeriod);
                 }
             }
 
