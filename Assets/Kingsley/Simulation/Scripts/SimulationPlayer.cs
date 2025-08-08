@@ -43,13 +43,13 @@ namespace KSimulation
             public float speed;
         }
 
-        public delegate void OnSpawnMovingObject(int id);
+        public delegate void OnSpawnMovingObject(int playerId, int id);
         private event OnSpawnMovingObject onSpawned;
 
-        public delegate void OnDestroyMovingObject(int id);
+        public delegate void OnDestroyMovingObject(int playerId, int id);
         private event OnDestroyMovingObject onDestroyed;
 
-        public delegate void OnTimeScrub(float fromTime, float toTime);
+        public delegate void OnTimeScrub(int playerId, float fromTime, float toTime);
         private event OnTimeScrub onTimeScrubbed;
 
         [SerializeField]
@@ -63,6 +63,8 @@ namespace KSimulation
 
         [SerializeField]
         private float playbackSpeed = 1.0f;
+
+        public int Id { get; set; }
 
         public float PlaybackSpeed { get; set; }
 
@@ -81,7 +83,7 @@ namespace KSimulation
         public float SimTime { get { return mSimTime; } set {
                 float oldValue = mSimTime;
                 mSimTime = value;
-                onTimeScrubbed(oldValue, mSimTime);
+                onTimeScrubbed(Id, oldValue, mSimTime);
             } }
 
         public bool Loaded { get; private set; }
@@ -150,7 +152,7 @@ namespace KSimulation
             {
                 UpdateTimeExtents(mSimulationDB.ReadTableTimePeriod(sessionName, obj));
 
-                onSpawned(obj);
+                onSpawned(Id, obj);
             }
         }
 
@@ -159,7 +161,7 @@ namespace KSimulation
             int[] objs = ListSimObjects();
             foreach (int obj in objs)
             {
-                onDestroyed(obj);
+                onDestroyed(Id, obj);
             }
         }
 
@@ -168,20 +170,14 @@ namespace KSimulation
             int[] objs = ListSimObjects();
             foreach (int obj in objs)
             {
-                onSpawn(obj);
+                onSpawn(Id, obj);
             }
         }
 
-        public void ScrubTime(float time)
+        public void ScrubTime(float relativeTime)
         {
-            if (time >= mTimeExtents.x && time <= mTimeExtents.y)
-            {
-                TearDown();
-
-                SetSimTime(time);
-
-                SetUp();
-            }
+            float clampedTime = Mathf.Clamp01(relativeTime);
+            SimTime = mTimeExtents.x + clampedTime * (mTimeExtents.y - mTimeExtents.x);
         }
 
         private void SetSimTime(float time)

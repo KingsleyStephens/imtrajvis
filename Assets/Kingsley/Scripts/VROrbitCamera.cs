@@ -13,6 +13,7 @@ namespace Oculus.Interaction.Locomotion
         [SerializeField]
         private CharacterController _characterController;
 
+        
         [Header("VR Player")]
         /// <summary>
         /// Root of the actual VR player so it
@@ -35,8 +36,12 @@ namespace Oculus.Interaction.Locomotion
         private Transform _playerEyes;
 
         [SerializeField]
-        private float moveSpeed = 10.0f;
+        private GameObject _pivotMarkerPrefab;
 
+
+
+        [SerializeField]
+        private float moveSpeed = 10.0f;
 
         private Func<float> _deltaTimeProvider = () => Time.deltaTime;
         public void SetDeltaTimeProvider(Func<float> deltaTimeProvider)
@@ -125,19 +130,23 @@ namespace Oculus.Interaction.Locomotion
             mPanning = !mPanning;
         }
 
-        public void SetPivotPos(Vector3 pos, Transform parent)
+        public Vector3 PivotPos { get { return (pivot != null) ? pivot.position : Vector3.zero; } set { if (pivot != null) { pivot.transform.position = value; UpdateCameraPos(); } } }
+
+        public void ParentPivotPos(Vector3 pos, Transform parent)
         {
             if (pivot == null)
             {
-                GameObject go = new GameObject("Orbit Pivot");
-                pivot = go.transform;
-                pivot.parent = parent;
-                pivot.localScale = Vector3.one;
+                if (_pivotMarkerPrefab != null)
+                {
+                    GameObject go = Instantiate(_pivotMarkerPrefab, parent);
+                    pivot = go.transform;
+                    pivot.localScale = Vector3.one;
 
-                GameObject goOrbit = new GameObject("camPosDummy");
-                camPosDummy = goOrbit.transform;
-                camPosDummy.parent = pivot;
-                camPosDummy.localScale = Vector3.one;
+                    GameObject goOrbit = new GameObject("camPosDummy");
+                    camPosDummy = goOrbit.transform;
+                    camPosDummy.parent = pivot;
+                    camPosDummy.localScale = Vector3.one;
+                }
             }
 
             pivot.localPosition = pos;
@@ -146,7 +155,6 @@ namespace Oculus.Interaction.Locomotion
             mOrbitHeight = orbitHeight;
             UpdateCameraPos();
         }
-
 
         private void UpdateCameraPos()
         {
@@ -335,6 +343,11 @@ namespace Oculus.Interaction.Locomotion
             {
                 _endOfFrameRoutine = StartCoroutine(EndOfFrameCoroutine());
             }
+
+            if (pivot != null)
+            {
+                pivot.gameObject.SetActive(true);
+            }
         }
 
         protected virtual void OnDisable()
@@ -344,6 +357,11 @@ namespace Oculus.Interaction.Locomotion
                 _accumulatedDeltaFrame = Pose.identity;
                 StopCoroutine(_endOfFrameRoutine);
                 _endOfFrameRoutine = null;
+            }
+
+            if (pivot != null)
+            {
+                pivot.gameObject.SetActive(false);
             }
         }
 

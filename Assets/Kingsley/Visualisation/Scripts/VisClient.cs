@@ -129,17 +129,17 @@ namespace KVisualisation
 
         }
 
-        public virtual void OnMovingObjectSpawn(int id)
+        public virtual void OnMovingObjectSpawn(int playerId, int id)
         {
 
         }
 
-        public virtual void OnMovingObjectDestruct(int id)
+        public virtual void OnMovingObjectDestruct(int playerId, int id)
         {
 
         }
 
-        public virtual void OnTimeScrub(float fromTime, float toTime)
+        public virtual void OnTimeScrub(int playerId, float fromTime, float toTime)
         {
 
         }

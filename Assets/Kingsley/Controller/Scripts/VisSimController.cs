@@ -2,6 +2,7 @@ using KSimulation;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace KController
 {
@@ -45,41 +46,42 @@ namespace KController
 
         [SerializeField]
         private SimConfig simConfig;
+        
+        [SerializeField]
+        private GameObject simPlayerPrefab;
 
+        private List<SimulationPlayer> mSimPlayers = new List<SimulationPlayer>();
 
-        private SimulationPlayer mSimPlayer;
-
-        public delegate void OnSpawn(int id);
+        public delegate void OnSpawn(int playerId, int id);
         private event OnSpawn onSpawned;
 
-        public delegate void OnDestruct(int id);
+        public delegate void OnDestruct(int playerId, int id);
         private event OnDestruct onDestructed;
 
-        public delegate void OnTimeScrub(float fromTime, float toTime);
+        public delegate void OnTimeScrub(int playerId, float fromTime, float toTime);
         private event OnTimeScrub onTimeScrubed;
 
         public bool Loaded { get; private set; }
 
-        public SimulationPlayer Player { get { return mSimPlayer; } private set { mSimPlayer = value; } }
+        public List<SimulationPlayer> Players { get { return mSimPlayers; } }
 
         void Start()
         {
-            LoadSim();
         }
 
         public void StartPlay()
         {
-            if (mSimPlayer != null)
+            foreach (var sp in mSimPlayers)
             {
-                mSimPlayer.OnStart();
+                sp.OnStart();
             }
         }
 
         public void StopPlay()
         {
-            if (mSimPlayer != null)
+            foreach (var sp in mSimPlayers)
             {
-                mSimPlayer.OnStop();
+                sp.OnStop();
             }
 
             onSpawned = null;
@@ -90,7 +92,7 @@ namespace KController
         /**
          * Load the simulation from the configured settings
          */
-        public void LoadSim()
+        public void LoadSim(int count = 1)
         {
             if (simConfig != null)
             {
@@ -103,7 +105,17 @@ namespace KController
                         }
                     case SimType.LocalPlayback:
                         {
-                            LoadScene((simConfig as LocalSim).scene);
+                            for (int i = 0; i < count; ++i)
+                            {
+                                GameObject player = Instantiate(simPlayerPrefab);
+                                player.name = "SimPlayer" + i.ToString();
+                                SimulationPlayer simPlayer = player.GetComponent<SimulationPlayer>();
+                                if (simPlayer != null)
+                                {
+                                    simPlayer.Id = i;
+                                    mSimPlayers.Add(simPlayer);
+                                }
+                            }
                             break;
                         }
                     default:
@@ -112,6 +124,15 @@ namespace KController
                         }
                 }
             }
+        }
+
+        public void UnloadSim()
+        {
+            foreach (var p in mSimPlayers)
+            {
+                Destroy(p.gameObject);
+            }
+            mSimPlayers.Clear();
         }
 
         /**
@@ -137,15 +158,15 @@ namespace KController
             }
 
             // Post-load logic
-            mSimPlayer = GameObject.FindAnyObjectByType<SimulationPlayer>();
-            if (mSimPlayer != null)
+            SimulationPlayer simPlayer = GameObject.FindAnyObjectByType<SimulationPlayer>();
+            if (simPlayer != null)
             {
-                while (!mSimPlayer.Loaded)
+                while (!simPlayer.Loaded)
                 {
                     yield return null;
                 }
 
-                mSimPlayer.Attach(CallOnSpawned, CallOnDestructed, CallOnTimeScrubbed);
+                simPlayer.Attach(CallOnSpawned, CallOnDestructed, CallOnTimeScrubbed);
             }
 
             Loaded = true;
@@ -157,7 +178,10 @@ namespace KController
             onDestructed += onDestruct;
             onTimeScrubed += onScrub;
 
-            mSimPlayer.CheckSpawned((id) => onSpawn(id));
+            foreach (var p in mSimPlayers)
+            {
+                p.CheckSpawned((playerId, id) => onSpawn(playerId, id));
+            }
         }
 
         public void Detach(OnSpawn onSpawn, OnDestruct onDestruct, OnTimeScrub onScrub)
@@ -167,36 +191,36 @@ namespace KController
             onTimeScrubed -= onScrub;
         }
 
-        private void CallOnSpawned(int id)
+        private void CallOnSpawned(int playerId, int id)
         {
-            onSpawned?.Invoke(id);
+            onSpawned?.Invoke(playerId, id);
         }
 
-        private void CallOnDestructed(int id)
+        private void CallOnDestructed(int playerId, int id)
         {
-            onDestructed?.Invoke(id);
+            onDestructed?.Invoke(playerId,id);
         }
 
-        private void CallOnTimeScrubbed(float fromTime, float toTime)
+        private void CallOnTimeScrubbed(int playerId, float fromTime, float toTime)
         {
-            onTimeScrubed?.Invoke(fromTime, toTime);
+            onTimeScrubed?.Invoke(playerId, fromTime, toTime);
         }
 
-        public int[] ListSimObjects()
+        public int[] ListSimObjects(int playerId)
         {
-            if (mSimPlayer != null)
+            if (playerId < mSimPlayers.Count)
             {
-                return mSimPlayer.ListSimObjects();
+                return mSimPlayers[playerId].ListSimObjects();
             }
 
             return null;
         }
 
-        public MovingObjectData GetSimObjectData(int id)
+        public MovingObjectData GetSimObjectData(int playerId, int id)
         {
-            if (mSimPlayer != null)
+            if (playerId < mSimPlayers.Count)
             {
-                SimulationPlayer.MovingObjectData data = mSimPlayer.GetSimObjectData(id);
+                SimulationPlayer.MovingObjectData data = mSimPlayers[playerId].GetSimObjectData(id);
                 if (data != null)
                 {
                     return new MovingObjectData(data.id, data.parentId, data.objectClass, data.name, data.timePeriod);
@@ -206,11 +230,11 @@ namespace KController
             return null;
         }
 
-        public MovingObjectUpdate GetSimObjectUpdate(int id)
+        public MovingObjectUpdate GetSimObjectUpdate(int playerId, int id)
         {
-            if (mSimPlayer != null)
+            if (playerId < mSimPlayers.Count)
             {
-                SimulationPlayer.MovingObjectUpdate update = mSimPlayer.GetSimObjectUpdate(id);
+                SimulationPlayer.MovingObjectUpdate update = mSimPlayers[playerId].GetSimObjectUpdate(id);
                 if (update != null)
                 { 
                     return new MovingObjectUpdate(update.position, update.orientation, update.speed);

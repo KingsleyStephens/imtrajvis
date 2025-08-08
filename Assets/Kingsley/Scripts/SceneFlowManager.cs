@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using KController;
@@ -41,10 +42,17 @@ public class SceneFlowManager : MonoBehaviour
     private GameObject trajConfigUI;
 
     [SerializeField]
+    private GameObject leftControllerUI;
+
+    [SerializeField]
     private GameObject cameraRig;
 
     [SerializeField]
     private Camera mainCamera;
+
+    [SerializeField]
+    private float positionCheckPeriod = 0.5f;
+    private float lastPositionCheckTime = 0.0f;
 
     public VisSimController Controller { get; private set; }
 
@@ -64,6 +72,8 @@ public class SceneFlowManager : MonoBehaviour
     private ViewConfig[] tableTopViewConfig;
     [SerializeField]
     private ViewConfig[] roomViewConfig;
+
+    private int mCurrentClient = 0;
 
     public enum ViewConfigType
     {
@@ -114,8 +124,9 @@ public class SceneFlowManager : MonoBehaviour
 
     private List<VisClient.MovingObjectSettings> clientConfigs = new List<VisClient.MovingObjectSettings>();
 
-    public float PlaybackSpeed { get { return Controller.Player.PlaybackSpeed; } set { Controller.Player.PlaybackSpeed = value; } }
-    public float SimTime { get { return Controller.Player.SimTime; } set { Controller.Player.SimTime = value; } }
+    public float PlaybackSpeed { get { return Controller.Players[mCurrentClient].PlaybackSpeed; } set { Controller.Players[mCurrentClient].PlaybackSpeed = value; } }
+    public float SimTime { get { return Controller.Players[mCurrentClient].SimTime; } set { Controller.Players[mCurrentClient].SimTime = value; } }
+    public float ScrubTime { set { Controller.Players[mCurrentClient].ScrubTime(value); } }
 
     [SerializeField]
     private float speedChangeDelta = 0.01f;
@@ -186,7 +197,7 @@ public class SceneFlowManager : MonoBehaviour
                         VROrbitCamera newCam = cameraRig.GetComponentInChildren<VROrbitCamera>();
                         if (newCam != null)
                         {
-                            newCam.SetPivotPos(Vector3.zero, visRoot);
+                            newCam.ParentPivotPos(Vector3.zero, visRoot);
                             newCam.enabled = true;
                         }
                     }
@@ -240,7 +251,7 @@ public class SceneFlowManager : MonoBehaviour
         }
     }
 
-    private System.Collections.IEnumerator DeferApplyConfig()
+    private IEnumerator DeferApplyConfig()
     {
         yield return new WaitForEndOfFrame();
         ApplyViewChange();
@@ -387,56 +398,94 @@ public class SceneFlowManager : MonoBehaviour
 
     public void MoveToNextClient()
     {
-        MoveToClient(1);
+        MoveToClientDirection(1);
+        UpdateControllerUI();
     }
 
     public void MoveToPrevClient()
     {
-        MoveToClient(-1);
+        MoveToClientDirection(-1);
+        UpdateControllerUI();
     }
 
-
-    private void MoveToClient(int direction)
+    private void MoveToClientDirection(int direction)
     {
-        int currentClient = -1;
+        mCurrentClient = GetClosestClientId();
 
-        Collider[] overlaps = Physics.OverlapSphere(mainCamera.transform.position, 10.0f, 1 << LayerMask.NameToLayer("VisInstance"));
-        if (overlaps.Length > 0)
+        int nextClient = mCurrentClient + direction;
+        if (nextClient < 0)
         {
-            Visualisation vis = overlaps[0].gameObject.GetComponent<Visualisation>();
-            if (vis != null)
-            {
-                currentClient = vis.instanceId;
-            }
+            nextClient = visClients.Count - 1;
         }
-        else
+        else if (nextClient >= visClients.Count)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(mainCamera.transform.position, Vector3.down, out hit, 10000.0f, 1 << LayerMask.NameToLayer("VisInstance")))
-            {
-                Visualisation vis = hit.transform.gameObject.GetComponent<Visualisation>();
-                if (vis != null)
+            nextClient = 0;
+        }
+
+        MoveToClient(nextClient);
+    }
+
+    private void MoveToClient(int toClient)
+    {
+        if (!(toClient >= 0 && toClient < mNumClients))
+        {
+            return;
+        }
+        
+        Vector3 basePos = Vector3.zero;
+        switch (mViewConfigType)
+        {
+            case ViewConfigType.Tabletop:
                 {
-                    currentClient = vis.instanceId;
+                    VROrbitCamera orbitCam = cameraRig.GetComponentInChildren<VROrbitCamera>();
+                    if (orbitCam != null)
+                    {
+                        basePos = orbitCam.PivotPos;
+                    }
+
+                    break;
                 }
-            }
+            case ViewConfigType.Room:
+                {
+                    basePos = cameraRig.transform.position;
+
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
         }
 
-        if (currentClient >= 0)
+
+        Vector3 realtivePos = basePos - visClients[mCurrentClient].transform.position;
+        Vector3 toPos = visClients[toClient].transform.position + realtivePos;
+
+        switch (mViewConfigType)
         {
-            Vector3 realtivePos = cameraRig.transform.position - visClients[currentClient].transform.position;
+            case ViewConfigType.Tabletop:
+                {
+                    VROrbitCamera orbitCam = cameraRig.GetComponentInChildren<VROrbitCamera>();
+                    if (orbitCam != null)
+                    {
+                        orbitCam.PivotPos = toPos;
+                    }
 
-            int nextClient = currentClient + direction;
-            if (nextClient < 0)
-            {
-                nextClient = visClients.Count - 1;
-            }
-            else if (nextClient >= visClients.Count)
-            {
-                nextClient = 0;
-            }
-            cameraRig.transform.position = visClients[nextClient].transform.position + realtivePos;
+                    break;
+                }
+            case ViewConfigType.Room:
+                {
+                    cameraRig.transform.position = toPos;
+
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
         }
+
+        mCurrentClient = toClient;
     }
 
     public void ActivateLaunchMenu()
@@ -445,7 +494,7 @@ public class SceneFlowManager : MonoBehaviour
         {
             trajConfigUI.SetActive(false);
 
-            mViewConfigType = ViewConfigType.Room;
+            RoomView = true;
         }
 
         if (player != null)
@@ -455,6 +504,7 @@ public class SceneFlowManager : MonoBehaviour
             if (Controller != null)
             {
                 Controller.StopPlay();
+                Controller.UnloadSim();
             }
             player.SetActive(false);
         }
@@ -467,6 +517,11 @@ public class SceneFlowManager : MonoBehaviour
         clientConfigs.Clear();
         mCurrentClient = 0;
 
+        if (leftControllerUI != null)
+        {
+            leftControllerUI.SetActive(false);
+        }
+
         if (launchUI != null)
         {
             launchUI.SetActive(true);
@@ -475,8 +530,8 @@ public class SceneFlowManager : MonoBehaviour
 
     public void Launch()
     {
-        LaunchSim(mNumClients);
-        launchUI.SetActive(false);
+        StartCoroutine(LaunchSim(mNumClients));
+
     }
 
 
@@ -492,39 +547,51 @@ public class SceneFlowManager : MonoBehaviour
             TimeDecrease();
         }
 
-        /*        if (NumClients > 0 && trajConfigUI != null && !trajConfigUI.activeSelf && Mouse.current.rightButton.wasPressedThisFrame)
-                {
-                    if (mainCamera != null)
-                    {
-                        Vector2 screenPos = new Vector2(Mouse.current.position.x.value, Mouse.current.position.y.value);
 
-                        Ray ray = mainCamera.ScreenPointToRay(screenPos);
+        if (Time.time - lastPositionCheckTime > positionCheckPeriod)
+        {
+            int newClient = GetClosestClientId();
+            if (mCurrentClient != newClient)
+            {
+                mCurrentClient = newClient;
+                UpdateControllerUI();
+            }
 
-                        RaycastHit hit;
-                        if (Physics.Raycast(ray, out hit, 10000.0f, 1 << LayerMask.NameToLayer("VisInstance")))
-                        {
-                            Visualisation vis = hit.transform.gameObject.GetComponent<Visualisation>();
-                            if (vis != null)
-                            {
-                                ShowConfigScreen(vis.instanceId);
-                            }
-                        }
-
-                    }
-                }*/
+            lastPositionCheckTime = Time.time;
+        }        
     }
 
-    private int mCurrentClient = 0;
 
-    public int CurrentClientConfig { get { return mCurrentClient; } set { mCurrentClient = value; SetClientConfigUI(mCurrentClient);  } }
+    public int CurrentClientConfig { get { return mCurrentClient; } set { SetClientConfigUI(value, false);  } }
 
+    private void UpdateControllerUI()
+    {
+        if (leftControllerUI != null)
+        { 
+            leftControllerUI.SetActive(true);
+
+            TextMeshProUGUI[] labels = leftControllerUI.GetComponentsInChildren<TextMeshProUGUI>();
+            if (labels.Length > 0)
+            {
+                var currentConfigLabel = labels.First((t) => t.name == "InstanceLabel");
+                if (currentConfigLabel != null)
+                {
+                    currentConfigLabel.text = (mCurrentClient + 1).ToString();
+                }
+            }
+        }
+    }
 
     public void ShowConfigScreen()
     {
+        // Toggle
         if (trajConfigUI.activeSelf)
         {
+            trajConfigUI.SetActive(false);
             return;
         }
+
+        mCurrentClient = GetClosestClientId();
 
         trajConfigUI.SetActive(true);
 
@@ -561,21 +628,68 @@ public class SceneFlowManager : MonoBehaviour
         }
     }
 
-    private void SetClientConfigUI(int client)
+    private int GetClosestClientId()
     {
+        int id = -1;
+
+        List<Collider> visInstances = new List<Collider>();
+        foreach (var c in visClients) 
+        {
+            visInstances.Add(c.GetComponent<Collider>());
+        }
+
+        float closestDist = float.MaxValue;
+        int closestId = 0;
+        foreach (var instance in visInstances)
+        {
+            if (instance.bounds.Contains(mainCamera.transform.position))
+            {
+                id = instance.gameObject.GetComponent<Visualisation>().instanceId;
+                break;
+            }
+            else
+            {
+                float dist = Vector3.Distance(mainCamera.transform.position, instance.transform.position);
+                if (dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestId = instance.gameObject.GetComponent<Visualisation>().instanceId;
+                }
+            }
+        }
+
+        if (id == -1)
+        {
+            id = closestId;
+        }
+
+        return id;
+    }
+
+
+    private void SetClientConfigUI(int client, bool setClientDropdown = true)
+    {
+        MoveToClient(client);
+        mCurrentClient = client;
+
+        UpdateControllerUI();
+
         TMP_Dropdown[] dropDowns = trajConfigUI.GetComponentsInChildren<TMP_Dropdown>();
         if (dropDowns.Length > 0)
         {
-            var dropDownSearch = dropDowns.First((t) => t.name == "ClientInstanceDropdown");
-            if (dropDownSearch != null)
+            if (setClientDropdown)
             {
-                dropDownSearch.value = mCurrentClient;
+                var dropDownSearch = dropDowns.First((t) => t.name == "ClientInstanceDropdown");
+                if (dropDownSearch != null)
+                {
+                    dropDownSearch.value = mCurrentClient;
+                }
             }
 
-            dropDownSearch = dropDowns.First((t) => t.name == "TimeDropdown");
-            if (dropDownSearch != null)
+            var dropDownSearch2 = dropDowns.First((t) => t.name == "TimeDropdown");
+            if (dropDownSearch2 != null)
             {
-                dropDownSearch.value = TimeType;
+                dropDownSearch2.value = TimeType;
             }
         }
         else
@@ -606,11 +720,6 @@ public class SceneFlowManager : MonoBehaviour
             {
                 toggleSearch.isOn = Density;
             }
-            toggleSearch = toggles.First((t) => t.name == "NoChangeToggle");
-            if (toggleSearch != null)
-            {
-                toggleSearch.isOn = true;
-            }
         }
         else
         {
@@ -619,13 +728,19 @@ public class SceneFlowManager : MonoBehaviour
     }
 
 
-    public bool Mesh { get { return clientConfigs[mCurrentClient].mesh; } set { clientConfigs[mCurrentClient].mesh = value; } }
-    public bool Trails { get { return clientConfigs[mCurrentClient].trail; } set { clientConfigs[mCurrentClient].trail = value; } }
-    public bool Ghosting { get { return clientConfigs[mCurrentClient].ghosting; } set { clientConfigs[mCurrentClient].ghosting = value; } }
-    public bool Density { get { return clientConfigs[mCurrentClient].density; } set { clientConfigs[mCurrentClient].density = value; } }
-    public int TimeType { get { return (int)clientConfigs[mCurrentClient].timeType; } set { clientConfigs[mCurrentClient].timeType = (VisClient.MovingObjectSettings.TimeType)value; } }
-    public int Filter { get { return (int)clientConfigs[mCurrentClient].filter; } set { clientConfigs[mCurrentClient].filter = (VisClient.MovingObjectSettings.FilterType)value; } }
+    public bool Mesh { get { return clientConfigs[mCurrentClient].mesh; } set { clientConfigs[mCurrentClient].mesh = value; ApplyCurrentConfig(); } }
+    public bool Trails { get { return clientConfigs[mCurrentClient].trail; } set { clientConfigs[mCurrentClient].trail = value; ApplyCurrentConfig(); } }
+    public bool Ghosting { get { return clientConfigs[mCurrentClient].ghosting; } set { clientConfigs[mCurrentClient].ghosting = value; ApplyCurrentConfig(); } }
+    public bool Density { get { return clientConfigs[mCurrentClient].density; } set { clientConfigs[mCurrentClient].density = value; ApplyCurrentConfig(); } }
+    public int TimeType { get { return (int)clientConfigs[mCurrentClient].timeType; } set { clientConfigs[mCurrentClient].timeType = (VisClient.MovingObjectSettings.TimeType)value; ApplyCurrentConfig(); } }
 
+
+    public void ApplyFilter(int filterId)
+    {
+        clientConfigs[mCurrentClient].filter = (VisClient.MovingObjectSettings.FilterType)filterId; 
+        ApplyCurrentConfig(); 
+        clientConfigs[mCurrentClient].filter = VisClient.MovingObjectSettings.FilterType.None;
+    }
 
     public void ApplyCurrentConfig()
     {
@@ -652,8 +767,21 @@ public class SceneFlowManager : MonoBehaviour
         trajConfigUI.SetActive(false);
     }
 
-    public void LaunchSim(int clientCount)
+    public IEnumerator LaunchSim(int clientCount)
     {
+        if (player != null)
+        {
+            player.SetActive(true);
+            if (Controller != null)
+            {
+                Controller.LoadSim(clientCount);
+            }
+        }
+        while (!Controller.Loaded)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
         ResetTimeControls();
 
         ActivateCurrentViewConfig();
@@ -685,6 +813,9 @@ public class SceneFlowManager : MonoBehaviour
                 Controller.StartPlay();
             }
         }
+
+        launchUI.SetActive(false);
+        UpdateControllerUI();
     }
 
     private void SpawnClients(int clientCount)
@@ -717,16 +848,8 @@ public class SceneFlowManager : MonoBehaviour
                     {
                         visComponent.instanceId = i;
 
-
-
                         ApplyClientConfig(visComponent, config);
                     }
-
-/*                    InteractableUnityEventWrapper interaction = vis.GetComponent<InteractableUnityEventWrapper>();
-                    if (interaction != null)
-                    {
-                        interaction.WhenSelect.AddListener(() => ShowConfigScreen(interaction.gameObject.GetComponent<Visualisation>().instanceId));
-                    }*/
                 }
             }
         }

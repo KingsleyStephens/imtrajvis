@@ -1,11 +1,13 @@
 using KController;
 using KSimulation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using static KVisualisation.VisClient;
 using static Oculus.Interaction.Context;
+using static OVRPlugin;
 
 
 namespace KVisualisation
@@ -56,8 +58,9 @@ namespace KVisualisation
 
         public TextMeshProUGUI clientIdLabel;
 
-        private Dictionary<int, bool> mFilteredObjects = new Dictionary<int, bool>();
-        private bool mFilterActive = false;
+        private List<int> mFilterSelection = new List<int>();
+        private MovingObjectSettings.FilterType mFilterType = MovingObjectSettings.FilterType.None;
+        private Dictionary<int, bool> mFilterState= new Dictionary<int, bool>();
 
 
         public override void OnStart()
@@ -87,6 +90,12 @@ namespace KVisualisation
 
             EnsureWeaponParent();
 
+            int[] allIds = mVisSimController.ListSimObjects(mId);
+            foreach (int id in allIds)
+            {
+                mFilterState.Add(id, false);
+            }
+
             ApplySettings();
         }
 
@@ -108,7 +117,7 @@ namespace KVisualisation
             mAllObjectIds.Clear();
             mMovingObjects.Clear();
 
-            int[] allIds = mVisSimController.ListSimObjects();
+            int[] allIds = mVisSimController.ListSimObjects(mId);
             foreach (int id in allIds)
             {
                 mAllObjectIds.Add(id);
@@ -150,7 +159,7 @@ namespace KVisualisation
 
                 foreach (int id in mAllObjectIds)
                 {
-                    var update = mVisSimController.GetSimObjectUpdate(id);
+                    var update = mVisSimController.GetSimObjectUpdate(mId, id);
 
                     GameObject obj;
                     if (mMovingObjects.TryGetValue(id, out obj))
@@ -160,13 +169,9 @@ namespace KVisualisation
                             obj.transform.localPosition = update.position;
                             obj.transform.localRotation = update.orientation;
 
-                            if (updateDensity)
+                            if (updateDensity && !IsFiltered(id))
                             {
-                                Filterable filter = obj.GetComponent<Filterable>();
-                                if (filter == null || !filter.Filtered)
-                                {
-                                    densityMap3D.UpdatePosition(obj.transform.localPosition);
-                                }
+                                densityMap3D.UpdatePosition(obj.transform.localPosition);
                             }
 
                             if (movingObjectSettings.trail)
@@ -174,7 +179,7 @@ namespace KVisualisation
                                 AdaptiveTrailRenderer adaptiveTrailRenderer = obj.GetComponentInChildren<AdaptiveTrailRenderer>();
                                 if (adaptiveTrailRenderer != null)
                                 {
-                                    adaptiveTrailRenderer.AddPosition(obj.transform.position, mVisSimController.Player.SimTime);
+                                    adaptiveTrailRenderer.AddPosition(obj.transform.position, mVisSimController.Players[mId].SimTime);
                                 }
                             }
                         }
@@ -191,8 +196,13 @@ namespace KVisualisation
             }
         }
 
-        public override void OnTimeScrub(float fromTime, float toTime)
+        public override void OnTimeScrub(int playerId, float fromTime, float toTime)
         {
+            if (playerId != mId)
+            {
+                return;
+            }
+
             if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic)
             {
                 foreach (int id in mAllObjectIds)
@@ -230,15 +240,25 @@ namespace KVisualisation
             }
         }
 
-        public override void OnMovingObjectSpawn(int id)
+        public override void OnMovingObjectSpawn(int playerId, int id)
         {
+            if (playerId != mId)
+            {
+                return;
+            }
+
             mAllObjectIds.Add(id);
 
             Spawn(id);
         }
 
-        public override void OnMovingObjectDestruct(int id)
+        public override void OnMovingObjectDestruct(int playerId, int id)
         {
+            if (playerId != mId)
+            {
+                return;
+            }
+
             Destruct(id);
         }
 
@@ -279,7 +299,7 @@ namespace KVisualisation
 
         private void Spawn(int id)
         {
-            var data = mVisSimController.GetSimObjectData(id);
+            var data = mVisSimController.GetSimObjectData(mId, id);
             if (data != null)
             {
                 GameObject instance = Instantiate(objectPrefab, transform);
@@ -287,26 +307,11 @@ namespace KVisualisation
 
                 if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic)
                 { 
-                    var update = mVisSimController.GetSimObjectUpdate(id);
+                    var update = mVisSimController.GetSimObjectUpdate(mId, id);
                     if (update != null)
                     {
                         instance.transform.localPosition = update.position;
                         instance.transform.localRotation = update.orientation;
-                    }
-                }
-
-                Filterable filter = instance.GetComponent<Filterable>();
-                if (filter != null)
-                {
-                    bool filtered;
-                    if (mFilteredObjects.TryGetValue(id, out filtered))
-                    {
-                        filter.Filtered = filtered;
-                    }
-                    else
-                    {
-                        filter.Filtered = mFilterActive;
-                        mFilteredObjects[id] = filter.Filtered;
                     }
                 }
 
@@ -360,20 +365,61 @@ namespace KVisualisation
         {
             if (movingObjectSettings.filter != MovingObjectSettings.FilterType.None)
             {
-                mFilterActive = movingObjectSettings.filter != MovingObjectSettings.FilterType.Clear;
+                mFilterType = movingObjectSettings.filter;
 
-                List<int> inactiveObjects = new List<int>();
-                foreach (var fo in mFilteredObjects.Keys)
+                switch (mFilterType)
                 {
-                    if (!mMovingObjects.ContainsKey(fo))
-                    {
-                        inactiveObjects.Add(fo);
-                    }
-                }
+                    case MovingObjectSettings.FilterType.Clear:
+                        {
+                            mFilterSelection.Clear();
+                            var keys = mFilterState.Keys.ToArray();
+                            foreach (var k in keys)
+                            {
+                                mFilterState[k] = false;
+                            }
+                            break;
+                        }
+                    case MovingObjectSettings.FilterType.Selection:
+                    case MovingObjectSettings.FilterType.InverseSelection:
+                        {
+                            mFilterSelection.Clear();
 
-                foreach (var fo in inactiveObjects)
-                {
-                    mFilteredObjects[fo] = mFilterActive;
+                            foreach (var id in mMovingObjects.Keys)
+                            {
+                                GameObject movingObject = mMovingObjects[id];
+                                bool isSelected = false;
+
+                                SelectableObject selectable = movingObject.GetComponent<SelectableObject>();
+                                if (selectable != null)
+                                {
+                                    isSelected = selectable.State == SelectableObject.StateType.Selected;
+                                    selectable.State = SelectableObject.StateType.None;
+                                }
+
+                                if (isSelected)
+                                {
+                                    mFilterSelection.Add(id);
+                                }
+                            }
+
+                            var keys = mFilterState.Keys.ToArray();
+                            foreach (var k in keys)
+                            {
+                                if (mFilterType == MovingObjectSettings.FilterType.Selection)
+                                {
+                                    mFilterState[k] = mFilterState[k] || mFilterSelection.Contains(k);
+                                }
+                                else if (mFilterType == MovingObjectSettings.FilterType.InverseSelection)
+                                {
+                                    mFilterState[k] = mFilterState[k] || !mFilterSelection.Contains(k);
+                                }
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
                 }
             }
             
@@ -398,21 +444,32 @@ namespace KVisualisation
 
             if (!movingObjectSettings.trail || movingObjectSettings.filter != MovingObjectSettings.FilterType.None)
             {
-                if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
+                foreach (Transform child in mLineParent)
                 {
-                    foreach (Transform child in mLineParent)
-                    {
-                        Destroy(child.gameObject);
-                    }
+                    Destroy(child.gameObject);
                 }
-                else
+                foreach (Transform child in mTrailParent)
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+            else
+            {
+                if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
                 {
                     foreach (Transform child in mTrailParent)
                     {
                         Destroy(child.gameObject);
                     }
                 }
-            } 
+                else
+                {
+                    foreach (Transform child in mLineParent)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
+            }
 
             // Weapons
             foreach (Transform child in mWeaponParent)
@@ -440,12 +497,15 @@ namespace KVisualisation
                 }
             }
 
-            movingObjectSettings.filter = MovingObjectSettings.FilterType.None;
-
             if (clientIdLabel != null)
             {
                 clientIdLabel.text = (mId + 1).ToString();
             }
+        }
+
+        private bool IsFiltered(int objectId)
+        {
+            return mFilterState.ContainsKey(objectId) && mFilterState[objectId];
         }
 
         private void ApplySettingsToMovingObject(GameObject movingObject)
@@ -455,68 +515,14 @@ namespace KVisualisation
                 Destroy(child.gameObject);
             }
 
-            if (mFilterActive)
-            {
-                bool isSelected = false;
-
-                SelectableObject selectable = movingObject.GetComponent<SelectableObject>();
-                if (selectable != null)
-                {
-                    isSelected = selectable.State == SelectableObject.StateType.Selected;
-                    selectable.State = SelectableObject.StateType.None;
-                }
-
-                Filterable filterable = movingObject.GetComponent<Filterable>();
-                if (filterable != null)
-                {
-                    switch (movingObjectSettings.filter)
-                    {
-                        case MovingObjectSettings.FilterType.Clear:
-                            {
-                                if (filterable.Filtered)
-                                {
-                                    filterable.Filtered = false;
-                                }
-                                break;
-                            }
-                        case MovingObjectSettings.FilterType.InverseSelection:
-                            {
-                                if (!filterable.Filtered)
-                                {
-                                    filterable.Filtered = !isSelected;
-                                }
-                                break;
-                            }
-                        case MovingObjectSettings.FilterType.Selection:
-                            {
-                                if (!filterable.Filtered)
-                                {
-                                    filterable.Filtered = isSelected;
-                                }
-                                break;
-                            }
-                        default:
-                            {
-                                break;
-                            }
-                    }
-
-                    VisAgentData data = movingObject.GetComponent<VisAgentData>();
-                    if (data != null)
-                    {
-                        mFilteredObjects[data.id] = filterable.Filtered;
-                    }
-
-                    if (filterable.Filtered)
-                    {
-                        return;
-                    }
-                }
-            }
-
             VisAgentData agentData = movingObject.GetComponent<VisAgentData>();
             if (agentData != null)
             {
+                if (IsFiltered(agentData.id))
+                {
+                    return;
+                }
+                
                 if (agentData.agentClass == VisAgentData.AgentClass.MovingObject)
                 {
                     Color c = Color.white;
@@ -543,7 +549,7 @@ namespace KVisualisation
                     if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
                     {
                         pathTimeStep = 0.5f;
-                        path = mVisSimController.Player.SampleObjectPath(agentData.id, 0.0f, 60.0f * 10.0f, pathTimeStep);
+                        path = mVisSimController.Players[mId].SampleObjectPath(agentData.id, 0.0f, 60.0f * 10.0f, pathTimeStep);
                         if (path != null && path.Length > 0)
                         {
                             movingObject.transform.localPosition = path[path.Length - 1].position;
@@ -552,11 +558,11 @@ namespace KVisualisation
                     }
                     else if (movingObjectSettings.trail)
                     {
-                        var data = mVisSimController.Player.GetSimObjectData(agentData.id);
+                        var data = mVisSimController.Players[mId].GetSimObjectData(agentData.id);
 
                         pathStartTime = data.timePeriod.x;
                         pathTimeStep = 0.1f;
-                        path = mVisSimController.Player.SampleObjectPath(agentData.id, pathStartTime, Mathf.Min(data.timePeriod.y, mVisSimController.Player.SimTime), pathTimeStep);
+                        path = mVisSimController.Players[mId].SampleObjectPath(agentData.id, pathStartTime, Mathf.Min(data.timePeriod.y, mVisSimController.Players[mId].SimTime), pathTimeStep);
                     }
 
                     if (movingObjectSettings.mesh)
@@ -644,11 +650,11 @@ namespace KVisualisation
                             SimulationPlayer.MovingObjectUpdate[] ghostPath = null;
                             if (ghostSpawner.ghostingDropType == MovingObjectSettings.GhostingDrop.Distance)
                             {
-                                ghostPath = mVisSimController.Player.SampleObjectPathDistance(agentData.id, 0.0f, 60.0f * 10.0f, 0.5f, movingObjectSettings.ghostingDropValue);
+                                ghostPath = mVisSimController.Players[mId].SampleObjectPathDistance(agentData.id, 0.0f, 60.0f * 10.0f, 0.5f, movingObjectSettings.ghostingDropValue);
                             }
                             else
                             {
-                                ghostPath = mVisSimController.Player.SampleObjectPath(agentData.id, 0.0f, 60.0f * 10.0f, movingObjectSettings.ghostingDropValue);
+                                ghostPath = mVisSimController.Players[mId].SampleObjectPath(agentData.id, 0.0f, 60.0f * 10.0f, movingObjectSettings.ghostingDropValue);
                             }
 
                             if (ghostPath != null && ghostPath.Length > 0)
