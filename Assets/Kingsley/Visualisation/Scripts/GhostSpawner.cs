@@ -4,7 +4,7 @@ using UnityEngine;
 namespace KVisualisation
 {
 
-    public class GhostSpawner : MonoBehaviour
+    public class GhostSpawner : MonoBehaviour, ITimeUpdater
     {
         public GameObject ghostPrefab;
         public Color colour = Color.white;
@@ -15,9 +15,10 @@ namespace KVisualisation
         public float ghostingValue = 1.0f;
         public float duration = 30.0f;
 
+        public int parentId = -1;
+
         private float lastTime = -1000.0f;
         private Vector3 lastPosition = Vector3.zero;
-
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -25,37 +26,48 @@ namespace KVisualisation
 
         }
 
-        // Update is called once per frame
-        void Update()
+        public void SetTime(float time)
         {
             if (ghostingDropType == VisClient.MovingObjectSettings.GhostingDrop.Distance)
             {
                 if (Vector3.Distance(transform.parent.localPosition, lastPosition) > ghostingValue)
                 {
-                    Spawn(transform.parent.localPosition, transform.parent.localRotation, duration);
+                    Spawn(transform.parent.localPosition, transform.parent.localRotation, time, duration);
                     lastPosition = transform.parent.localPosition;
                 }
             }
             else if (ghostingDropType != VisClient.MovingObjectSettings.GhostingDrop.Time)
             {
-                if (Time.time - lastTime > ghostingValue)
+                if (time - lastTime > ghostingValue)
                 {
-                    Spawn(transform.parent.localPosition, transform.parent.localRotation, duration);
-                    lastTime = Time.time;
+                    Spawn(transform.parent.localPosition, transform.parent.localRotation, time, duration);
+                    lastTime = time;
                 }
             }
         }
 
-        public void Spawn(Vector3 pos, Quaternion rot, float t)
+        public void Reset()
+        {
+            lastTime = -1000.0f;
+            lastPosition = Vector3.zero;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+
+        }
+
+        public void Spawn(Vector3 pos, Quaternion rot, float time, float destructTime)
         {
             GameObject ghostObj = Instantiate(ghostPrefab, ghostParent);
             ghostObj.transform.localPosition = pos;
             ghostObj.transform.localRotation  = rot;
 
-            if (t >= 0.0f)
+            if (destructTime >= 0.0f)
             {
                 DestructTimer destruct = ghostObj.AddComponent<DestructTimer>();
-                destruct.duration = t;
+                destruct.duration = destructTime;
             }
 
             MeshRenderer meshRenderer = ghostObj.GetComponent<MeshRenderer>();
@@ -65,6 +77,15 @@ namespace KVisualisation
                 m.SetColor("_BaseColor", colour);
                 m.SetColor("_WireColor", colour);
                 meshRenderer.material = m;
+            }
+
+            GhostObject go = ghostObj.GetComponent<GhostObject>();
+            {
+                if (go != null)
+                {
+                    go.parentId = parentId;
+                    go.spawnTime = time;
+                }
             }
         }
     }

@@ -107,15 +107,9 @@ namespace KController
                         {
                             for (int i = 0; i < count; ++i)
                             {
-                                GameObject player = Instantiate(simPlayerPrefab);
-                                player.name = "SimPlayer" + i.ToString();
-                                SimulationPlayer simPlayer = player.GetComponent<SimulationPlayer>();
-                                if (simPlayer != null)
-                                {
-                                    simPlayer.Id = i;
-                                    mSimPlayers.Add(simPlayer);
-                                }
+                                LoadSimPlayer(i);
                             }
+                            Loaded = true;
                             break;
                         }
                     default:
@@ -145,6 +139,20 @@ namespace KController
             if (!string.IsNullOrEmpty(name))
             {
                 StartCoroutine(LoadSceneCoroutine(name));
+            }
+        }
+
+        private void LoadSimPlayer(int id)
+        {
+            GameObject player = Instantiate(simPlayerPrefab);
+            player.name = "SimPlayer" + id.ToString();
+            SimulationPlayer simPlayer = player.GetComponent<SimulationPlayer>();
+            if (simPlayer != null)
+            {
+                simPlayer.Id = id;
+                mSimPlayers.Add(simPlayer);
+                simPlayer.Load();
+                simPlayer.Attach(CallOnSpawned, CallOnDestructed, CallOnTimeScrubbed);
             }
         }
 
@@ -208,7 +216,7 @@ namespace KController
 
         public int[] ListSimObjects(int playerId)
         {
-            if (playerId < mSimPlayers.Count)
+            if (playerId >= 0 && playerId < mSimPlayers.Count)
             {
                 return mSimPlayers[playerId].ListSimObjects();
             }

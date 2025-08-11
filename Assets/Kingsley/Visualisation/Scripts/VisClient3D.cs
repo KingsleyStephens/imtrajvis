@@ -62,6 +62,7 @@ namespace KVisualisation
         private MovingObjectSettings.FilterType mFilterType = MovingObjectSettings.FilterType.None;
         private Dictionary<int, bool> mFilterState= new Dictionary<int, bool>();
 
+        public float SimTime {  get { return mVisSimController.Players[mId].SimTime; } }
 
         public override void OnStart()
         {
@@ -91,9 +92,12 @@ namespace KVisualisation
             EnsureWeaponParent();
 
             int[] allIds = mVisSimController.ListSimObjects(mId);
-            foreach (int id in allIds)
+            if (allIds != null)
             {
-                mFilterState.Add(id, false);
+                foreach (int id in allIds)
+                {
+                    mFilterState.Add(id, false);
+                }
             }
 
             ApplySettings();
@@ -131,7 +135,7 @@ namespace KVisualisation
             foreach (var key in mMovingObjects.Keys)
             {
                 GameObject movingObject = mMovingObjects[key];
-                VisAgentData data = movingObject.GetComponent<VisAgentData>();
+                VisAgent data = movingObject.GetComponent<VisAgent>();
                 if (data != null)
                 {
                     if (data.parentId == formationId)
@@ -179,8 +183,14 @@ namespace KVisualisation
                                 AdaptiveTrailRenderer adaptiveTrailRenderer = obj.GetComponentInChildren<AdaptiveTrailRenderer>();
                                 if (adaptiveTrailRenderer != null)
                                 {
-                                    adaptiveTrailRenderer.AddPosition(obj.transform.position, mVisSimController.Players[mId].SimTime);
+                                    adaptiveTrailRenderer.AddPosition(obj.transform.position, SimTime);
                                 }
+                            }
+
+                            VisAgent visAgent = obj.GetComponentInChildren<VisAgent>();
+                            if (visAgent != null)
+                            {
+                                visAgent.SetTime(SimTime);
                             }
                         }
                         else
@@ -219,20 +229,45 @@ namespace KVisualisation
                                 {
                                     adaptiveTrailRenderer.CullOnTime(toTime);
                                 }
-                                //else
-                                //{
-                                //    float sampleDelta = 0.1f;
-                                //    SimulationPlayer.MovingObjectUpdate[] path = mVisSimController.Player.SampleObjectPath(id, fromTime, toTime, sampleDelta);
-                                //    if (path != null)
-                                //    {
-                                //        float t = fromTime;
-                                //        foreach (var p in path)
-                                //        {
-                                //            adaptiveTrailRenderer.AddPosition(obj.transform.TransformPoint(p.position), t);
-                                //            t += sampleDelta;
-                                //        }
-                                //    }
-                                //}
+                            }
+                        }
+
+                        if (movingObjectSettings.ghosting)
+                        {
+                            if (toTime < fromTime)
+                            {
+                                GhostSpawner ghostSpawner = obj.GetComponentInChildren<GhostSpawner>();
+                                if (ghostSpawner != null)
+                                {
+                                    ghostSpawner.Reset();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (toTime < fromTime)
+                {
+                    foreach (Transform child in mGhostParent)
+                    {
+                        GhostObject ghostObject = child.gameObject.GetComponent<GhostObject>();
+                        if (ghostObject != null)
+                        {
+                            if (ghostObject.spawnTime > toTime)
+                            {
+                                Destroy(ghostObject.gameObject);
+                            }
+                        }
+                    }
+
+                    foreach (Transform child in mTrailParent)
+                    {
+                        GhostObject ghostObject = child.gameObject.GetComponent<GhostObject>();
+                        if (ghostObject != null)
+                        {
+                            if (ghostObject.spawnTime > toTime)
+                            {
+                                Destroy(ghostObject.gameObject);
                             }
                         }
                     }
@@ -299,6 +334,11 @@ namespace KVisualisation
 
         private void Spawn(int id)
         {
+            if (mMovingObjects.ContainsKey(id))
+            {
+                return;
+            }
+
             var data = mVisSimController.GetSimObjectData(mId, id);
             if (data != null)
             {
@@ -315,10 +355,10 @@ namespace KVisualisation
                     }
                 }
 
-                VisAgentData agentData = instance.GetComponent<VisAgentData>();
+                VisAgent agentData = instance.GetComponent<VisAgent>();
                 if (agentData != null)
                 {
-                    VisAgentData.AgentClass agentClass = System.Enum.Parse<VisAgentData.AgentClass>(data.objectClass);
+                    VisAgent.AgentClass agentClass = System.Enum.Parse<VisAgent.AgentClass>(data.objectClass);
 
                     agentData.id = data.id;
                     agentData.parentId = data.parentId;
@@ -326,7 +366,7 @@ namespace KVisualisation
 
                     ApplySettingsToMovingObject(instance);
 
-                    if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic && agentClass == VisAgentData.AgentClass.Weapon)
+                    if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic && agentClass == VisAgent.AgentClass.Weapon)
                     {
                         EnsureWeaponParent();
 
@@ -343,15 +383,26 @@ namespace KVisualisation
             GameObject obj;
             if (mMovingObjects.TryGetValue(id, out obj))
             {
-                VisAgentData agentData = obj.GetComponent<VisAgentData>();
+                VisAgent agentData = obj.GetComponent<VisAgent>();
                 if (agentData != null)
                 {
-                    if (agentData.agentClass == VisAgentData.AgentClass.MovingObject && movingObjectSettings.trail)
+                    if (agentData.agentClass == VisAgent.AgentClass.MovingObject && movingObjectSettings.trail)
                     {
                         TrailRenderer tr = obj.GetComponentInChildren<TrailRenderer>();
                         if (tr != null)
                         {
                             tr.transform.SetParent(mTrailParent, true);
+                        }
+                        AdaptiveTrailRenderer atr = obj.GetComponentInChildren<AdaptiveTrailRenderer>();
+                        if (atr != null)
+                        {
+                            atr.transform.SetParent(mTrailParent, true);
+
+                            GhostObject ghostObject = atr.gameObject.GetComponent<GhostObject>();
+                            if (ghostObject != null)
+                            {
+                                ghostObject.spawnTime = SimTime;
+                            }
                         }
                     }
                 }
@@ -441,6 +492,26 @@ namespace KVisualisation
                     Destroy(child.gameObject);
                 }
             }
+            else
+            {
+                foreach (var k in mFilterState.Keys)
+                {
+                    if (mFilterState[k])
+                    {
+                        foreach (Transform child in mGhostParent)
+                        {
+                            GhostObject ghostObject = child.gameObject.GetComponent<GhostObject>();
+                            if (ghostObject != null)
+                            {
+                                if (ghostObject.parentId == k)
+                                {
+                                    Destroy(ghostObject.gameObject);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             if (!movingObjectSettings.trail || movingObjectSettings.filter != MovingObjectSettings.FilterType.None)
             {
@@ -515,20 +586,22 @@ namespace KVisualisation
                 Destroy(child.gameObject);
             }
 
-            VisAgentData agentData = movingObject.GetComponent<VisAgentData>();
+            VisAgent agentData = movingObject.GetComponent<VisAgent>();
             if (agentData != null)
             {
+                agentData.ClearUpdatables();
+
                 if (IsFiltered(agentData.id))
                 {
                     return;
                 }
                 
-                if (agentData.agentClass == VisAgentData.AgentClass.MovingObject)
+                if (agentData.agentClass == VisAgent.AgentClass.MovingObject)
                 {
                     Color c = Color.white;
                     if (agentData.parentId != -1)
                     {
-                        if (agentData.agentClass == VisAgentData.AgentClass.MovingObject)
+                        if (agentData.agentClass == VisAgent.AgentClass.MovingObject)
                         {
                             if (!formationColours.ContainsKey(agentData.parentId))
                             {
@@ -562,7 +635,7 @@ namespace KVisualisation
 
                         pathStartTime = data.timePeriod.x;
                         pathTimeStep = 0.1f;
-                        path = mVisSimController.Players[mId].SampleObjectPath(agentData.id, pathStartTime, Mathf.Min(data.timePeriod.y, mVisSimController.Players[mId].SimTime), pathTimeStep);
+                        path = mVisSimController.Players[mId].SampleObjectPath(agentData.id, pathStartTime, Mathf.Min(data.timePeriod.y, SimTime), pathTimeStep);
                     }
 
                     if (movingObjectSettings.mesh)
@@ -624,6 +697,12 @@ namespace KVisualisation
                                     }
                                 }
 
+                                GhostObject ghostObject = trailObject.GetComponent<GhostObject>();
+                                if (ghostObject != null)
+                                {
+                                    ghostObject.parentId = agentData.id;
+                                }
+
                                 //trailRenderer.time = movingObjectSettings.trailTime;
                             }
                         }
@@ -638,30 +717,56 @@ namespace KVisualisation
                         ghostingObject.transform.localScale = Vector3.one;
 
                         GhostSpawner ghostSpawner = ghostingObject.AddComponent<GhostSpawner>();
+                        ghostSpawner.parentId = agentData.id;
                         ghostSpawner.ghostPrefab = ghostPrefab;
                         ghostSpawner.ghostParent = mGhostParent;
                         ghostSpawner.ghostingDropType = movingObjectSettings.ghostingDrop;
                         ghostSpawner.ghostingValue = movingObjectSettings.ghostingDropValue;
                         ghostSpawner.colour = movingObjectSettings.overrideGhostColour ? movingObjectSettings.ghostColour : c;
                         //ghostSpawner.duration = movingObjectSettings.trailTime;
+                        agentData.AddUpdatable(ghostSpawner);
+
+                        var data = mVisSimController.Players[mId].GetSimObjectData(agentData.id);
+                        float startTime = data.timePeriod.x;
 
                         if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
                         {
                             SimulationPlayer.MovingObjectUpdate[] ghostPath = null;
                             if (ghostSpawner.ghostingDropType == MovingObjectSettings.GhostingDrop.Distance)
                             {
-                                ghostPath = mVisSimController.Players[mId].SampleObjectPathDistance(agentData.id, 0.0f, 60.0f * 10.0f, 0.5f, movingObjectSettings.ghostingDropValue);
+                                ghostPath = mVisSimController.Players[mId].SampleObjectPathDistance(agentData.id, startTime, data.timePeriod.y, 0.5f, movingObjectSettings.ghostingDropValue);
                             }
                             else
                             {
-                                ghostPath = mVisSimController.Players[mId].SampleObjectPath(agentData.id, 0.0f, 60.0f * 10.0f, movingObjectSettings.ghostingDropValue);
+                                ghostPath = mVisSimController.Players[mId].SampleObjectPath(agentData.id, startTime, data.timePeriod.y, movingObjectSettings.ghostingDropValue);
                             }
 
                             if (ghostPath != null && ghostPath.Length > 0)
                             { 
                                 foreach (var p in ghostPath)
                                 {
-                                    ghostSpawner.Spawn(p.position, p.orientation, -1.0f);
+                                    ghostSpawner.Spawn(p.position, p.orientation, p.time, -1.0f);
+                                }
+                            }
+                        }
+                        else
+                        {
+
+                            SimulationPlayer.MovingObjectUpdate[] ghostPath = null;
+                            if (ghostSpawner.ghostingDropType == MovingObjectSettings.GhostingDrop.Distance)
+                            {
+                                ghostPath = mVisSimController.Players[mId].SampleObjectPathDistance(agentData.id, startTime, Mathf.Min(data.timePeriod.y, SimTime), 0.5f, movingObjectSettings.ghostingDropValue);
+                            }
+                            else
+                            {
+                                ghostPath = mVisSimController.Players[mId].SampleObjectPath(agentData.id, startTime, Mathf.Min(data.timePeriod.y, SimTime), movingObjectSettings.ghostingDropValue);
+                            }
+
+                            if (ghostPath != null && ghostPath.Length > 0)
+                            {
+                                foreach (var p in ghostPath)
+                                {
+                                    ghostSpawner.Spawn(p.position, p.orientation, p.time, -1.0f);
                                 }
                             }
                         }

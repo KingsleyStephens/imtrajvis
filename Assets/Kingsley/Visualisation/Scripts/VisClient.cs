@@ -71,6 +71,7 @@ namespace KVisualisation
         protected VisSimController mVisSimController;
 
         protected int mId = -1;
+        public int Id { set { mId = value; } }
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -102,16 +103,17 @@ namespace KVisualisation
 
         private void OnEnable()
         {
-            if (mVisSimController != null)
-            {
-                mVisSimController.Attach(OnMovingObjectSpawn, OnMovingObjectDestruct, OnTimeScrub);
-            }
+
         }
 
 
         public void SetController(VisSimController visSimController)
         {
             mVisSimController = visSimController;
+            if (mVisSimController != null)
+            {
+                mVisSimController.Attach(OnMovingObjectSpawn, OnMovingObjectDestruct, OnTimeScrub);
+            }
         }
 
         public virtual void OnSettingsUpdate()

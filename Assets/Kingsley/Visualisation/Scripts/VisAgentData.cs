@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace KVisualisation
 {
-    public class VisAgentData : MonoBehaviour
+    public class VisAgent : MonoBehaviour, ITimeUpdater
     {
         public enum AgentClass
         {
@@ -15,6 +16,32 @@ namespace KVisualisation
 
         public int id = -1;
         public int parentId = -1;
+
+        private List<ITimeUpdater> updatables = new List<ITimeUpdater>();
+
+        public void AddUpdatable(ITimeUpdater updatable)
+        {
+            updatables.Add(updatable);
+        }
+
+        public void ClearUpdatables()
+        {
+            updatables.Clear();
+        }
+
+        public void SetTime(float time)
+        {
+            foreach(var updatable in updatables)
+            {
+                updatable.SetTime(time);
+            }
+        }
+
+        public void Reset()
+        {
+            
+        }
+
     }
 
 }

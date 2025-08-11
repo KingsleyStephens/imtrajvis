@@ -31,16 +31,18 @@ namespace KSimulation
 
         public class MovingObjectUpdate
         {
-            public MovingObjectUpdate(Vector3 position, Quaternion orientation, float speed)
+            public MovingObjectUpdate(Vector3 position, Quaternion orientation, float speed, float time)
             {
                 this.position = position;
                 this.orientation = orientation;
                 this.speed = speed;
+                this.time = time;
             }
 
             public Vector3 position;
             public Quaternion orientation;
             public float speed;
+            public float time;
         }
 
         public delegate void OnSpawnMovingObject(int playerId, int id);
@@ -96,6 +98,11 @@ namespace KSimulation
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
+        {
+
+        }
+
+        public void Load()
         {
             mSimulationDB = OpenDb();
             SetSimTime(startTime);
@@ -180,6 +187,11 @@ namespace KSimulation
             SimTime = mTimeExtents.x + clampedTime * (mTimeExtents.y - mTimeExtents.x);
         }
 
+        public float GetSimTimeAsRelativeTime()
+        {
+            return (SimTime - mTimeExtents.x) / (mTimeExtents.y - mTimeExtents.x);
+        }
+
         private void SetSimTime(float time)
         {
             mSimTime = mSimStartTime = time;
@@ -208,7 +220,7 @@ namespace KSimulation
             SpatioTemporalDB.MovingObjectPositionUpdate update = mSimulationDB.ReadTable(sessionName, id, mSimTime);
             if (update != null)
             {
-                return new MovingObjectUpdate(update.position, update.orientation, update.speed);
+                return new MovingObjectUpdate(update.position, update.orientation, update.speed, mSimTime);
             }
 
             return null;
@@ -224,7 +236,7 @@ namespace KSimulation
                 SpatioTemporalDB.MovingObjectPositionUpdate update = mSimulationDB.ReadTable(sessionName, id, t);
                 while (update != null)
                 {
-                    samples.Add(new MovingObjectUpdate(update.position, update.orientation, update.speed));
+                    samples.Add(new MovingObjectUpdate(update.position, update.orientation, update.speed, t));
                     t += timeStep;
                     update = mSimulationDB.ReadTable(sessionName, id, t);
                 }
@@ -236,7 +248,7 @@ namespace KSimulation
                     SpatioTemporalDB.MovingObjectPositionUpdate update = mSimulationDB.ReadTable(sessionName, id, t);
                     if (update != null)
                     {
-                        samples.Add(new MovingObjectUpdate(update.position, update.orientation, update.speed));
+                        samples.Add(new MovingObjectUpdate(update.position, update.orientation, update.speed, t));
                     }
                 }
             }
@@ -274,8 +286,6 @@ namespace KSimulation
         {
             mSimTime += Time.deltaTime * PlaybackSpeed;
             mSimTime = Mathf.Clamp(mSimTime, mTimeExtents.x, mTimeExtents.y);
-
-            Debug.Log("K3 UPDATE " + mTimeExtents.ToString());
         }
 
         private JsonSpatioTemporalDB OpenDb()

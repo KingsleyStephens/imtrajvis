@@ -49,7 +49,7 @@ namespace KVisualisation
 
         public void UpdateGroup(StateType state)
         {
-            VisAgentData data = gameObject.GetComponent<VisAgentData>();
+            VisAgent data = gameObject.GetComponent<VisAgent>();
             if (data != null)
             {
                 if (data.parentId >= 0)
@@ -57,7 +57,7 @@ namespace KVisualisation
                     GameObject[] formation = VisClient3D.Instance.GetAllOjectsOfFormation(data.parentId);
                     foreach (var f in formation)
                     {
-                        VisAgentData fData = f.GetComponent<VisAgentData>();
+                        VisAgent fData = f.GetComponent<VisAgent>();
                         if (fData  != null)
                         {
                             if (fData.id != data.id)

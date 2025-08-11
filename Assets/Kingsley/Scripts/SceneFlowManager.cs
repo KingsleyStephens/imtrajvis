@@ -133,7 +133,8 @@ public class SceneFlowManager : MonoBehaviour
 
     private bool mTimeSpeedControl = true;
 
-    private float mPrevPlaybackSpeed = 1.0f;
+    private List<float> mPrevPlaybackSpeed = new List<float>();
+    private bool mIsPaused = false;
 
     public bool IncreaseTime { get; set; } = false;
     public bool DecreaseTime { get; set; } = false;
@@ -246,8 +247,8 @@ public class SceneFlowManager : MonoBehaviour
                 root.OnResize();
             }
 
-
-            StartCoroutine(DeferApplyConfig());
+            ApplyViewChange();
+            ApplyCurrentConfig();
         }
     }
 
@@ -261,9 +262,13 @@ public class SceneFlowManager : MonoBehaviour
     private void ResetTimeControls()
     {
         mTimeSpeedControl = true;
-        mPrevPlaybackSpeed = 1.0f;
+        for (int i = 0; i < mPrevPlaybackSpeed.Count; i++)
+        {
+            mPrevPlaybackSpeed[i] = 1.0f;
+        }
         IncreaseTime = false;
         DecreaseTime = false;
+        mIsPaused = false;
     }
 
     public void TimeControlToggle()
@@ -272,12 +277,44 @@ public class SceneFlowManager : MonoBehaviour
 
         if (mTimeSpeedControl)
         {
-            PlaybackSpeed = mPrevPlaybackSpeed;
+            PlaybackSpeed = mPrevPlaybackSpeed[mCurrentClient];
         }
         else
         {
-            mPrevPlaybackSpeed = PlaybackSpeed;
+            mPrevPlaybackSpeed[mCurrentClient] = PlaybackSpeed;
             PlaybackSpeed = 0.0f;
+        }
+    }
+
+    public void SyncTime()
+    {
+        for (int i = 0; i < Controller.Players.Count; ++i)
+        {
+            if (i != mCurrentClient)
+            {
+                Controller.Players[i].SimTime = Controller.Players[mCurrentClient].SimTime;
+                mPrevPlaybackSpeed[i] = mPrevPlaybackSpeed[mCurrentClient];
+            }
+        }
+    }
+
+    private void PauseToggle(bool paused)
+    {
+        mIsPaused = paused;
+        if (mIsPaused)
+        {
+            for (int i = 0; i < Controller.Players.Count; ++i)
+            {
+                mPrevPlaybackSpeed[i] = Controller.Players[i].PlaybackSpeed;
+                Controller.Players[i].PlaybackSpeed = 0.0f;
+            }
+        }
+        else
+        {
+            for (int i = 0; i < Controller.Players.Count; ++i)
+            {
+                Controller.Players[i].PlaybackSpeed = mPrevPlaybackSpeed[i];
+            }
         }
     }
 
@@ -322,11 +359,11 @@ public class SceneFlowManager : MonoBehaviour
 
     public void IncreaseSimTime()
     {
-        ChangeSimTime(mPrevPlaybackSpeed);
+        ChangeSimTime(mPrevPlaybackSpeed[mCurrentClient]);
     }
     public void DecreaseSimTime()
     {
-        ChangeSimTime(-mPrevPlaybackSpeed);
+        ChangeSimTime(-mPrevPlaybackSpeed[mCurrentClient]);
     }
     public void ChangeSimTime(float delta)
     {
@@ -530,7 +567,7 @@ public class SceneFlowManager : MonoBehaviour
 
     public void Launch()
     {
-        StartCoroutine(LaunchSim(mNumClients));
+        LaunchSim(mNumClients);
 
     }
 
@@ -558,7 +595,7 @@ public class SceneFlowManager : MonoBehaviour
             }
 
             lastPositionCheckTime = Time.time;
-        }        
+        }
     }
 
 
@@ -591,6 +628,7 @@ public class SceneFlowManager : MonoBehaviour
             return;
         }
 
+        PauseToggle(true);
         mCurrentClient = GetClosestClientId();
 
         trajConfigUI.SetActive(true);
@@ -725,6 +763,16 @@ public class SceneFlowManager : MonoBehaviour
         {
             Debug.LogWarning("No Toggles found in trajConfigUI");
         }
+
+        Slider[] sliders = trajConfigUI.GetComponentsInChildren<Slider>();
+        if (sliders.Length > 0)
+        {
+            var sliderSearch = sliders.First((t) => t.name == "TimeSlider");
+            if (sliderSearch != null)
+            {
+                sliderSearch.value = Controller.Players[mCurrentClient].GetSimTimeAsRelativeTime();
+            }
+        }
     }
 
 
@@ -765,27 +813,13 @@ public class SceneFlowManager : MonoBehaviour
     public void CloseConfigScreen()
     {
         trajConfigUI.SetActive(false);
+        PauseToggle(false);
     }
 
-    public IEnumerator LaunchSim(int clientCount)
+    public void LaunchSim(int clientCount)
     {
-        if (player != null)
-        {
-            player.SetActive(true);
-            if (Controller != null)
-            {
-                Controller.LoadSim(clientCount);
-            }
-        }
-        while (!Controller.Loaded)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-
+        // Local parameter setting
         ResetTimeControls();
-
-        ActivateCurrentViewConfig();
-        SpawnClients(clientCount);
 
         Vector3 startPos = mSmallMultiples[clientCount].startPos;
         if (cameraRig != null)
@@ -794,36 +828,45 @@ public class SceneFlowManager : MonoBehaviour
             cameraRig.transform.rotation = Quaternion.identity;
         }
 
-        if (player != null)
+        // Load the simulation players
+        if (Controller != null)
         {
-            player.SetActive(true);
-
-            if (Controller != null)
-            {
-                foreach (var client in visClients)
-                {
-                    Visualisation vis = client.GetComponent<Visualisation>();
-                    if (vis != null)
-                    {
-                        vis.controller = Controller;
-                    }
-                    client.SetActive(true);
-                }
-
-                Controller.StartPlay();
-            }
+            Controller.gameObject.SetActive(true);
+            Controller.LoadSim(clientCount);
         }
 
-        launchUI.SetActive(false);
+        // Load the visualisation clients
+        SpawnClients(clientCount, Controller);
+
+        // Configure current view
+        ActivateCurrentViewConfig();
         UpdateControllerUI();
+
+        // Start the simulation and playback running
+        if (Controller != null)
+        {
+
+            foreach (var c in visClients)
+            {
+                c.SetActive(true);
+                
+            }
+
+            Controller.StartPlay();
+        }
+
+        // Hide launch UI
+        launchUI.SetActive(false);
     }
 
-    private void SpawnClients(int clientCount)
+    private void SpawnClients(int clientCount, VisSimController controller)
     {
         if (visPrefab == null)
         {
             return; 
         }
+
+        mPrevPlaybackSpeed.Clear();
 
         if (mSmallMultiples.ContainsKey(clientCount))
         {
@@ -846,10 +889,11 @@ public class SceneFlowManager : MonoBehaviour
                     Visualisation visComponent = vis.GetComponent<Visualisation>();
                     if (visComponent != null)
                     {
-                        visComponent.instanceId = i;
+                        visComponent.Configure(controller, i);
 
                         ApplyClientConfig(visComponent, config);
                     }
+                    mPrevPlaybackSpeed.Add(1.0f);
                 }
             }
         }
