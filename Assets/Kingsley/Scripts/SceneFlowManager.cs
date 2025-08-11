@@ -624,7 +624,7 @@ public class SceneFlowManager : MonoBehaviour
         // Toggle
         if (trajConfigUI.activeSelf)
         {
-            trajConfigUI.SetActive(false);
+            CloseConfigScreen();
             return;
         }
 
@@ -812,8 +812,8 @@ public class SceneFlowManager : MonoBehaviour
 
     public void CloseConfigScreen()
     {
-        trajConfigUI.SetActive(false);
         PauseToggle(false);
+        trajConfigUI.SetActive(false);
     }
 
     public void LaunchSim(int clientCount)
