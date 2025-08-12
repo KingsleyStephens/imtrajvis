@@ -395,7 +395,8 @@ namespace Oculus.Interaction.Locomotion
                 if (_raiseDir != 0 && !_hasVerticalSnapped)
                 {
                     mOrbitHeight += _raiseDir * verticleSpeed;
-                    mOrbitHeight = Mathf.Clamp(mOrbitHeight, 0.0f, orbitHeight * orbitDistance / mOrbitDist);
+                    float heightRange = orbitHeight * orbitDistance / mOrbitDist;
+                    mOrbitHeight = Mathf.Clamp(mOrbitHeight, -heightRange, heightRange);
                     _hasVerticalSnapped = true;
                 }
 

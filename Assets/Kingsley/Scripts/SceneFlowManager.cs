@@ -1,14 +1,16 @@
+using KController;
+using KVisualisation;
+using Oculus.Interaction.Locomotion;
+using SATestbed;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using KController;
-using KVisualisation;
-using SATestbed;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
-using Oculus.Interaction.Locomotion;
 
 public class SceneFlowManager : MonoBehaviour
 {
@@ -110,10 +112,12 @@ public class SceneFlowManager : MonoBehaviour
     {
         public List<SmallMultipleConfig> config = new List<SmallMultipleConfig>();
         public Vector3 startPos = Vector3.zero;
+        public float shadowDist = 400.0f;
     }
 
 
-    private Dictionary<int, SmallMultipleGroup> mSmallMultiples = new Dictionary<int, SmallMultipleGroup>();
+    private Dictionary<int, SmallMultipleGroup> mSmallMultiplesFreeFly = new Dictionary<int, SmallMultipleGroup>();
+    private Dictionary<int, SmallMultipleGroup> mSmallMultiplesTabletop = new Dictionary<int, SmallMultipleGroup>();
 
     private List<GameObject> visClients = new List<GameObject>();
 
@@ -175,17 +179,12 @@ public class SceneFlowManager : MonoBehaviour
 
     private void ActivateCurrentViewConfig()
     {
-        if (visRoot == null)
-        {
-            return;
-        }
-
-        ViewConfig currentConfig = null;
         switch (mViewConfigType)
         {
             case ViewConfigType.Tabletop:
                 {
-                    currentConfig = tableTopViewConfig[mNumClients - 1];
+                    ViewConfig currentConfig = tableTopViewConfig[mNumClients - 1];
+                    ResizeVis(currentConfig.position, currentConfig.scale);
 
                     if (cameraRig != null)
                     {
@@ -203,14 +202,15 @@ public class SceneFlowManager : MonoBehaviour
                         }
                     }
 
+                    roomViewInteraction.SetActive(false);
                     tableTopInteraction.SetActive(true);
 
                     break;
                 }
             case ViewConfigType.Room:
                 {
-                    currentConfig = roomViewConfig[mNumClients - 1];
-
+                    ViewConfig currentConfig = roomViewConfig[mNumClients - 1];
+                    ResizeVis(currentConfig.position, currentConfig.scale);
 
                     if (cameraRig != null)
                     {
@@ -227,6 +227,7 @@ public class SceneFlowManager : MonoBehaviour
                         }
                     }
 
+                    tableTopInteraction.SetActive(false);
                     roomViewInteraction.SetActive(true);
 
                     break;
@@ -236,27 +237,56 @@ public class SceneFlowManager : MonoBehaviour
                     break;
                 }
         }
-        if (currentConfig != null)
+
+        ApplyViewChange();
+        ApplyConfigAll();
+
+        var mult = GetMultipleConfig(visClients.Count);
+        if (mult != null)
         {
-            visRoot.position = currentConfig.position;
-            visRoot.localScale = currentConfig.scale;
+            SetShadowDistance(mult.shadowDist);
+        }
+    }
+
+    private void ResizeVis(Vector3 position, Vector3 scale)
+    {
+        if (visRoot != null)
+        {
+            visRoot.position = position;
+            visRoot.localScale = scale;
 
             VisRoot root = visRoot.GetComponent<VisRoot>();
             if (root != null)
             {
                 root.OnResize();
             }
+        }
 
-            ApplyViewChange();
-            ApplyCurrentConfig();
+        var mult = GetMultipleConfig(mNumClients);
+        if (mult != null)
+        {
+            List<SmallMultipleConfig> smallMultipleConfigs = mult.config;
+
+            for (int i = 0; i < visClients.Count; i++)
+            {
+                if (i < smallMultipleConfigs.Count)
+                {
+                    SmallMultipleConfig smConfig = smallMultipleConfigs[i];
+
+                    var vis = visClients[i];
+                    vis.transform.localPosition = smConfig.position;
+                    vis.transform.localRotation = Quaternion.identity;
+                    vis.transform.localScale = smConfig.scale;
+                }
+            }
         }
     }
 
     private IEnumerator DeferApplyConfig()
     {
-        yield return new WaitForEndOfFrame();
         ApplyViewChange();
-        ApplyCurrentConfig();
+        yield return new WaitForEndOfFrame();
+        ApplyConfigAll();
     }
 
     private void ResetTimeControls()
@@ -374,34 +404,73 @@ public class SceneFlowManager : MonoBehaviour
     private void Awake()
     {
         float height = 40.0f;
+        float shadowDist = 50.0f;
 
+        // Tabletop
         List<SmallMultipleConfig> config1 = new List<SmallMultipleConfig>();
         config1.Add(new SmallMultipleConfig(Vector3.one, Vector3.zero));
-        mSmallMultiples.Add(1, new SmallMultipleGroup() { config = config1, startPos = new Vector3(0.0f, height, 0.0f) });
+        mSmallMultiplesTabletop.Add(1, new SmallMultipleGroup() { config = config1, startPos = new Vector3(0.0f, height, 0.0f), shadowDist = shadowDist });
 
         float scale = 0.5f;
         float h = height * scale;
+        float sd = shadowDist * scale;
 
         List<SmallMultipleConfig> config2 = new List<SmallMultipleConfig>();
         config2.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, 0.0f)));
         config2.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, 0.0f)));
-        mSmallMultiples.Add(2, new SmallMultipleGroup() { config = config2, startPos = new Vector3(0.0f, h, 0.0f) });
+        mSmallMultiplesTabletop.Add(2, new SmallMultipleGroup() { config = config2, startPos = new Vector3(0.0f, h, 0.0f), shadowDist = sd });
 
         scale = 0.25f;
         h = height * scale;
+        sd = shadowDist * scale;
 
         List<SmallMultipleConfig> config3 = new List<SmallMultipleConfig>();
-        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * 0.25f * 0.5f)));
-        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * 0.25f * 0.5f)));
-        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(0.0f, 0.0f, visDimensions.z * scale * 0.5f)));
-        mSmallMultiples.Add(3, new SmallMultipleGroup() { config = config3, startPos = new Vector3(0.0f, h, 0.0f) });
+        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, -visDimensions.y * scale * 0.25f, 0.0f)));
+        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, -visDimensions.y * scale * 0.25f, 0.0f)));
+        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(0.0f, visDimensions.y * scale * 0.25f, 0.0f)));
+        mSmallMultiplesTabletop.Add(3, new SmallMultipleGroup() { config = config3, startPos = new Vector3(0.0f, h, 0.0f), shadowDist = sd });
 
         List<SmallMultipleConfig> config4 = new List<SmallMultipleConfig>();
+        config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, -visDimensions.y * scale * 0.25f, 0.0f)));
+        config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, -visDimensions.y * scale * 0.25f, 0.0f)));
+        config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, visDimensions.y * scale * 0.25f, 0.0f)));
+        config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, visDimensions.y * scale * 0.25f, 0.0f)));
+        mSmallMultiplesTabletop.Add(4, new SmallMultipleGroup() { config = config4, startPos = new Vector3(0.0f, h, 0.0f), shadowDist = sd });
+
+
+        // FreeFly
+        height = 40.0f;
+        shadowDist = 300.0f;
+
+        config1 = new List<SmallMultipleConfig>();
+        config1.Add(new SmallMultipleConfig(Vector3.one, Vector3.zero));
+        mSmallMultiplesFreeFly.Add(1, new SmallMultipleGroup() { config = config1, startPos = new Vector3(0.0f, height, 0.0f), shadowDist = shadowDist });
+
+        scale = 0.5f;
+        h = height * scale;
+        sd = shadowDist * scale;
+
+        config2 = new List<SmallMultipleConfig>();
+        config2.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, 0.0f)));
+        config2.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, 0.0f)));
+        mSmallMultiplesFreeFly.Add(2, new SmallMultipleGroup() { config = config2, startPos = new Vector3(0.0f, h, 0.0f), shadowDist = sd });
+
+        scale = 0.25f;
+        h = height * scale;
+        sd = shadowDist * scale;
+
+        config3 = new List<SmallMultipleConfig>();
+        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * scale * 0.5f)));
+        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * scale * 0.5f)));
+        config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(0.0f, 0.0f, visDimensions.z * scale * 0.5f)));
+        mSmallMultiplesFreeFly.Add(3, new SmallMultipleGroup() { config = config3, startPos = new Vector3(0.0f, h, 0.0f), shadowDist = sd });
+
+        config4 = new List<SmallMultipleConfig>();
         config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * scale * 0.5f)));
         config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * scale * 0.5f)));
         config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, visDimensions.z * scale * 0.5f)));
         config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, visDimensions.z * scale * 0.5f)));
-        mSmallMultiples.Add(4, new SmallMultipleGroup() { config = config4, startPos = new Vector3(0.0f, h, 0.0f) });
+        mSmallMultiplesFreeFly.Add(4, new SmallMultipleGroup() { config = config4, startPos = new Vector3(0.0f, h, 0.0f), shadowDist = sd });
     }
 
 
@@ -798,11 +867,19 @@ public class SceneFlowManager : MonoBehaviour
         }
     }
 
+    public void ApplyConfigAll()
+    {
+        for (int i = 0; i < visClients.Count; i++)
+        {
+            ApplyClientConfig(visClients[i].GetComponent<Visualisation>(), clientConfigs[i]);
+        }
+    }
+
     public void ApplyViewChange()
     {
-        if (mCurrentClient >= 0 && mCurrentClient < visClients.Count)
+        for (int i = 0; i < visClients.Count; i++)
         {
-            Visualisation vis = visClients[mCurrentClient].GetComponent<Visualisation>();
+            Visualisation vis = visClients[i].GetComponent<Visualisation>();
             if (vis != null)
             {
                 vis.ApplyViewChange();
@@ -816,16 +893,35 @@ public class SceneFlowManager : MonoBehaviour
         trajConfigUI.SetActive(false);
     }
 
+    private SmallMultipleGroup GetMultipleConfig(int count)
+    {
+        switch (mViewConfigType)
+        {
+            case ViewConfigType.Tabletop:
+                return mSmallMultiplesTabletop.ContainsKey(count) ? mSmallMultiplesTabletop[count] : null;
+            case ViewConfigType.Room:
+                return mSmallMultiplesFreeFly.ContainsKey(count) ? mSmallMultiplesFreeFly[count] : null;
+            default:
+                return null;
+        }
+    }
+
     public void LaunchSim(int clientCount)
     {
         // Local parameter setting
         ResetTimeControls();
 
-        Vector3 startPos = mSmallMultiples[clientCount].startPos;
-        if (cameraRig != null)
+        var mult = GetMultipleConfig(clientCount);
+        if (mult != null)
         {
-            cameraRig.transform.position = startPos;
-            cameraRig.transform.rotation = Quaternion.identity;
+            Vector3 startPos = mult.startPos;
+            if (cameraRig != null)
+            {
+                cameraRig.transform.position = startPos;
+                cameraRig.transform.rotation = Quaternion.identity;
+            }
+
+            SetShadowDistance(mult.shadowDist);
         }
 
         // Load the simulation players
@@ -868,9 +964,10 @@ public class SceneFlowManager : MonoBehaviour
 
         mPrevPlaybackSpeed.Clear();
 
-        if (mSmallMultiples.ContainsKey(clientCount))
+        var mult = GetMultipleConfig(clientCount);
+        if (mult != null)
         {
-            List<SmallMultipleConfig> smallMultipleConfigs = mSmallMultiples[clientCount].config;
+            List<SmallMultipleConfig> smallMultipleConfigs = mult.config;
 
             for (int i = 0; i < clientCount; i++)
             {
@@ -896,6 +993,8 @@ public class SceneFlowManager : MonoBehaviour
                     mPrevPlaybackSpeed.Add(1.0f);
                 }
             }
+
+            SetShadowDistance(mult.shadowDist);
         }
     }
 
@@ -904,6 +1003,15 @@ public class SceneFlowManager : MonoBehaviour
         if (vis != null)
         {
             vis.ApplyConfig(config);
+        }
+    }
+
+    private void SetShadowDistance(float distance)
+    {
+        UniversalRenderPipelineAsset urpAsset = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
+        if (urpAsset != null)
+        {
+            urpAsset.shadowDistance = distance;
         }
     }
 }

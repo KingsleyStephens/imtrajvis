@@ -342,6 +342,12 @@ namespace KVisualisation
             var data = mVisSimController.GetSimObjectData(mId, id);
             if (data != null)
             {
+                VisAgent.AgentClass agentClass = System.Enum.Parse<VisAgent.AgentClass>(data.objectClass);
+                if (agentClass == VisAgent.AgentClass.Weapon)
+                {
+                    return; // Ignore for now
+                }
+
                 GameObject instance = Instantiate(objectPrefab, transform);
                 instance.name = data.name;
 
@@ -358,7 +364,6 @@ namespace KVisualisation
                 VisAgent agentData = instance.GetComponent<VisAgent>();
                 if (agentData != null)
                 {
-                    VisAgent.AgentClass agentClass = System.Enum.Parse<VisAgent.AgentClass>(data.objectClass);
 
                     agentData.id = data.id;
                     agentData.parentId = data.parentId;
@@ -366,12 +371,12 @@ namespace KVisualisation
 
                     ApplySettingsToMovingObject(instance);
 
-                    if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic && agentClass == VisAgent.AgentClass.Weapon)
-                    {
-                        EnsureWeaponParent();
+                    //if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic && agentClass == VisAgent.AgentClass.Weapon)
+                    //{
+                    //    EnsureWeaponParent();
 
-                        Instantiate(weaponPrefab, mWeaponParent);
-                    }
+                    //    Instantiate(weaponPrefab, mWeaponParent);
+                    //}
                 }
 
                 mMovingObjects.Add(id, instance);
