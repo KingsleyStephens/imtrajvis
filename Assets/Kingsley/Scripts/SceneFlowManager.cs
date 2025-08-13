@@ -453,24 +453,24 @@ public class SceneFlowManager : MonoBehaviour
         config2 = new List<SmallMultipleConfig>();
         config2.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, 0.0f)));
         config2.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, 0.0f)));
-        mSmallMultiplesFreeFly.Add(2, new SmallMultipleGroup() { config = config2, startPos = new Vector3(0.0f, h, 0.0f), shadowDist = sd });
+        mSmallMultiplesFreeFly.Add(2, new SmallMultipleGroup() { config = config2, startPos = new Vector3(-visDimensions.x * scale * 0.5f, h, 0.0f), shadowDist = sd });
 
         scale = 0.25f;
-        h = height * scale;
+        h = height;
         sd = shadowDist * scale;
 
         config3 = new List<SmallMultipleConfig>();
         config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * scale * 0.5f)));
         config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * scale * 0.5f)));
         config3.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(0.0f, 0.0f, visDimensions.z * scale * 0.5f)));
-        mSmallMultiplesFreeFly.Add(3, new SmallMultipleGroup() { config = config3, startPos = new Vector3(0.0f, h, 0.0f), shadowDist = sd });
+        mSmallMultiplesFreeFly.Add(3, new SmallMultipleGroup() { config = config3, startPos = new Vector3(-visDimensions.x * scale * 0.5f, h, -visDimensions.z * scale * 0.5f), shadowDist = sd });
 
         config4 = new List<SmallMultipleConfig>();
         config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * scale * 0.5f)));
         config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, -visDimensions.z * scale * 0.5f)));
         config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(-visDimensions.x * scale * 0.5f, 0.0f, visDimensions.z * scale * 0.5f)));
         config4.Add(new SmallMultipleConfig(Vector3.one * scale, new Vector3(visDimensions.x * scale * 0.5f, 0.0f, visDimensions.z * scale * 0.5f)));
-        mSmallMultiplesFreeFly.Add(4, new SmallMultipleGroup() { config = config4, startPos = new Vector3(0.0f, h, 0.0f), shadowDist = sd });
+        mSmallMultiplesFreeFly.Add(4, new SmallMultipleGroup() { config = config4, startPos = new Vector3(-visDimensions.x * scale * 0.5f, h, -visDimensions.z * scale * 0.5f), shadowDist = sd });
     }
 
 
@@ -505,13 +505,11 @@ public class SceneFlowManager : MonoBehaviour
     public void MoveToNextClient()
     {
         MoveToClientDirection(1);
-        UpdateControllerUI();
     }
 
     public void MoveToPrevClient()
     {
         MoveToClientDirection(-1);
-        UpdateControllerUI();
     }
 
     private void MoveToClientDirection(int direction)
@@ -531,7 +529,21 @@ public class SceneFlowManager : MonoBehaviour
         MoveToClient(nextClient);
     }
 
-    private void MoveToClient(int toClient)
+    private float mLaunchTime = 0.0f;
+    public void UIMoveToClient(int toClient)
+    {
+        if (launchUI != null && launchUI.activeSelf)
+        {
+            return;
+        }
+
+        if (Time.time - mLaunchTime > 0.5f)
+        { 
+            MoveToClient(toClient - 1);
+        }
+    }
+
+    public void MoveToClient(int toClient)
     {
         if (!(toClient >= 0 && toClient < mNumClients))
         {
@@ -592,10 +604,16 @@ public class SceneFlowManager : MonoBehaviour
         }
 
         mCurrentClient = toClient;
+        UpdateControllerUI();
     }
 
     public void ActivateLaunchMenu()
     {
+        if (launchUI != null && launchUI.activeSelf)
+        {
+            return;
+        }
+        
         if (trajConfigUI != null && trajConfigUI.activeSelf)
         {
             trajConfigUI.SetActive(false);
@@ -908,6 +926,13 @@ public class SceneFlowManager : MonoBehaviour
 
     public void LaunchSim(int clientCount)
     {
+        if (!(launchUI != null && launchUI.activeSelf))
+        {
+            return;
+        }
+
+        mNumClients = clientCount;
+
         // Local parameter setting
         ResetTimeControls();
 
@@ -953,6 +978,7 @@ public class SceneFlowManager : MonoBehaviour
 
         // Hide launch UI
         launchUI.SetActive(false);
+        mLaunchTime = Time.time;
     }
 
     private void SpawnClients(int clientCount, VisSimController controller)
