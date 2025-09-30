@@ -19,6 +19,8 @@ namespace KingsleyPhD
         [SerializeField]
         private Transform[] workspaceRoots;
         [SerializeField]
+        private Transform fullscreenRoot;
+        [SerializeField]
         private GameObject cellPrototype;
         [SerializeField]
         private GameObject lineBatcherPrototype;
@@ -36,7 +38,8 @@ namespace KingsleyPhD
         private TMP_Dropdown workspaceDropdown;
         [SerializeField]
         private SnapshotCamera snapshotCamera;
-
+        [SerializeField]
+        private SceneFlowManager sceneFlowManager;
 
 
         // PRIVATE DATA
@@ -54,6 +57,8 @@ namespace KingsleyPhD
         private Dictionary<string, DesignInstanceJSON> mDesignInstances = new Dictionary<string, DesignInstanceJSON>();
 
         private TimelineJSON mTimelineJSON;
+
+        private Transform mPrevWorkspaceRoot;
 
         // PUBLIC
 
@@ -136,15 +141,52 @@ namespace KingsleyPhD
             }
         }
 
+        public void Hide()
+        {
+            foreach (var ws in mWorkspaces)
+            {
+                if (!ws.IsFPV)
+                {
+                    ws.gameObject.SetActive(false);
+                }
+            }
+
+            transform.parent.gameObject.SetActive(false);
+        }
+
+        public void Show()
+        {
+            foreach (var ws in mWorkspaces)
+            {
+                ws.gameObject.SetActive(true);
+            }
+
+            transform.parent.gameObject.SetActive(true);
+        }
+
+        public void Grow(Workspace workspace)
+        {
+            mPrevWorkspaceRoot = workspace.transform.parent;
+            workspace.transform.SetParent(fullscreenRoot);
+            workspace.transform.localPosition = Vector3.zero;
+
+            Hide();
+        }
+
         public void Shrink()
         {
             foreach (var ws in mWorkspaces) 
             {
                 if (ws.IsFPV)
                 {
+                    ws.transform.SetParent(mPrevWorkspaceRoot);
+                    ws.transform.localPosition = Vector3.zero;
+                    mPrevWorkspaceRoot = null;
                     ws.Shrink();
                 }
             }
+
+            Show();
         }
 
         // PRIVATE
@@ -205,6 +247,8 @@ namespace KingsleyPhD
             if (mTimelineJSON != null)
             {
                 mTimelineJSON.AddSlot(id);
+
+                LoadConfig();
             }
         }
 
@@ -295,7 +339,13 @@ namespace KingsleyPhD
                             workspace.DesignInstance = instance;
                             workspace.OnChange += WorkspaceChange;
                             workspace.OnClose += WorkspaceClose;
+                            workspace.OnGoFPV += Grow;
                             mWorkspaces.Add(workspace);
+
+                            if (sceneFlowManager != null)
+                            {
+                                sceneFlowManager.Launch(workspace.SceneRoot);
+                            }
                         }
 
                         mCurrCellData = cellData;

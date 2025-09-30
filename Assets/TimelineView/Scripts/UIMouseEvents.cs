@@ -1,5 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
+using static KVisualisation.DemoKeys;
 
 namespace KingsleyPhD
 {
@@ -8,15 +11,15 @@ namespace KingsleyPhD
         private CloseButton mCurrCloseButton;
         private CellView mCurrentlySelectedCellView;
         private Toggle mCurrToggleButton;
+        private UIEventHandler mCurrEventHandler;
 
         public UnityEvent OnEsc;
-
+        
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-
         }
-
+    
         // Update is called once per frame
         void Update()
         {
@@ -44,6 +47,10 @@ namespace KingsleyPhD
                 else if (mCurrToggleButton != null)
                 {
                     mCurrToggleButton.OnActivate();
+                }
+                else if (mCurrEventHandler != null)
+                {
+                    mCurrEventHandler.Click();
                 }
             }
 
@@ -116,6 +123,14 @@ namespace KingsleyPhD
                                     }
                                 }
                             }
+                            else
+                            {
+                                UIEventHandler handler = hit.transform.GetComponent<UIEventHandler>();
+                                if (handler != null)
+                                {
+                                    mCurrEventHandler = handler;
+                                }
+                            }
                         }
                     }
 
@@ -138,6 +153,11 @@ namespace KingsleyPhD
                 {
                     mCurrentlySelectedCellView.ResetState();
                     mCurrentlySelectedCellView = null;
+                }
+
+                if (mCurrEventHandler != null)
+                {
+                    mCurrEventHandler = null;
                 }
             }
         }

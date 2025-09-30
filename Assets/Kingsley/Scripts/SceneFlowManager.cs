@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -655,7 +656,12 @@ public class SceneFlowManager : MonoBehaviour
     public void Launch()
     {
         LaunchSim(mNumClients);
+    }
 
+    public void Launch(Transform root)
+    {
+        visRoot = root;
+        LaunchSim(1);
     }
 
 
@@ -926,10 +932,10 @@ public class SceneFlowManager : MonoBehaviour
 
     public void LaunchSim(int clientCount)
     {
-        if (!(launchUI != null && launchUI.activeSelf))
-        {
-            return;
-        }
+        //if (!(launchUI != null && launchUI.activeSelf))
+        //{
+        //    return;
+        //}
 
         mNumClients = clientCount;
 
@@ -939,12 +945,12 @@ public class SceneFlowManager : MonoBehaviour
         var mult = GetMultipleConfig(clientCount);
         if (mult != null)
         {
-            Vector3 startPos = mult.startPos;
-            if (cameraRig != null)
-            {
-                cameraRig.transform.position = startPos;
-                cameraRig.transform.rotation = Quaternion.identity;
-            }
+            //Vector3 startPos = mult.startPos;
+            //if (cameraRig != null)
+            //{
+            //    cameraRig.transform.position = startPos;
+            //    cameraRig.transform.rotation = Quaternion.identity;
+            //}
 
             SetShadowDistance(mult.shadowDist);
         }
@@ -957,7 +963,7 @@ public class SceneFlowManager : MonoBehaviour
         }
 
         // Load the visualisation clients
-        SpawnClients(clientCount, Controller);
+        SpawnClients(clientCount, Controller, visRoot);
 
         // Configure current view
         ActivateCurrentViewConfig();
@@ -966,22 +972,25 @@ public class SceneFlowManager : MonoBehaviour
         // Start the simulation and playback running
         if (Controller != null)
         {
-
             foreach (var c in visClients)
             {
                 c.SetActive(true);
-                
+                VisClient vc = c.GetComponent<VisClient>();
+                if (vc != null)
+                {
+                    vc.OnStart();
+                }
             }
 
             Controller.StartPlay();
         }
 
         // Hide launch UI
-        launchUI.SetActive(false);
+        //launchUI.SetActive(false);
         mLaunchTime = Time.time;
     }
 
-    private void SpawnClients(int clientCount, VisSimController controller)
+    private void SpawnClients(int clientCount, VisSimController controller, Transform root)
     {
         if (visPrefab == null)
         {
@@ -1001,7 +1010,7 @@ public class SceneFlowManager : MonoBehaviour
                 {
                     SmallMultipleConfig smConfig = smallMultipleConfigs[i];
 
-                    GameObject vis = Instantiate(visPrefab, visRoot);
+                    GameObject vis = Instantiate(visPrefab, root);
                     vis.transform.localPosition = smConfig.position;
                     vis.transform.localRotation = Quaternion.identity;
                     vis.transform.localScale = smConfig.scale;

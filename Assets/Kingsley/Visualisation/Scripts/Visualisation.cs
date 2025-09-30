@@ -48,6 +48,23 @@ namespace SATestbed
             ActivateVis();
         }
 
+
+        public void StartVis()
+        {
+            GameObject[] dimensions = new GameObject[] { oneD, twoD, twoPointFiveD, threeD };
+            for (int i = 0; i < dimensions.Length; i++)
+            {
+                if (dimensions[i] != null && dimensions[i].activeSelf)
+                {
+                    VisClient visClient = dimensions[i].GetComponent<VisClient>();
+                    if (visClient != null)
+                    {
+                        visClient.OnStart();
+                    }
+                }
+            }
+        }
+
         public void Configure(VisSimController controller, int clientId)
         {
             instanceId = clientId;

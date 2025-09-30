@@ -8,6 +8,8 @@ namespace KingsleyPhD
     public class Workspace : MonoBehaviour
     {
         [SerializeField]
+        private Transform sceneRoot;
+        [SerializeField]
         private GameObject ui;
         [SerializeField]
         private CloseButton closeButton;
@@ -31,6 +33,9 @@ namespace KingsleyPhD
         public delegate void Close(Workspace workspace);
         public event Close OnClose;
 
+        public delegate void GoFPV(Workspace workspace);
+        public event GoFPV OnGoFPV;
+
         private Vector3 mNormalScale;
         private bool mFPVActive = false;
 
@@ -38,6 +43,8 @@ namespace KingsleyPhD
         public bool IsFPV { get; private set; }
 
         public string CellId { get; set; }
+
+        public Transform SceneRoot {  get { return sceneRoot; } }
 
         public DesignInstanceJSON DesignInstance { 
             get { return mDesignSpaceInstance; }
@@ -149,6 +156,12 @@ namespace KingsleyPhD
             }
 
             IsFPV = mFPVActive;
+
+            if (mFPVActive) 
+            {
+                OnGoFPV?.Invoke(this);
+            }
+            
         }
 
         public void Pin(bool pinned)
