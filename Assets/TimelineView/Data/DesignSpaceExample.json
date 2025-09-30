@@ -1,0 +1,30 @@
+{
+    "categories": [
+        { "name": "Category 1", 
+          "dimensions": [
+            { "name": "Dimension 1",
+              "singular": true,
+              "options": ["Option 1", "Option 2", "Option 3"]
+            },
+            { "name": "Dimension 2",
+              "singular": false,
+              "options": ["Option 1", "Option 2", "Option 3"]
+            }
+
+          ]
+        },
+        { "name": "Category 2", 
+          "dimensions": [
+            { "name": "Dimension 1",
+              "singular": true,
+              "options": ["Option 1", "Option 2", "Option 3"]
+            },
+            { "name": "Dimension 2",
+              "singular": false,
+              "options": ["Option 1", "Option 2", "Option 3"]
+            }
+          ]
+        }        
+    ]
+
+}
