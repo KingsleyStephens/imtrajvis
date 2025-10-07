@@ -11,6 +11,8 @@ namespace KingsleyPhD
     public class TimelineSlot
     {
         public string id;
+        public Vector3 orientation = Vector3.zero;
+        public float zoom = 1.0f;
     }
 
 
@@ -71,6 +73,23 @@ namespace KingsleyPhD
             slots = slotList.ToArray();
 
             Save();
+        }
+
+        public void UpdateSlot(string id, Vector3 orientation, float zoom)
+        {
+            TimelineSlot slot = slots.First(x => x.id == id);
+            if (slot != null)
+            {
+                slot.orientation = orientation;
+                slot.zoom = zoom;
+
+                Save();
+            }
+        }
+
+        public TimelineSlot GetSlot(string id)
+        {
+            return slots.First(x => x.id == id);
         }
 
         public void Save()

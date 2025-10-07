@@ -174,10 +174,24 @@ namespace KingsleyPhD
 
         public void Grow(Workspace workspace)
         {
+            if (mDesignWorkspace != null)
+            {
+                if (mTimelineJSON != null)
+                {
+                    mTimelineJSON.UpdateSlot(workspace.CellId, designRoot.localRotation.eulerAngles, designRoot.localScale.x);
+                }
+            }
+            else
+            {
+                if (mTimelineJSON != null)
+                {
+                    mTimelineJSON.UpdateSlot(workspace.CellId, workspace.SceneRoot.localRotation.eulerAngles, workspace.SceneRoot.localScale.x);
+                }
+            }
+
             mFPVWorkspace = workspace;
 
             UserStart us = workspace.ViewRoot.GetComponentInChildren<UserStart>();
-            Debug.Log(us);
             if (us != null && cameraRig != null)
             {
                 cameraRig.transform.position = us.transform.position;
@@ -185,6 +199,9 @@ namespace KingsleyPhD
 
             workspace.ViewRoot.SetParent(fullscreenRoot);
             workspace.ViewRoot.localPosition = Vector3.zero;
+            workspace.ViewRoot.localScale = Vector3.one;
+            workspace.ViewRoot.localRotation = Quaternion.identity;
+
             workspace.Grow();
 
             Hide();
@@ -196,14 +213,47 @@ namespace KingsleyPhD
             {
                 if (mDesignWorkspace != null)
                 {
-                    mFPVWorkspace.ViewRoot.SetParent(designRoot);
+                    if (designRoot != null)
+                    {
+                        mFPVWorkspace.ViewRoot.SetParent(designRoot);
+                        designRoot.gameObject.SetActive(true);
+
+                        if (mTimelineJSON != null)
+                        {
+                            TimelineSlot slot = mTimelineJSON.GetSlot(mDesignWorkspace.CellId);
+                            if (slot != null)
+                            {
+                                designRoot.localRotation = Quaternion.Euler(slot.orientation);
+                                TrackballControl tb = designRoot.GetComponent<TrackballControl>();
+                                if (tb != null)
+                                {
+                                    tb.ZoomDistance = slot.zoom;
+                                }
+                            }
+                        }
+                    }
                 }
                 else
                 {
                     mFPVWorkspace.ViewRoot.SetParent(mFPVWorkspace.SceneRoot);
+
+                    if (mTimelineJSON != null)
+                    {
+                        TimelineSlot slot = mTimelineJSON.GetSlot(mFPVWorkspace.CellId);
+                        if (slot != null)
+                        {
+                            mFPVWorkspace.SceneRoot.localRotation = Quaternion.Euler(slot.orientation);
+                            TrackballControl tb = mFPVWorkspace.SceneRoot.GetComponent<TrackballControl>();
+                            if (tb != null)
+                            {
+                                tb.ZoomDistance = slot.zoom;
+                            }
+                        }
+                    }
                 }
 
                 mFPVWorkspace.ViewRoot.localPosition = Vector3.zero;
+                mFPVWorkspace.ViewRoot.localRotation = Quaternion.identity;
                 mFPVWorkspace.Shrink();
 
                 if (cameraRig != null)
@@ -377,6 +427,16 @@ namespace KingsleyPhD
                             workspace.OnDesignMenu += OnDesignMenu;
                             mWorkspaces.Add(workspace);
 
+                            if (mTimelineJSON != null)
+                            {
+                                TimelineSlot slot = mTimelineJSON.GetSlot(cellData.id);
+                                if (slot != null)
+                                {
+                                    workspace.SceneRoot.localRotation = Quaternion.Euler(slot.orientation);
+                                    workspace.SceneRoot.localScale = new Vector3(slot.zoom, slot.zoom, slot.zoom);
+                                }
+                            }
+
                             if (sceneFlowManager != null)
                             {
                                 sceneFlowManager.Launch(workspace.ViewRoot);
@@ -404,8 +464,12 @@ namespace KingsleyPhD
                     }
                 }
 
-                mDesignWorkspace.ViewRoot.SetParent(designRoot);
-                mDesignWorkspace.ViewRoot.localPosition = Vector3.zero;
+                if (designRoot != null)
+                {
+                    mDesignWorkspace.ViewRoot.SetParent(designRoot);
+                    mDesignWorkspace.ViewRoot.localPosition = Vector3.zero;
+                    designRoot.gameObject.SetActive(true);
+                }
 
                 transform.parent.gameObject.SetActive(false);
             }
@@ -422,6 +486,11 @@ namespace KingsleyPhD
                 mDesignWorkspace.ViewRoot.SetParent(mDesignWorkspace.SceneRoot);
                 mDesignWorkspace.ViewRoot.localPosition = Vector3.zero;
                 mDesignWorkspace = null;
+
+                if (designRoot != null)
+                {
+                    designRoot.gameObject.SetActive(false);
+                }
 
                 transform.parent.gameObject.SetActive(true);
             }
@@ -479,6 +548,11 @@ namespace KingsleyPhD
             Workspace ws = mWorkspaces.Find(x => x.CellId == workspace.CellId);
             if (ws != null)
             {
+                if (mTimelineJSON != null)
+                {
+                    mTimelineJSON.UpdateSlot(ws.CellId, ws.SceneRoot.localRotation.eulerAngles, ws.SceneRoot.localScale.x);
+                }
+
                 if (mDesignWorkspace != null)
                 {
                     OnDesignMenu(mDesignWorkspace);

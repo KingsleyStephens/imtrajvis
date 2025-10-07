@@ -164,7 +164,7 @@ namespace KingsleyPhD
             {
                 ToggleFPV();
 
-                if (mVisRoot  != null)
+                if (mVisRoot != null)
                 {
                     mVisRoot.OnResize();
                 }

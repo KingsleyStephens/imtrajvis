@@ -663,6 +663,18 @@ public class SceneFlowManager : MonoBehaviour
     public void Launch(Transform root)
     {
         visRoot = root;
+
+        if (player != null)
+        {
+            Controller = player.GetComponent<VisSimController>();
+            if (Controller != null)
+            {
+                Controller.StopPlay();
+                Controller.UnloadSim();
+            }
+            player.SetActive(false);
+        }
+
         LaunchSim(1);
     }
 
