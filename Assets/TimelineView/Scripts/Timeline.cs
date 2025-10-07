@@ -1,3 +1,4 @@
+using KVisualisation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,11 +16,15 @@ namespace KingsleyPhD
     {
         // PUBLIC FIELDS
         [SerializeField]
+        private GameObject cameraRig;
+        [SerializeField]
         private GameObject workspacePrototype;
         [SerializeField]
         private Transform[] workspaceRoots;
         [SerializeField]
         private Transform fullscreenRoot;
+        [SerializeField]
+        private Transform designRoot;
         [SerializeField]
         private GameObject cellPrototype;
         [SerializeField]
@@ -58,7 +63,10 @@ namespace KingsleyPhD
 
         private TimelineJSON mTimelineJSON;
 
-        private Transform mPrevWorkspaceRoot;
+        private Workspace mFPVWorkspace;
+        private Workspace mDesignWorkspace;
+
+        private Vector3 mStartPos = Vector3.zero;
 
         // PUBLIC
 
@@ -166,24 +174,44 @@ namespace KingsleyPhD
 
         public void Grow(Workspace workspace)
         {
-            mPrevWorkspaceRoot = workspace.transform.parent;
-            workspace.transform.SetParent(fullscreenRoot);
-            workspace.transform.localPosition = Vector3.zero;
+            mFPVWorkspace = workspace;
+
+            UserStart us = workspace.ViewRoot.GetComponentInChildren<UserStart>();
+            Debug.Log(us);
+            if (us != null && cameraRig != null)
+            {
+                cameraRig.transform.position = us.transform.position;
+            }
+
+            workspace.ViewRoot.SetParent(fullscreenRoot);
+            workspace.ViewRoot.localPosition = Vector3.zero;
+            workspace.Grow();
 
             Hide();
         }
 
         public void Shrink()
         {
-            foreach (var ws in mWorkspaces) 
+            if (mFPVWorkspace != null)
             {
-                if (ws.IsFPV)
+                if (mDesignWorkspace != null)
                 {
-                    ws.transform.SetParent(mPrevWorkspaceRoot);
-                    ws.transform.localPosition = Vector3.zero;
-                    mPrevWorkspaceRoot = null;
-                    ws.Shrink();
+                    mFPVWorkspace.ViewRoot.SetParent(designRoot);
                 }
+                else
+                {
+                    mFPVWorkspace.ViewRoot.SetParent(mFPVWorkspace.SceneRoot);
+                }
+
+                mFPVWorkspace.ViewRoot.localPosition = Vector3.zero;
+                mFPVWorkspace.Shrink();
+
+                if (cameraRig != null)
+                {
+                    cameraRig.transform.position = mStartPos;
+                }
+
+                mFPVWorkspace = null;
             }
 
             Show();
@@ -209,6 +237,11 @@ namespace KingsleyPhD
             mController.OnActivateCell += CellActivation;
             mController.OnCloseCell += CellClose;
             mController.OnNewCell += CellNew;
+
+            if (cameraRig != null)
+            {
+                mStartPos = cameraRig.transform.position;
+            }
         }
 
         private void LoadConfig()
@@ -331,6 +364,7 @@ namespace KingsleyPhD
                     {
                         GameObject wsObj = Instantiate(workspacePrototype, wsRoot, true);
                         wsObj.transform.localPosition = Vector3.zero;
+                        wsObj.transform.localScale = Vector3.one;
 
                         Workspace workspace = wsObj.GetComponent<Workspace>();
                         if (workspace != null)
@@ -340,17 +374,56 @@ namespace KingsleyPhD
                             workspace.OnChange += WorkspaceChange;
                             workspace.OnClose += WorkspaceClose;
                             workspace.OnGoFPV += Grow;
+                            workspace.OnDesignMenu += OnDesignMenu;
                             mWorkspaces.Add(workspace);
 
                             if (sceneFlowManager != null)
                             {
-                                sceneFlowManager.Launch(workspace.SceneRoot);
+                                sceneFlowManager.Launch(workspace.ViewRoot);
                             }
                         }
 
                         mCurrCellData = cellData;
                     }
                 }
+            }
+        }
+
+
+        private void OnDesignMenu(Workspace workspace)
+        {
+            if (mDesignWorkspace == null)
+            {
+                mDesignWorkspace = workspace;
+
+                foreach (var ws in mWorkspaces)
+                {
+                    if (ws != mDesignWorkspace)
+                    {
+                        ws.gameObject.SetActive(false);
+                    }
+                }
+
+                mDesignWorkspace.ViewRoot.SetParent(designRoot);
+                mDesignWorkspace.ViewRoot.localPosition = Vector3.zero;
+
+                transform.parent.gameObject.SetActive(false);
+            }
+            else
+            {
+                foreach (var ws in mWorkspaces)
+                {
+                    if (ws != mDesignWorkspace)
+                    {
+                        ws.gameObject.SetActive(true);
+                    }
+                }
+
+                mDesignWorkspace.ViewRoot.SetParent(mDesignWorkspace.SceneRoot);
+                mDesignWorkspace.ViewRoot.localPosition = Vector3.zero;
+                mDesignWorkspace = null;
+
+                transform.parent.gameObject.SetActive(true);
             }
         }
 
@@ -406,6 +479,11 @@ namespace KingsleyPhD
             Workspace ws = mWorkspaces.Find(x => x.CellId == workspace.CellId);
             if (ws != null)
             {
+                if (mDesignWorkspace != null)
+                {
+                    OnDesignMenu(mDesignWorkspace);
+                }
+
                 int index = mWorkspaces.IndexOf(ws);
                 Destroy(ws.gameObject);
                 mWorkspaces.RemoveAt(index);

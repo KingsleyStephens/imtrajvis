@@ -490,10 +490,10 @@ public class SceneFlowManager : MonoBehaviour
                 }
             case RunType.Play:
                 {
-                    if (launchUI != null)
-                    {
-                        ActivateLaunchMenu();
-                    }
+                    //if (launchUI != null)
+                    //{
+                    //    ActivateLaunchMenu();
+                    //}
                     break;
                 }
             default:
@@ -610,6 +610,8 @@ public class SceneFlowManager : MonoBehaviour
 
     public void ActivateLaunchMenu()
     {
+        return; // Disabled
+
         if (launchUI != null && launchUI.activeSelf)
         {
             return;
@@ -764,9 +766,16 @@ public class SceneFlowManager : MonoBehaviour
         int id = -1;
 
         List<Collider> visInstances = new List<Collider>();
-        foreach (var c in visClients) 
+        foreach (var c in visClients)
         {
-            visInstances.Add(c.GetComponent<Collider>());
+            if (c != null)
+            {
+                Collider col = c.GetComponent<Collider>();
+                if (col != null)
+                {
+                    visInstances.Add(col);
+                }
+            }
         }
 
         float closestDist = float.MaxValue;
@@ -996,6 +1005,10 @@ public class SceneFlowManager : MonoBehaviour
         {
             return; 
         }
+
+        visClients.Clear();
+        clientConfigs.Clear();
+        mCurrentClient = 0;
 
         mPrevPlaybackSpeed.Clear();
 

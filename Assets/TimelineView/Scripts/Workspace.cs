@@ -1,3 +1,4 @@
+using KVisualisation;
 using UnityEngine;
 
 namespace KingsleyPhD
@@ -10,6 +11,8 @@ namespace KingsleyPhD
         [SerializeField]
         private Transform sceneRoot;
         [SerializeField]
+        private Transform viewRoot;
+        [SerializeField]
         private GameObject ui;
         [SerializeField]
         private CloseButton closeButton;
@@ -21,6 +24,10 @@ namespace KingsleyPhD
         private Toggle pinToggle;
         [SerializeField]
         private GameObject designSpace;
+        [SerializeField]
+        private Vector3 smScale = new Vector3(0.002f, 0.002f, 0.002f);
+        [SerializeField]
+        private Vector3 designScale = new Vector3(0.01f, 0.01f, 0.01f);
         [SerializeField]
         private Vector3 fpvScale = new Vector3(10.0f, 10.0f, 10.0f);
 
@@ -36,7 +43,9 @@ namespace KingsleyPhD
         public delegate void GoFPV(Workspace workspace);
         public event GoFPV OnGoFPV;
 
-        private Vector3 mNormalScale;
+        public delegate void GoDesignMenu(Workspace workspace);
+        public event GoDesignMenu OnDesignMenu;
+
         private bool mFPVActive = false;
 
         public bool Pinned { get; private set; }
@@ -45,6 +54,10 @@ namespace KingsleyPhD
         public string CellId { get; set; }
 
         public Transform SceneRoot {  get { return sceneRoot; } }
+        public Transform ViewRoot { get { return viewRoot; } }
+
+        private VisRoot mVisRoot;
+        private bool mDesignActive = false;
 
         public DesignInstanceJSON DesignInstance { 
             get { return mDesignSpaceInstance; }
@@ -65,8 +78,10 @@ namespace KingsleyPhD
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            mNormalScale = transform.localScale;
+            viewRoot.localScale = smScale;
+            viewRoot.localPosition = Vector3.zero;
 
+            mVisRoot = viewRoot.GetComponent<VisRoot>();
 
             if (closeButton != null)
             {
@@ -80,7 +95,7 @@ namespace KingsleyPhD
 
             if (fpvButton != null)
             {
-                fpvButton.OnActivateButton += FPV;
+                fpvButton.OnActivateButton += ToggleFPV;
             }
 
             if (pinToggle != null)
@@ -120,7 +135,26 @@ namespace KingsleyPhD
         {
             if (designSpace != null)
             {
-                designSpace.SetActive(!designSpace.activeSelf);
+                mDesignActive = !mDesignActive;
+                designSpace.SetActive(mDesignActive);
+
+                OnDesignMenu?.Invoke(this);
+
+                if (mDesignActive)
+                {
+                    viewRoot.localScale = designScale;
+                    viewRoot.localPosition = Vector3.zero;
+                }
+                else
+                {
+                    viewRoot.localScale = smScale;
+                    viewRoot.localPosition = Vector3.zero;
+                }
+
+                if (mVisRoot != null)
+                {
+                    mVisRoot.OnResize();
+                }
             }
         }
 
@@ -128,27 +162,50 @@ namespace KingsleyPhD
         {
             if (mFPVActive)
             {
-                FPV();
+                ToggleFPV();
+
+                if (mVisRoot  != null)
+                {
+                    mVisRoot.OnResize();
+                }
             }
         }
 
-        public void FPV()
+        public void Grow()
         {
-            if (designSpace != null)
+            if (mVisRoot != null)
+            {
+                mVisRoot.OnResize();
+            }
+        }
+
+        public void ToggleFPV()
+        {
+            mFPVActive = !mFPVActive;
+
+            if (mFPVActive && designSpace != null)
             {
                 designSpace.SetActive(false);
             }
-
-            mFPVActive = !mFPVActive;
+            else if (!mFPVActive && mDesignActive && designSpace != null)
+            {
+                designSpace.SetActive(true);
+            }
 
             if (mFPVActive)
             {
-                transform.localScale = fpvScale;
+                viewRoot.localScale = fpvScale;
+            }
+            else if (mDesignActive)
+            {
+                viewRoot.localScale = designScale;
             }
             else
             {
-                transform.localScale = mNormalScale;
+                viewRoot.localScale = smScale;
             }
+
+            viewRoot.localPosition = Vector3.zero;
 
             if (ui != null)
             {

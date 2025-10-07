@@ -20,7 +20,7 @@ namespace KingsleyPhD
         [SerializeField]
         private TimelineView.CellConfig cellConfig;
         [SerializeField]
-        float categoriesWidth = 30.0f;
+        float categoriesBuffer = 5.0f;
 
         [SerializeField]
         private string jsonFile;
@@ -65,14 +65,22 @@ namespace KingsleyPhD
             DesignSpaceJSON designSpaceJSON = DesignSpaceJSON.Load(Path.Combine(Application.streamingAssetsPath,jsonFile));
             if (designSpaceJSON != null)
             {
-                int numCategories = designSpaceJSON.categories.Length;
-                float spacing = categoriesWidth / numCategories;
-                int index = 0;
+                float width = 0.0f;
                 foreach (var category in designSpaceJSON.categories)
                 {
+                    width += cellConfig.cellSize.x * category.dimensions.Length + categoriesBuffer;
+                }
+                float start = -width * 0.5f;
+
+                float spacing = 0.0f;
+                int index = 0;
+                float pos = 0.0f;
+                foreach (var category in designSpaceJSON.categories)
+                {
+                    spacing = cellConfig.cellSize.x * category.dimensions.Length;
                     GameObject catParent = new GameObject("Category " + category.name);
                     catParent.transform.SetParent(transform);
-                    catParent.transform.localPosition = new Vector3(-categoriesWidth * 0.5f + spacing * 0.5f + index * spacing, 0.0f, 0.0f);
+                    catParent.transform.localPosition = new Vector3(start + pos, 0.0f, 0.0f);
 
                     CellLine catRow = new CellLine();
 
@@ -130,6 +138,8 @@ namespace KingsleyPhD
                     //dimRow.controller.OnActivateCell += CellActivation;
 
                     mDimensionRows.Add(dimRow);
+
+                    pos += spacing + categoriesBuffer;
                 }
             }
 

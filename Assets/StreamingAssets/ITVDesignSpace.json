@@ -1,0 +1,105 @@
+{
+    "categories": [
+        { "name": "Intention", 
+          "dimensions": [
+            { "name": "Purpose",
+              "singular": true,
+              "options": ["Plan", "Operate", "Review"]
+            }
+          ]
+        },
+        { "name": "Data", 
+          "dimensions": [
+            { "name": "Temporal Nature",
+              "singular": true,
+              "options": ["Static", "Dynamic", "Real-life", "Replay"]
+            },
+            { "name": "Object Count",
+              "singular": true,
+              "options": ["Single", "Parent-child", "Multiple", "Group"]
+            },
+            { "name": "Environment Objects",
+              "singular": true,
+              "options": ["None", "Static", "Dynamic", "Embedded"]
+            }
+          ]
+        },
+        { "name": "Tools", 
+          "dimensions": [
+            { "name": "Task",
+              "singular": true,
+              "options": ["Overview to Details-on-demand", "Record", "Extract", "Aggregate", "Classify Patterns", "Outlier Detect", "Predict"]
+            }
+          ]
+        },
+        { "name": "Interaction", 
+          "dimensions": [
+            { "name": "Viewpoint",
+              "singular": false,
+              "options": ["Egocentric", "Exocentric", "Object-centric"]
+            },
+            { "name": "Navigate",
+              "singular": false,
+              "options": ["Direct", "Indirect"]
+            },
+            { "name": "Manipulate",
+              "singular": true,
+              "options": ["Time", "Trajectory Selection", "Trajectory Course", "Data Views"]
+            }
+          ]
+        },
+        { "name": "Trajectories", 
+          "dimensions": [
+            { "name": "Path",
+              "singular": true,
+              "options": ["Path", "Glyph", "Density"]
+            },
+            { "name": "Colour",
+              "singular": false,
+              "options": ["Uniform", "Data driven"]
+            }
+          ]
+        },
+        { "name": "Space/Time", 
+          "dimensions": [
+            { "name": "Dimensionality",
+              "singular": false,
+              "options": ["1D", "2D", "3D"]
+            },
+            { "name": "Continuity",
+              "singular": false,
+              "options": ["Single Space", "Multiple Spaces"]
+            },
+            { "name": "Time",
+              "singular": false,
+              "options": ["Static", "+ 1D position", "+ 1D animation"]
+            }
+          ]
+        },
+        { "name": "Virtuality", 
+          "dimensions": [
+            { "name": "Use of Virtual Reality",
+              "singular": false,
+              "options": ["Situated", "Virtual"]
+            }
+          ]
+        },
+        { "name": "Hardware", 
+          "dimensions": [
+            { "name": "Input Modality",
+              "singular": true,
+              "options": ["Hands", "Pointer", "Voice"]
+            },
+            { "name": "Sensory Channels",
+              "singular": true,
+              "options": ["Visual", "Audio", "Haptic"]
+            },
+            { "name": "Collaborate",
+              "singular": false,
+              "options": ["No", "Yes"]
+            }    
+          ]
+        }
+    ]
+
+}

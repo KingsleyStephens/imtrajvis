@@ -36,6 +36,50 @@ Transform:
   - {fileID: 7237464541647745963}
   m_Father: {fileID: 9177420767987577202}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2505798175219669414
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1039746222870123183}
+  - component: {fileID: 5933107927826576779}
+  m_Layer: 0
+  m_Name: VisRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1039746222870123183
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2505798175219669414}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8816565063359627776}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5933107927826576779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2505798175219669414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adf8da9f2f2eca4499d005e6e79273ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5512296212775214703
 GameObject:
   m_ObjectHideFlags: 0
@@ -45,7 +89,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8816565063359627776}
-  - component: {fileID: 4994397552824323214}
   m_Layer: 0
   m_Name: Scene
   m_TagString: Untagged
@@ -63,23 +106,12 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.01732, y: 0.29844, z: -0.40079}
-  m_LocalScale: {x: 0.002, y: 0.002, z: 0.002}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1039746222870123183}
   m_Father: {fileID: 9177420767987577202}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4994397552824323214
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5512296212775214703}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adf8da9f2f2eca4499d005e6e79273ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6488595172128495091
 GameObject:
   m_ObjectHideFlags: 0
@@ -127,13 +159,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneRoot: {fileID: 8816565063359627776}
+  viewRoot: {fileID: 1039746222870123183}
   ui: {fileID: 87096667938082259}
   closeButton: {fileID: 7436116914873454351}
   menuButton: {fileID: 3821456684098701043}
   fpvButton: {fileID: 5624695547135144177}
   pinToggle: {fileID: 1590446686890811577}
   designSpace: {fileID: 6703485195695258102}
-  fpvScale: {x: 10, y: 10, z: 10}
+  smScale: {x: 0.002, y: 0.002, z: 0.002}
+  designScale: {x: 0.01, y: 0.01, z: 0.01}
+  fpvScale: {x: 1, y: 1, z: 1}
 --- !u!1 &6703485195695258102
 GameObject:
   m_ObjectHideFlags: 0
@@ -185,9 +220,9 @@ MonoBehaviour:
   cellConfig:
     anchorPosition: {x: 0, y: 0, z: 0}
     anchorRotation: {x: 0, y: 0, z: 0, w: 0}
-    cellSize: {x: 6, y: 2}
-  categoriesWidth: 30
-  jsonFile: DesignSpace.json
+    cellSize: {x: 8, y: 2}
+  categoriesBuffer: 1
+  jsonFile: ITVDesignSpace.json
 --- !u!1001 &1471298766415144129
 PrefabInstance:
   m_ObjectHideFlags: 0

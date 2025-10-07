@@ -304,21 +304,36 @@ namespace KVisualisation
 
         public override void OnViewChange()
         {
-            foreach (Transform child in mGhostParent)
+            if (mGhostParent != null)
             {
-                Destroy(child.gameObject);
+                foreach (Transform child in mGhostParent)
+                {
+                    Destroy(child.gameObject);
+                }
             }
-            foreach (Transform child in mLineParent)
+
+            if (mLineParent != null)
             {
-                Destroy(child.gameObject);
+                foreach (Transform child in mLineParent)
+                {
+                    Destroy(child.gameObject);
+                }
             }
-            foreach (Transform child in mTrailParent)
+
+            if (mTrailParent != null)
             {
-                Destroy(child.gameObject);
+                foreach (Transform child in mTrailParent)
+                {
+                    Destroy(child.gameObject);
+                }
             }
-            foreach (Transform child in mWeaponParent)
+
+            if (mWeaponParent != null)
             {
-                Destroy(child.gameObject);
+                foreach (Transform child in mWeaponParent)
+                {
+                    Destroy(child.gameObject);
+                }
             }
         }
 
@@ -492,9 +507,12 @@ namespace KVisualisation
 
             if (!movingObjectSettings.ghosting)
             {
-                foreach (Transform child in mGhostParent)
+                if (mGhostParent != null)
                 {
-                    Destroy(child.gameObject);
+                    foreach (Transform child in mGhostParent)
+                    {
+                        Destroy(child.gameObject);
+                    }
                 }
             }
             else
@@ -520,37 +538,52 @@ namespace KVisualisation
 
             if (!movingObjectSettings.trail || movingObjectSettings.filter != MovingObjectSettings.FilterType.None)
             {
-                foreach (Transform child in mLineParent)
-                {
-                    Destroy(child.gameObject);
-                }
-                foreach (Transform child in mTrailParent)
-                {
-                    Destroy(child.gameObject);
-                }
-            }
-            else
-            {
-                if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
-                {
-                    foreach (Transform child in mTrailParent)
-                    {
-                        Destroy(child.gameObject);
-                    }
-                }
-                else
+                if (mLineParent != null)
                 {
                     foreach (Transform child in mLineParent)
                     {
                         Destroy(child.gameObject);
                     }
                 }
+                if (mTrailParent != null)
+                {
+                    foreach (Transform child in mTrailParent)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
+            }
+            else
+            {
+                if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
+                {
+                    if (mTrailParent != null)
+                    {
+                        foreach (Transform child in mTrailParent)
+                        {
+                            Destroy(child.gameObject);
+                        }
+                    }
+                }
+                else
+                {
+                    if (mLineParent != null)
+                    {
+                        foreach (Transform child in mLineParent)
+                        {
+                            Destroy(child.gameObject);
+                        }
+                    }
+                }
             }
 
             // Weapons
-            foreach (Transform child in mWeaponParent)
+            if (mWeaponParent != null)
             {
-                Destroy(child.gameObject);
+                foreach (Transform child in mWeaponParent)
+                {
+                    Destroy(child.gameObject);
+                }
             }
 
 
