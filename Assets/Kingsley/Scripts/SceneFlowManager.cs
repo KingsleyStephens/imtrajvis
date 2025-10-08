@@ -59,6 +59,8 @@ public class SceneFlowManager : MonoBehaviour
 
     public VisSimController Controller { get; private set; }
 
+    public float SimRelativeTime {  get { return Controller.Players[mCurrentClient].GetSimTimeAsRelativeTime();  } }
+
     [Serializable]
     private class ViewConfig
     {

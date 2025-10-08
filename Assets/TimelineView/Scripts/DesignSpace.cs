@@ -1,9 +1,10 @@
 using System.Collections.Generic;
-using UnityEngine;
-using static KingsleyPhD.TimelineView;
-using UnityEngine.InputSystem.XR;
 using System.IO;
+using UnityEngine;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.UI;
+using static KingsleyPhD.TimelineModel;
+using static KingsleyPhD.TimelineView;
 
 namespace KingsleyPhD
 {
@@ -53,6 +54,9 @@ namespace KingsleyPhD
 
         public delegate void Change();
         public event Change OnChange;
+
+        public delegate void TimeChange(bool staticTime);
+        public event TimeChange OnTimeChange;
 
         // PRIVATE
 
@@ -120,6 +124,14 @@ namespace KingsleyPhD
 
                             string id = optCol.model.AddCell(dimension.singular ? TimelineModel.Cell.CellType.Toggle : TimelineModel.Cell.CellType.Radio, option, selected);
                             mCellLookup.Add(id, new CellLookup() { category = category.name, dimension = dimension.name, option = option });
+
+                            if (category.name == "Space/Time" && dimension.name == "Time")
+                            {
+                                if (selected)
+                                {
+                                    OnTimeChange?.Invoke(option != "+ 1D animation");
+                                }
+                            }
                         }
 
                         optCol.view = new TimelineView(cellPrototype, lineBatcherPrototype, optParent.transform, cellConfig);
@@ -175,6 +187,11 @@ namespace KingsleyPhD
                 DesignInstance.Set(cell.category, cell.dimension, cell.option, selected);
 
                 OnChange?.Invoke();
+
+                if (cell.category == "Space/Time" &&  cell.dimension == "Time")
+                {
+                    OnTimeChange?.Invoke(cell.option != "+ 1D animation");
+                }
             }
         }
     }

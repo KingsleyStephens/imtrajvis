@@ -1,5 +1,7 @@
 using KVisualisation;
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
+using static KingsleyPhD.DesignSpace;
 
 namespace KingsleyPhD
 {
@@ -24,6 +26,8 @@ namespace KingsleyPhD
         private CloseButton fpvButton;
         [SerializeField]
         private Toggle pinToggle;
+        [SerializeField]
+        private Slider timeSlider;
         [SerializeField]
         private GameObject designSpace;
         [SerializeField]
@@ -64,6 +68,9 @@ namespace KingsleyPhD
         private VisRoot mVisRoot;
         private bool mDesignActive = false;
 
+        private bool mLockTimeEvents = false;
+        private bool mIsStaticTime = false;
+
         public DesignInstanceJSON DesignInstance { 
             get { return mDesignSpaceInstance; }
             set {
@@ -75,10 +82,26 @@ namespace KingsleyPhD
                     {
                         ds.DesignInstance = mDesignSpaceInstance;
                     }
-                } 
+                }
+
+                DoTimeChange(!mDesignSpaceInstance.Query("Space/Time", "Time", "+ 1D animation"));
             }
         }
 
+        public float Time { set { if (!mLockTimeEvents && mSceneFlowManager != null) { mSceneFlowManager.ScrubTime = value; } } }
+
+        private void Awake()
+        {
+            if (designSpace != null)
+            {
+                DesignSpace ds = designSpace.GetComponent<DesignSpace>();
+                if (ds != null)
+                {
+                    ds.OnChange += DoChange;
+                    ds.OnTimeChange += DoTimeChange;
+                }
+            }
+        }
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -111,12 +134,6 @@ namespace KingsleyPhD
             if (designSpace != null)
             {
                 designSpace.SetActive(false);
-
-                DesignSpace ds = designSpace.GetComponent<DesignSpace>();
-                if (ds != null)
-                {
-                    ds.OnChange += DoChange;
-                }
             }
 
             GameObject sceneFlowGO = Instantiate(sceneFlowManagerPrefab);
@@ -138,10 +155,31 @@ namespace KingsleyPhD
             OnChange?.Invoke();
         }
 
+        void DoTimeChange(bool staticTime)
+        {
+            if (timeSlider != null)
+            {
+                mIsStaticTime = staticTime;
+                timeSlider.gameObject.SetActive(!mIsStaticTime);
+
+                if (!mIsStaticTime && mSceneFlowManager != null)
+                {
+                    mSceneFlowManager.ScrubTime = 0.0f;
+                }
+            }
+        }
+
         // Update is called once per frame
         void Update()
         {
+            if (!mIsStaticTime && timeSlider != null)
+            {
+                mLockTimeEvents = true;
 
+                timeSlider.Value = mSceneFlowManager.SimRelativeTime;
+
+                mLockTimeEvents = false;
+            }
         }
 
         public void DoClose()

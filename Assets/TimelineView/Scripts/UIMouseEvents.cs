@@ -11,7 +11,9 @@ namespace KingsleyPhD
         private CloseButton mCurrCloseButton;
         private CellView mCurrentlySelectedCellView;
         private Toggle mCurrToggleButton;
+        private Slider mCurrSlider;
         private UIEventHandler mCurrEventHandler;
+        private Vector2 mCurrControlPos = Vector2.zero;
 
         public UnityEvent OnEsc;
         
@@ -52,6 +54,10 @@ namespace KingsleyPhD
                 {
                     mCurrEventHandler.Click();
                 }
+                else if (mCurrSlider != null)
+                {
+                    mCurrSlider.OnActivate(mCurrControlPos.x);
+                }
             }
 
             if (Input.GetMouseButtonUp(0))
@@ -77,6 +83,10 @@ namespace KingsleyPhD
                 BoxCollider box = hit.collider as BoxCollider;
                 if (box != null)
                 {
+                    mCurrControlPos = hit.transform.InverseTransformPoint(hit.point);
+                    mCurrControlPos.x = mCurrControlPos.x / box.size.x + 0.5f;
+                    mCurrControlPos.y = mCurrControlPos.y / box.size.y + 0.5f;
+
                     CloseButton closeButton = hit.transform.GetComponentInParent<CloseButton>();
                     if (closeButton != null)
                     {
@@ -105,30 +115,38 @@ namespace KingsleyPhD
                         }
                         else
                         {
-                            CellView cellView = hit.transform.GetComponentInParent<CellView>();
-                            if (cellView != null)
+                            Slider hitSlider = hit.transform.GetComponentInParent<Slider>();
+                            if (hitSlider != null)
                             {
-                                if (mCurrentlySelectedCellView == null)
-                                {
-                                    cellView.OnSelect();
-                                    mCurrentlySelectedCellView = cellView;
-                                }
-                                else
-                                {
-                                    if (mCurrentlySelectedCellView != cellView)
-                                    {
-                                        mCurrentlySelectedCellView.ResetState();
-                                        cellView.OnSelect();
-                                        mCurrentlySelectedCellView = cellView;
-                                    }
-                                }
+                                mCurrSlider = hitSlider;
                             }
                             else
                             {
-                                UIEventHandler handler = hit.transform.GetComponent<UIEventHandler>();
-                                if (handler != null)
+                                CellView cellView = hit.transform.GetComponentInParent<CellView>();
+                                if (cellView != null)
                                 {
-                                    mCurrEventHandler = handler;
+                                    if (mCurrentlySelectedCellView == null)
+                                    {
+                                        cellView.OnSelect();
+                                        mCurrentlySelectedCellView = cellView;
+                                    }
+                                    else
+                                    {
+                                        if (mCurrentlySelectedCellView != cellView)
+                                        {
+                                            mCurrentlySelectedCellView.ResetState();
+                                            cellView.OnSelect();
+                                            mCurrentlySelectedCellView = cellView;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    UIEventHandler handler = hit.transform.GetComponent<UIEventHandler>();
+                                    if (handler != null)
+                                    {
+                                        mCurrEventHandler = handler;
+                                    }
                                 }
                             }
                         }

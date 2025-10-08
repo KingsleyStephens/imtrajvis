@@ -70,15 +70,9 @@ namespace KSimulation
 
         public float PlaybackSpeed { get; set; }
 
-        private static SimulationPlayer instance;
-
-        public static SimulationPlayer Instance { get { return instance; } }
-
-
         private SpatioTemporalDB mSimulationDB;
 
         private float mSimTime;
-        private float mSimStartTime;
 
         private Vector2 mTimeExtents = Vector2.zero;
 
@@ -92,7 +86,6 @@ namespace KSimulation
 
         private void Awake()
         {
-            instance = this;
             PlaybackSpeed = playbackSpeed;
         }
 
@@ -194,7 +187,7 @@ namespace KSimulation
 
         private void SetSimTime(float time)
         {
-            mSimTime = mSimStartTime = time;
+            mSimTime = time;
         }
 
         public int[] ListSimObjects()
