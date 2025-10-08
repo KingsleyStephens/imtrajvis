@@ -199,7 +199,12 @@ namespace KSimulation
 
         public int[] ListSimObjects()
         {
-            return mSimulationDB.ListTable(sessionName);
+            if (mSimulationDB != null)
+            {
+                return mSimulationDB.ListTable(sessionName);
+            }
+
+            return new int[0];
         }
 
         public MovingObjectData GetSimObjectData(int id)

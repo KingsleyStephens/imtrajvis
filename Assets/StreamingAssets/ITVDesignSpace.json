@@ -1,34 +1,10 @@
 {
     "categories": [
-        { "name": "Intention", 
-          "dimensions": [
-            { "name": "Purpose",
-              "singular": true,
-              "options": ["Plan", "Operate", "Review"]
-            }
-          ]
-        },
         { "name": "Data", 
           "dimensions": [
-            { "name": "Temporal Nature",
-              "singular": true,
-              "options": ["Static", "Dynamic", "Real-life", "Replay"]
-            },
-            { "name": "Object Count",
-              "singular": true,
-              "options": ["Single", "Parent-child", "Multiple", "Group"]
-            },
             { "name": "Environment Objects",
-              "singular": true,
-              "options": ["None", "Static", "Dynamic", "Embedded"]
-            }
-          ]
-        },
-        { "name": "Tools", 
-          "dimensions": [
-            { "name": "Task",
-              "singular": true,
-              "options": ["Overview to Details-on-demand", "Record", "Extract", "Aggregate", "Classify Patterns", "Outlier Detect", "Predict"]
+              "singular": false,
+              "options": ["None", "Static"]
             }
           ]
         },
@@ -44,15 +20,19 @@
             },
             { "name": "Manipulate",
               "singular": true,
-              "options": ["Time", "Trajectory Selection", "Trajectory Course", "Data Views"]
+              "options": ["Time", "Traj Selection", "Data Views"]
             }
           ]
         },
         { "name": "Trajectories", 
           "dimensions": [
+            { "name": "Object",
+              "singular": false,
+              "options": ["None", "Glyph"]
+            },
             { "name": "Path",
               "singular": true,
-              "options": ["Path", "Glyph", "Density"]
+              "options": ["Trail", "Glyph", "Density"]
             },
             { "name": "Colour",
               "singular": false,
@@ -64,40 +44,12 @@
           "dimensions": [
             { "name": "Dimensionality",
               "singular": false,
-              "options": ["1D", "2D", "3D"]
-            },
-            { "name": "Continuity",
-              "singular": false,
-              "options": ["Single Space", "Multiple Spaces"]
+              "options": ["2D", "3D"]
             },
             { "name": "Time",
               "singular": false,
               "options": ["Static", "+ 1D position", "+ 1D animation"]
             }
-          ]
-        },
-        { "name": "Virtuality", 
-          "dimensions": [
-            { "name": "Use of Virtual Reality",
-              "singular": false,
-              "options": ["Situated", "Virtual"]
-            }
-          ]
-        },
-        { "name": "Hardware", 
-          "dimensions": [
-            { "name": "Input Modality",
-              "singular": true,
-              "options": ["Hands", "Pointer", "Voice"]
-            },
-            { "name": "Sensory Channels",
-              "singular": true,
-              "options": ["Visual", "Audio", "Haptic"]
-            },
-            { "name": "Collaborate",
-              "singular": false,
-              "options": ["No", "Yes"]
-            }    
           ]
         }
     ]

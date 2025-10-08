@@ -36,11 +36,6 @@ namespace KVisualisation
         [SerializeField]
         private GameObject densityMap;
 
-        private static VisClient3D instance;
-
-        public static VisClient3D Instance { get { return instance; } }
-
-
         private DensityMap3D densityMap3D;
 
         private Dictionary<int, GameObject> mMovingObjects = new Dictionary<int, GameObject>();
@@ -66,8 +61,6 @@ namespace KVisualisation
 
         public override void OnStart()
         {
-            instance = this;
-
             GameObject ghostParent = new GameObject("GhostParent");
             ghostParent.transform.parent = transform;
             mGhostParent = ghostParent.transform;
@@ -335,6 +328,11 @@ namespace KVisualisation
                     Destroy(child.gameObject);
                 }
             }
+        }
+
+        public override void OnResize()
+        {
+
         }
 
         private int GetNextAgentColour()
@@ -715,33 +713,33 @@ namespace KVisualisation
                         {
                             GameObject trailObject = Instantiate(trailPrefab, movingObject.transform);
 
-                            LineRenderer trailRenderer = trailObject.GetComponent<LineRenderer>();
-                            if (trailRenderer != null)
+                            AdaptiveTrailRenderer trail = trailObject.GetComponent<AdaptiveTrailRenderer>();
+                            if (trail != null)
                             {
-                                var m = trailRenderer.material;
-                                m.SetColor("_BaseColor", c);
-                                trailRenderer.material = m;
+                                trail.Init(mTrailParent);
 
-                                trailRenderer.widthMultiplier = transform.lossyScale.x;
-
-                                AdaptiveTrailRenderer trail = trailObject.GetComponent<AdaptiveTrailRenderer>();
-                                if (trail != null)
+                                float t = pathStartTime;
+                                foreach (var p in path)
                                 {
-                                    float t = pathStartTime;
-                                    foreach (var p in path)
-                                    {
-                                        trail.AddPosition(movingObject.transform.parent.TransformPoint(p.position), t);
-                                        t += pathTimeStep;
-                                    }
+                                    trail.AddPosition(movingObject.transform.parent.TransformPoint(p.position), t);
+                                    t += pathTimeStep;
                                 }
 
-                                GhostObject ghostObject = trailObject.GetComponent<GhostObject>();
-                                if (ghostObject != null)
+                                LineRenderer trailRenderer = trail.DelegateTrail.gameObject.GetComponent<LineRenderer>();
+                                if (trailRenderer != null)
                                 {
-                                    ghostObject.parentId = agentData.id;
-                                }
+                                    var m = trailRenderer.material;
+                                    m.SetColor("_BaseColor", c);
+                                    trailRenderer.material = m;
 
-                                //trailRenderer.time = movingObjectSettings.trailTime;
+                                    trailRenderer.widthMultiplier = transform.lossyScale.x;
+                                }
+                            }
+
+                            GhostObject ghostObject = trailObject.GetComponent<GhostObject>();
+                            if (ghostObject != null)
+                            {
+                                ghostObject.parentId = agentData.id;
                             }
                         }
                     }

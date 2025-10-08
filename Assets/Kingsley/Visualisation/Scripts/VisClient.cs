@@ -125,6 +125,11 @@ namespace KVisualisation
 
         }
 
+        public virtual void OnResize()
+        {
+
+        }
+
         public virtual void OnUpdate()
         {
 

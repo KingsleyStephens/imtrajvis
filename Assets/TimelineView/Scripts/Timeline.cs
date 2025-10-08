@@ -43,8 +43,6 @@ namespace KingsleyPhD
         private TMP_Dropdown workspaceDropdown;
         [SerializeField]
         private SnapshotCamera snapshotCamera;
-        [SerializeField]
-        private SceneFlowManager sceneFlowManager;
 
 
         // PRIVATE DATA
@@ -264,7 +262,10 @@ namespace KingsleyPhD
                 mFPVWorkspace = null;
             }
 
-            Show();
+            if (mDesignWorkspace == null)
+            {
+                Show();
+            }
         }
 
         // PRIVATE
@@ -435,11 +436,6 @@ namespace KingsleyPhD
                                     workspace.SceneRoot.localRotation = Quaternion.Euler(slot.orientation);
                                     workspace.SceneRoot.localScale = new Vector3(slot.zoom, slot.zoom, slot.zoom);
                                 }
-                            }
-
-                            if (sceneFlowManager != null)
-                            {
-                                sceneFlowManager.Launch(workspace.ViewRoot);
                             }
                         }
 

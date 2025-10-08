@@ -66,10 +66,10 @@ public class SceneFlowManager : MonoBehaviour
         public Vector3 scale;
     }
 
-    [SerializeField]
-    private GameObject tableTopInteraction;
-    [SerializeField]
-    private GameObject roomViewInteraction;
+    
+    public GameObject tableTopInteraction;
+
+    public GameObject roomViewInteraction;
 
     [SerializeField]
     private ViewConfig[] tableTopViewConfig;
@@ -144,6 +144,128 @@ public class SceneFlowManager : MonoBehaviour
     public bool IncreaseTime { get; set; } = false;
     public bool DecreaseTime { get; set; } = false;
 
+    public void ConfigDesignSpace(KingsleyPhD.DesignInstanceJSON designSpace)
+    {
+        //        public bool Mesh { get { return clientConfigs[mCurrentClient].mesh; } set { clientConfigs[mCurrentClient].mesh = value; ApplyCurrentConfig(); } }
+        //public bool Trails { get { return clientConfigs[mCurrentClient].trail; } set { clientConfigs[mCurrentClient].trail = value; ApplyCurrentConfig(); } }
+        //public bool Ghosting { get { return clientConfigs[mCurrentClient].ghosting; } set { clientConfigs[mCurrentClient].ghosting = value; ApplyCurrentConfig(); } }
+        //public bool Density { get { return clientConfigs[mCurrentClient].density; } set { clientConfigs[mCurrentClient].density = value; ApplyCurrentConfig(); } }
+        //public int TimeType { get { return (int)clientConfigs[mCurrentClient].timeType; } set { clientConfigs[mCurrentClient].timeType = (VisClient.MovingObjectSettings.TimeType)value; ApplyCurrentConfig(); } }
+
+        foreach (var cat in designSpace.categories)
+        {
+            switch (cat.name)
+            {
+                case "Trajectories":
+                    {
+                        foreach (var dim in cat.dimensions)
+                        {
+                            switch (dim.name)
+                            {
+                                case "Object":
+                                    {
+                                        int index = 0;
+                                        foreach (var opt in dim.options)
+                                        {
+                                            switch (opt)
+                                            {
+                                                case "None":
+                                                    {
+                                                        Mesh = !dim.choices[index];
+                                                        break;
+                                                    }
+                                                case "Glyph":
+                                                    {
+                                                        Mesh = dim.choices[index];
+                                                        break;
+                                                    }
+                                            }
+
+                                            index++;
+                                        }
+                                        break;
+                                    }
+                                case "Path":
+                                    {
+                                        int index = 0;
+                                        foreach (var opt in dim.options)
+                                        {
+                                            switch (opt)
+                                            {
+                                                case "Trail":
+                                                    {
+                                                        Trails = dim.choices[index];
+                                                        break;
+                                                    }
+                                                case "Glyph":
+                                                    {
+                                                        Ghosting = dim.choices[index];
+                                                        break;
+                                                    }
+                                                case "Density":
+                                                    {
+                                                        Density = dim.choices[index];
+                                                        break;
+                                                    }
+                                            }
+
+                                            index++;
+                                        }
+                                        break;
+                                    }
+                            }
+                        }
+                        break;
+                    }
+                case "Space/Time":
+                    {
+                        foreach (var dim in cat.dimensions)
+                        {
+                            switch (dim.name)
+                            {
+                                case "Time":
+                                    {
+                                        int index = 0;
+                                        foreach (var opt in dim.options)
+                                        {
+                                            switch (opt)
+                                            {
+                                                case "Static":
+                                                    {
+                                                        if (dim.choices[index])
+                                                        {
+                                                            TimeType = (int)VisClient.MovingObjectSettings.TimeType.Static;
+                                                        }
+                                                        break;
+                                                    }
+                                                case "+ 1D position":
+                                                    {
+                                                        break;
+                                                    }
+                                                case "+ 1D animation":
+                                                    {
+                                                        if (dim.choices[index])
+                                                        {
+                                                            TimeType = (int)VisClient.MovingObjectSettings.TimeType.Dynamic;
+                                                        }
+                                                        break;
+                                                    }
+                                            }
+
+                                            index++;
+                                        }
+                                        break;
+                                    }
+                            }
+                        }
+
+                        break;
+                    }
+            }
+        }
+
+
+    }
 
     private void ApplyViewConfig(ViewConfigType config)
     {
@@ -158,13 +280,20 @@ public class SceneFlowManager : MonoBehaviour
             case ViewConfigType.Tabletop:
                 {
                     currentConfig = tableTopViewConfig[mNumClients - 1];
-                    tableTopInteraction.SetActive(false);
+                    if (tableTopInteraction != null)
+                    {
+                        tableTopInteraction.SetActive(false);
+                    }
+                    
                     break;
                 }
             case ViewConfigType.Room:
                 {
                     currentConfig = roomViewConfig[mNumClients - 1];
-                    roomViewInteraction.SetActive(false);
+                    if (roomViewInteraction != null)
+                    {
+                        roomViewInteraction.SetActive(false);
+                    }
                     break;
                 }
             default:
@@ -203,8 +332,14 @@ public class SceneFlowManager : MonoBehaviour
                         }
                     }
 
-                    roomViewInteraction.SetActive(false);
-                    tableTopInteraction.SetActive(true);
+                    if (roomViewInteraction != null)
+                    {
+                        roomViewInteraction.SetActive(false);
+                    }
+                    if (tableTopInteraction != null)
+                    {
+                        tableTopInteraction.SetActive(true);
+                    }
 
                     break;
                 }
@@ -228,8 +363,15 @@ public class SceneFlowManager : MonoBehaviour
                         }
                     }
 
-                    tableTopInteraction.SetActive(false);
-                    roomViewInteraction.SetActive(true);
+                    if (tableTopInteraction != null)
+                    {
+                        tableTopInteraction.SetActive(false);
+                    }
+
+                    if (roomViewInteraction != null)
+                    {
+                        roomViewInteraction.SetActive(true);
+                    }
 
                     break;
                 }
@@ -249,19 +391,24 @@ public class SceneFlowManager : MonoBehaviour
         }
     }
 
+    public void Resize()
+    {
+        ActivateCurrentViewConfig();
+    }
+
     private void ResizeVis(Vector3 position, Vector3 scale)
     {
-        if (visRoot != null)
-        {
-            visRoot.position = position;
-            visRoot.localScale = scale;
+        //if (visRoot != null)
+        //{
+        //    visRoot.position = position;
+        //    visRoot.localScale = scale;
 
-            VisRoot root = visRoot.GetComponent<VisRoot>();
-            if (root != null)
-            {
-                root.OnResize();
-            }
-        }
+        //    VisRoot root = visRoot.GetComponent<VisRoot>();
+        //    if (root != null)
+        //    {
+        //        root.OnResize();
+        //    }
+        //}
 
         var mult = GetMultipleConfig(mNumClients);
         if (mult != null)
@@ -281,6 +428,8 @@ public class SceneFlowManager : MonoBehaviour
                 }
             }
         }
+
+        ApplyConfigAll();
     }
 
     private IEnumerator DeferApplyConfig()
@@ -478,6 +627,11 @@ public class SceneFlowManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+        }
+
         switch (runType)
         {
             case RunType.Record:
@@ -996,7 +1150,7 @@ public class SceneFlowManager : MonoBehaviour
             foreach (var c in visClients)
             {
                 c.SetActive(true);
-                VisClient vc = c.GetComponent<VisClient>();
+                VisClient vc = c.GetComponentInChildren<VisClient>();
                 if (vc != null)
                 {
                     vc.OnStart();
@@ -1049,6 +1203,8 @@ public class SceneFlowManager : MonoBehaviour
                         visComponent.Configure(controller, i);
 
                         ApplyClientConfig(visComponent, config);
+
+                        visComponent.ActivateVis();
                     }
                     mPrevPlaybackSpeed.Add(1.0f);
                 }

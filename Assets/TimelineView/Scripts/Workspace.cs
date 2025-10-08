@@ -9,6 +9,8 @@ namespace KingsleyPhD
     public class Workspace : MonoBehaviour
     {
         [SerializeField]
+        private GameObject sceneFlowManagerPrefab;
+        [SerializeField]
         private Transform sceneRoot;
         [SerializeField]
         private Transform viewRoot;
@@ -48,8 +50,11 @@ namespace KingsleyPhD
 
         private bool mFPVActive = false;
 
+        private SceneFlowManager mSceneFlowManager;
+
         public bool Pinned { get; private set; }
         public bool IsFPV { get; private set; }
+        public bool DesignActive { get { return mDesignActive; } }
 
         public string CellId { get; set; }
 
@@ -113,10 +118,23 @@ namespace KingsleyPhD
                     ds.OnChange += DoChange;
                 }
             }
+
+            GameObject sceneFlowGO = Instantiate(sceneFlowManagerPrefab);
+            mSceneFlowManager = sceneFlowGO.GetComponent<SceneFlowManager>();
+            if (mSceneFlowManager != null)
+            {
+                mSceneFlowManager.Launch(viewRoot);
+                mSceneFlowManager.ConfigDesignSpace(mDesignSpaceInstance);
+            }
         }
 
         void DoChange()
         {
+            if (mSceneFlowManager != null)
+            {
+                mSceneFlowManager.ConfigDesignSpace(mDesignSpaceInstance);
+            }
+
             OnChange?.Invoke();
         }
 
@@ -128,6 +146,9 @@ namespace KingsleyPhD
 
         public void DoClose()
         {
+            Destroy(mSceneFlowManager.gameObject);
+            mSceneFlowManager = null;
+
             OnClose?.Invoke(this);
         }
 
@@ -168,6 +189,7 @@ namespace KingsleyPhD
                 {
                     mVisRoot.OnResize();
                 }
+                mSceneFlowManager.Resize();
             }
         }
 
@@ -177,6 +199,7 @@ namespace KingsleyPhD
             {
                 mVisRoot.OnResize();
             }
+            mSceneFlowManager.Resize();
         }
 
         public void ToggleFPV()
