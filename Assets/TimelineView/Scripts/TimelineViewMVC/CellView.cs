@@ -139,7 +139,7 @@ namespace KingsleyPhD
                 mPanelColour = panel.color;
             }
 
-            CloseButton closeButton = gameObject.GetComponentInChildren<CloseButton>();
+            Button closeButton = gameObject.GetComponentInChildren<Button>();
             if (closeButton != null)
             {
                 if (CellData != null && CellData.type == CellData.CellType.NewCellButton)

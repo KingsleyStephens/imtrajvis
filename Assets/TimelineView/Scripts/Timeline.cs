@@ -1,5 +1,6 @@
 using KVisualisation;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -176,29 +177,29 @@ namespace KingsleyPhD
             {
                 if (mTimelineJSON != null)
                 {
-                    mTimelineJSON.UpdateSlot(workspace.CellId, designRoot.localRotation.eulerAngles, designRoot.localScale.x);
+                    mTimelineJSON.UpdateSlot(workspace.CellId, designRoot.localRotation.eulerAngles, designRoot.localScale.x, workspace.SceneFlowManager.SimTime);
                 }
             }
             else
             {
                 if (mTimelineJSON != null)
                 {
-                    mTimelineJSON.UpdateSlot(workspace.CellId, workspace.SceneRoot.localRotation.eulerAngles, workspace.SceneRoot.localScale.x);
+                    mTimelineJSON.UpdateSlot(workspace.CellId, workspace.SceneRoot.localRotation.eulerAngles, workspace.SceneRoot.localScale.x, workspace.SceneFlowManager.SimTime);
                 }
             }
 
             mFPVWorkspace = workspace;
+
+            workspace.ViewRoot.SetParent(fullscreenRoot);
+            workspace.ViewRoot.localPosition = Vector3.zero;
+            workspace.ViewRoot.localScale = Vector3.one;
+            workspace.ViewRoot.localRotation = Quaternion.identity;
 
             UserStart us = workspace.ViewRoot.GetComponentInChildren<UserStart>();
             if (us != null && cameraRig != null)
             {
                 cameraRig.transform.position = us.transform.position;
             }
-
-            workspace.ViewRoot.SetParent(fullscreenRoot);
-            workspace.ViewRoot.localPosition = Vector3.zero;
-            workspace.ViewRoot.localScale = Vector3.one;
-            workspace.ViewRoot.localRotation = Quaternion.identity;
 
             workspace.Grow();
 
@@ -207,8 +208,12 @@ namespace KingsleyPhD
 
         public void Shrink()
         {
+            Debug.Log("1");
+
             if (mFPVWorkspace != null)
             {
+                Debug.Log("2");
+
                 if (mDesignWorkspace != null)
                 {
                     if (designRoot != null)
@@ -268,12 +273,35 @@ namespace KingsleyPhD
             }
         }
 
+
+        public void TimeForward()
+        {
+            if (mFPVWorkspace != null)
+            {
+                if (mFPVWorkspace.SceneFlowManager != null)
+                {
+                    mFPVWorkspace.SceneFlowManager.TimeIncrease();
+                }
+            }
+        }
+
+        public void TimeBackward()
+        {
+            if (mFPVWorkspace != null)
+            {
+                if (mFPVWorkspace.SceneFlowManager != null)
+                {
+                    mFPVWorkspace.SceneFlowManager.TimeDecrease();
+                }
+            }
+        }
+
         // PRIVATE
 
 
         /**
-         * Start
-         */
+            * Start
+            */
         void Start()
         {
             mModel = new TimelineModel();
@@ -435,6 +463,7 @@ namespace KingsleyPhD
                                 {
                                     workspace.SceneRoot.localRotation = Quaternion.Euler(slot.orientation);
                                     workspace.SceneRoot.localScale = new Vector3(slot.zoom, slot.zoom, slot.zoom);
+                                    workspace.Init(slot.time);
                                 }
                             }
                         }
@@ -546,7 +575,7 @@ namespace KingsleyPhD
             {
                 if (mTimelineJSON != null)
                 {
-                    mTimelineJSON.UpdateSlot(ws.CellId, ws.SceneRoot.localRotation.eulerAngles, ws.SceneRoot.localScale.x);
+                    mTimelineJSON.UpdateSlot(ws.CellId, ws.SceneRoot.localRotation.eulerAngles, ws.SceneRoot.localScale.x, ws.SceneFlowManager.SimTime);
                 }
 
                 if (mDesignWorkspace != null)
@@ -598,5 +627,36 @@ namespace KingsleyPhD
             return null;
         }
 
+        public void NextWorkspace()
+        {
+            if (mFPVWorkspace != null)
+            {
+                int index = mWorkspaces.IndexOf(mFPVWorkspace);
+                index++;
+                if (index >= mWorkspaces.Count)
+                {
+                    index = 0;
+                }
+
+                Shrink();
+                mWorkspaces[index].ToggleFPV();
+            }
+        }
+
+        public void PrevWorkspace()
+        {
+            if (mFPVWorkspace != null)
+            {
+                int index = mWorkspaces.IndexOf(mFPVWorkspace);
+                index--;
+                if (index < 0)
+                {
+                    index = mWorkspaces.Count - 1;
+                }
+
+                Shrink();
+                mWorkspaces[index].ToggleFPV();
+            }
+        }
     }
 }

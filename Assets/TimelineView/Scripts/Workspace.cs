@@ -1,4 +1,5 @@
 using KVisualisation;
+using TMPro;
 using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using static KingsleyPhD.DesignSpace;
@@ -19,15 +20,17 @@ namespace KingsleyPhD
         [SerializeField]
         private GameObject ui;
         [SerializeField]
-        private CloseButton closeButton;
+        private Button closeButton;
         [SerializeField]
-        private CloseButton menuButton;
+        private Button menuButton;
         [SerializeField]
-        private CloseButton fpvButton;
+        private Button fpvButton;
         [SerializeField]
         private Toggle pinToggle;
         [SerializeField]
         private Slider timeSlider;
+        [SerializeField]
+        private Button timePlayButton;
         [SerializeField]
         private GameObject designSpace;
         [SerializeField]
@@ -62,15 +65,17 @@ namespace KingsleyPhD
 
         public string CellId { get; set; }
 
-        public Transform SceneRoot {  get { return sceneRoot; } }
+        public Transform SceneRoot { get { return sceneRoot; } }
         public Transform ViewRoot { get { return viewRoot; } }
+
+        public SceneFlowManager SceneFlowManager { get { return mSceneFlowManager; } }
 
         private VisRoot mVisRoot;
         private bool mDesignActive = false;
 
         private bool mLockTimeEvents = false;
         private bool mIsStaticTime = false;
-
+        private bool mTimePaused = true;
         public DesignInstanceJSON DesignInstance { 
             get { return mDesignSpaceInstance; }
             set {
@@ -89,6 +94,15 @@ namespace KingsleyPhD
         }
 
         public float Time { set { if (!mLockTimeEvents && mSceneFlowManager != null) { mSceneFlowManager.ScrubTime = value; } } }
+
+
+        private float mInitialTime = 0.0f;
+
+
+        public void Init(float time)
+        {
+            mInitialTime = time;
+        }
 
         private void Awake()
         {
@@ -131,6 +145,11 @@ namespace KingsleyPhD
                 pinToggle.OnToggleButton += Pin;
             }
 
+            if (timePlayButton != null)
+            {
+                timePlayButton.OnActivateButton += TimePlayToggle;
+            }
+
             if (designSpace != null)
             {
                 designSpace.SetActive(false);
@@ -142,7 +161,11 @@ namespace KingsleyPhD
             {
                 mSceneFlowManager.Launch(viewRoot);
                 mSceneFlowManager.ConfigDesignSpace(mDesignSpaceInstance);
+                mSceneFlowManager.SimTime = mInitialTime;
             }
+
+            SyncTimeSlider();
+            SetTimePlayButton(mTimePaused);
         }
 
         void DoChange()
@@ -161,6 +184,10 @@ namespace KingsleyPhD
             {
                 mIsStaticTime = staticTime;
                 timeSlider.gameObject.SetActive(!mIsStaticTime);
+                if (timePlayButton != null)
+                {
+                    timePlayButton.gameObject.SetActive(!mIsStaticTime);
+                }
 
                 if (!mIsStaticTime && mSceneFlowManager != null)
                 {
@@ -172,7 +199,15 @@ namespace KingsleyPhD
         // Update is called once per frame
         void Update()
         {
-            if (!mIsStaticTime && timeSlider != null)
+            if (!mIsStaticTime && !mTimePaused)
+            {
+                SyncTimeSlider();
+            }
+        }
+
+        private void SyncTimeSlider()
+        {
+            if (timeSlider != null && mSceneFlowManager != null)
             {
                 mLockTimeEvents = true;
 
@@ -184,10 +219,10 @@ namespace KingsleyPhD
 
         public void DoClose()
         {
+            OnClose?.Invoke(this);
+
             Destroy(mSceneFlowManager.gameObject);
             mSceneFlowManager = null;
-
-            OnClose?.Invoke(this);
         }
 
         public void Menu()
@@ -285,6 +320,30 @@ namespace KingsleyPhD
         public void Pin(bool pinned)
         {
             Pinned = pinned;
+        }
+
+        public void TimePlayToggle()
+        {
+            mTimePaused = !mTimePaused;
+
+            SetTimePlayButton(mTimePaused);
+        }
+
+        private void SetTimePlayButton(bool paused)
+        {
+            if (mSceneFlowManager != null)
+            {
+                mSceneFlowManager.TimePause(paused);
+            }
+
+            if (timePlayButton != null)
+            {
+                TextMeshProUGUI text = timePlayButton.GetComponentInChildren<TextMeshProUGUI>();
+                if (text != null)
+                {
+                    text.text = (paused) ? ">" : "||";
+                }
+            }
         }
     }
 

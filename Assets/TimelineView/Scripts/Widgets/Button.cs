@@ -4,7 +4,7 @@ using static KingsleyPhD.TimelineView;
 
 namespace KingsleyPhD
 {
-    public class CloseButton : MonoBehaviour
+    public class Button : MonoBehaviour
     {
         [SerializeField]
         private Image panel;

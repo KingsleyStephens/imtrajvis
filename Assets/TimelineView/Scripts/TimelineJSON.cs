@@ -13,6 +13,7 @@ namespace KingsleyPhD
         public string id;
         public Vector3 orientation = Vector3.zero;
         public float zoom = 1.0f;
+        public float time = 0.0f;
     }
 
 
@@ -75,13 +76,14 @@ namespace KingsleyPhD
             Save();
         }
 
-        public void UpdateSlot(string id, Vector3 orientation, float zoom)
+        public void UpdateSlot(string id, Vector3 orientation, float zoom, float time)
         {
             TimelineSlot slot = slots.First(x => x.id == id);
             if (slot != null)
             {
                 slot.orientation = orientation;
                 slot.zoom = zoom;
+                slot.time = time;
 
                 Save();
             }

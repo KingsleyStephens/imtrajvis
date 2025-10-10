@@ -457,6 +457,13 @@ public class SceneFlowManager : MonoBehaviour
     {
         mTimeSpeedControl = !mTimeSpeedControl;
 
+        TimePause(!mTimeSpeedControl);
+    }
+
+    public void TimePause(bool pause)
+    {
+        mTimeSpeedControl = !pause;
+
         if (mTimeSpeedControl)
         {
             PlaybackSpeed = mPrevPlaybackSpeed[mCurrentClient];

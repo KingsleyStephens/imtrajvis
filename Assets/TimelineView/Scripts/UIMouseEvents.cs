@@ -8,7 +8,7 @@ namespace KingsleyPhD
 {
     public class UIMouseEvents : MonoBehaviour
     {
-        private CloseButton mCurrCloseButton;
+        private Button mCurrCloseButton;
         private CellView mCurrentlySelectedCellView;
         private Toggle mCurrToggleButton;
         private Slider mCurrSlider;
@@ -16,7 +16,11 @@ namespace KingsleyPhD
         private Vector2 mCurrControlPos = Vector2.zero;
 
         public UnityEvent OnEsc;
-        
+        public UnityEvent OnTimeForward;
+        public UnityEvent OnTimeBackward;
+        public UnityEvent OnViewForward;
+        public UnityEvent OnViewBackward;
+
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
@@ -30,7 +34,23 @@ namespace KingsleyPhD
 
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                OnEsc.Invoke();
+                OnEsc?.Invoke();
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                OnTimeForward?.Invoke();
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                OnTimeBackward?.Invoke();
+            }
+            else if (Input.GetKeyDown(KeyCode.RightBracket))
+            {
+                OnViewForward?.Invoke();
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftBracket))
+            {
+                OnViewBackward?.Invoke();
             }
         }
 
@@ -87,7 +107,7 @@ namespace KingsleyPhD
                     mCurrControlPos.x = mCurrControlPos.x / box.size.x + 0.5f;
                     mCurrControlPos.y = mCurrControlPos.y / box.size.y + 0.5f;
 
-                    CloseButton closeButton = hit.transform.GetComponentInParent<CloseButton>();
+                    Button closeButton = hit.transform.GetComponentInParent<Button>();
                     if (closeButton != null)
                     {
                         if (mCurrCloseButton == null)
