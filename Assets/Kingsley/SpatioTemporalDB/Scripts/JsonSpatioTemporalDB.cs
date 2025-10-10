@@ -64,7 +64,8 @@ namespace SpatioTemporalDatabase
 
         // DB OPERATIONS
 
-        public override bool CreateOrOpen() { 
+        public override bool CreateOrOpen() 
+        { 
             if (!string.IsNullOrEmpty(mJsonFilePath))
             {
                 if (File.Exists(mJsonFilePath))
@@ -82,9 +83,10 @@ namespace SpatioTemporalDatabase
                 {
                     mDB = new JsonDB();
                 }
+                return true;
             }
 
-            return true;
+            return false;
         }
         public override bool Save()
         {
@@ -257,6 +259,12 @@ namespace SpatioTemporalDatabase
 
             return Vector2.zero;
         }
+
+        public override bool TableExsits(string name)
+        {
+            return mDB.tables.Find(t => t.name == name) != null;
+        }
+
 
         /**
          * List the contents of a table

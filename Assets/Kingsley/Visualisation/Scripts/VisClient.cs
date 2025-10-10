@@ -46,6 +46,9 @@ namespace KVisualisation
             public bool overrideGhostColour = false;
             public Color ghostColour = Color.white;
 
+            public Vector3 objectScale = Vector3.one;
+
+
             public MovingObjectSettings() { }
             public MovingObjectSettings(MovingObjectSettings other)
             {

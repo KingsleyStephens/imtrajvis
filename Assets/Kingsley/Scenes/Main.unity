@@ -2264,6 +2264,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1494322745820607657, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 675
+      objectReference: {fileID: 0}
+    - target: {fileID: 2087012467046873163, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: set_SelectSession
+      objectReference: {fileID: 0}
+    - target: {fileID: 2087012467046873163, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: KingsleyPhD.Timeline, TimelineView
+      objectReference: {fileID: 0}
     - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
         type: 3}
       propertyPath: cameraRig
@@ -2276,6 +2291,12 @@ PrefabInstance:
       objectReference: {fileID: 887585984}
     - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
         type: 3}
+      propertyPath: scenePrefab
+      value: 
+      objectReference: {fileID: 1139305900334574516, guid: 87e429e367528b54280b19cf6d68e848,
+        type: 3}
+    - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
       propertyPath: fullscreenRoot
       value: 
       objectReference: {fileID: 810952515}
@@ -2284,6 +2305,11 @@ PrefabInstance:
       propertyPath: snapshotCamera
       value: 
       objectReference: {fileID: 1184636205}
+    - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
+      propertyPath: datasetDropdown
+      value: 
+      objectReference: {fileID: 827512411}
     - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
         type: 3}
       propertyPath: designSpaceFile
@@ -2371,6 +2397,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4644226816563560172, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: set_SelectDataset
+      objectReference: {fileID: 0}
+    - target: {fileID: 4644226816563560172, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: KingsleyPhD.Timeline, TimelineView
+      objectReference: {fileID: 0}
     - target: {fileID: 7030046035473838853, guid: 4176d37a193b2744381851d10a219844,
         type: 3}
       propertyPath: m_Name
@@ -2389,14 +2425,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 30367288}
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6238967758782911193, guid: 4176d37a193b2744381851d10a219844,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1012215797}
-    - targetCorrespondingSourceObject: {fileID: 5147965599196691569, guid: 4176d37a193b2744381851d10a219844,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2004233700}
     - targetCorrespondingSourceObject: {fileID: 3497788929143830067, guid: 4176d37a193b2744381851d10a219844,
         type: 3}
       insertIndex: -1
@@ -2405,7 +2433,27 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1716588890}
+    - targetCorrespondingSourceObject: {fileID: 6238967758782911193, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1012215797}
+    - targetCorrespondingSourceObject: {fileID: 5147965599196691569, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2004233700}
   m_SourcePrefab: {fileID: 100100000, guid: 4176d37a193b2744381851d10a219844, type: 3}
+--- !u!114 &827512411 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4644226816563560172, guid: 4176d37a193b2744381851d10a219844,
+    type: 3}
+  m_PrefabInstance: {fileID: 827512410}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b743370ac3e4ec2a1668f5455a8ef8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &840124556
 GameObject:
   m_ObjectHideFlags: 0

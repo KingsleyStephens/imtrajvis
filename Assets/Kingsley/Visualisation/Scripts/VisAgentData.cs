@@ -14,6 +14,7 @@ namespace KVisualisation
 
         public AgentClass agentClass = AgentClass.Formation;
 
+        public int playerId = -1;
         public int id = -1;
         public int parentId = -1;
 

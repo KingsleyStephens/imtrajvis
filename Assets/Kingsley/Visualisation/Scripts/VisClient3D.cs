@@ -38,10 +38,10 @@ namespace KVisualisation
 
         private DensityMap3D densityMap3D;
 
-        private Dictionary<int, GameObject> mMovingObjects = new Dictionary<int, GameObject>();
-        private List<int> mAllObjectIds = new List<int>();
+        private Dictionary<Vector2Int, GameObject> mMovingObjects = new Dictionary<Vector2Int, GameObject>();
+        private List<Vector2Int> mAllObjectIds = new List<Vector2Int>();
 
-        private Dictionary<int, int> formationColours = new Dictionary<int, int>();
+        private Dictionary<Vector2Int, int> formationColours = new Dictionary<Vector2Int, int>();
         private int nextColour = 0;
 
         private float mLastDensityUpdateTime = 0.0f;
@@ -53,11 +53,13 @@ namespace KVisualisation
 
         public TextMeshProUGUI clientIdLabel;
 
-        private List<int> mFilterSelection = new List<int>();
+        private List<Vector2Int> mFilterSelection = new List<Vector2Int>();
         private MovingObjectSettings.FilterType mFilterType = MovingObjectSettings.FilterType.None;
-        private Dictionary<int, bool> mFilterState= new Dictionary<int, bool>();
+        private Dictionary<Vector2Int, bool> mFilterState= new Dictionary<Vector2Int, bool>();
 
         public float SimTime {  get { return mVisSimController.Players[mId].SimTime; } }
+
+        private int NumPlayers { get { return mVisSimController.Players.Count; } }
 
         public override void OnStart()
         {
@@ -84,12 +86,15 @@ namespace KVisualisation
 
             EnsureWeaponParent();
 
-            int[] allIds = mVisSimController.ListSimObjects(mId);
-            if (allIds != null)
+            for (int i = 0; i < NumPlayers; i++)
             {
-                foreach (int id in allIds)
+                int[] allIds = mVisSimController.ListSimObjects(i);
+                if (allIds != null)
                 {
-                    mFilterState.Add(id, false);
+                    foreach (int id in allIds)
+                    {
+                        mFilterState.Add(new Vector2Int(i, id), false);
+                    }
                 }
             }
 
@@ -114,15 +119,18 @@ namespace KVisualisation
             mAllObjectIds.Clear();
             mMovingObjects.Clear();
 
-            int[] allIds = mVisSimController.ListSimObjects(mId);
-            foreach (int id in allIds)
+            for (int i = 0; i < NumPlayers; i++)
             {
-                mAllObjectIds.Add(id);
-                Spawn(id);
+                int[] allIds = mVisSimController.ListSimObjects(i);
+                foreach (int id in allIds)
+                {
+                    mAllObjectIds.Add(new Vector2Int(i, id));
+                    Spawn(i, id);
+                }
             }
         }
 
-        public GameObject[] GetAllOjectsOfFormation(int formationId)
+        public GameObject[] GetAllOjectsOfFormation(int player, int formationId)
         {
             List<GameObject> allObjects = new List<GameObject>();
             foreach (var key in mMovingObjects.Keys)
@@ -154,9 +162,9 @@ namespace KVisualisation
                     }
                 }
 
-                foreach (int id in mAllObjectIds)
+                foreach (Vector2Int id in mAllObjectIds)
                 {
-                    var update = mVisSimController.GetSimObjectUpdate(mId, id);
+                    var update = mVisSimController.GetSimObjectUpdate(id.x, id.y);
 
                     GameObject obj;
                     if (mMovingObjects.TryGetValue(id, out obj))
@@ -188,12 +196,12 @@ namespace KVisualisation
                         }
                         else
                         {
-                            Destruct(id);
+                            Destruct(id.x, id.y);
                         }
                     }
                     else if (update != null)
                     {
-                        Spawn(id);
+                        Spawn(id.x, id.y);
                     }
                 }
             }
@@ -201,14 +209,9 @@ namespace KVisualisation
 
         public override void OnTimeScrub(int playerId, float fromTime, float toTime)
         {
-            if (playerId != mId)
-            {
-                return;
-            }
-
             if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic)
             {
-                foreach (int id in mAllObjectIds)
+                foreach (Vector2Int id in mAllObjectIds)
                 {
                     GameObject obj;
                     if (mMovingObjects.TryGetValue(id, out obj))
@@ -270,24 +273,14 @@ namespace KVisualisation
 
         public override void OnMovingObjectSpawn(int playerId, int id)
         {
-            if (playerId != mId)
-            {
-                return;
-            }
+            mAllObjectIds.Add(new Vector2Int(playerId, id));
 
-            mAllObjectIds.Add(id);
-
-            Spawn(id);
+            Spawn(playerId, id);
         }
 
         public override void OnMovingObjectDestruct(int playerId, int id)
         {
-            if (playerId != mId)
-            {
-                return;
-            }
-
-            Destruct(id);
+            Destruct(playerId, id);
         }
 
         public override void OnSettingsUpdate()
@@ -345,14 +338,14 @@ namespace KVisualisation
 
 
 
-        private void Spawn(int id)
+        private void Spawn(int parent, int id)
         {
-            if (mMovingObjects.ContainsKey(id))
+            if (mMovingObjects.ContainsKey(new Vector2Int(parent, id)))
             {
                 return;
             }
 
-            var data = mVisSimController.GetSimObjectData(mId, id);
+            var data = mVisSimController.GetSimObjectData(parent, id);
             if (data != null)
             {
                 VisAgent.AgentClass agentClass = System.Enum.Parse<VisAgent.AgentClass>(data.objectClass);
@@ -363,10 +356,11 @@ namespace KVisualisation
 
                 GameObject instance = Instantiate(objectPrefab, transform);
                 instance.name = data.name;
+                instance.transform.localScale = Vector3.one;
 
                 if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic)
                 { 
-                    var update = mVisSimController.GetSimObjectUpdate(mId, id);
+                    var update = mVisSimController.GetSimObjectUpdate(parent, id);
                     if (update != null)
                     {
                         instance.transform.localPosition = update.position;
@@ -378,6 +372,7 @@ namespace KVisualisation
                 if (agentData != null)
                 {
 
+                    agentData.playerId = parent;
                     agentData.id = data.id;
                     agentData.parentId = data.parentId;
                     agentData.agentClass = agentClass;
@@ -392,14 +387,14 @@ namespace KVisualisation
                     //}
                 }
 
-                mMovingObjects.Add(id, instance);
+                mMovingObjects.Add(new Vector2Int(parent, id), instance);
             }
         }
 
-        private void Destruct(int id)
+        private void Destruct(int parent, int id)
         {
             GameObject obj;
-            if (mMovingObjects.TryGetValue(id, out obj))
+            if (mMovingObjects.TryGetValue(new Vector2Int(parent, id), out obj))
             {
                 VisAgent agentData = obj.GetComponent<VisAgent>();
                 if (agentData != null)
@@ -426,7 +421,7 @@ namespace KVisualisation
                 }
 
                 Destroy(obj);
-                mMovingObjects.Remove(id);
+                mMovingObjects.Remove(new Vector2Int(parent, id));
             }
         }
 
@@ -465,10 +460,10 @@ namespace KVisualisation
                                     selectable.State = SelectableObject.StateType.None;
                                 }
 
-                                if (isSelected)
-                                {
-                                    mFilterSelection.Add(id);
-                                }
+                                //if (isSelected)
+                                //{
+                                //    mFilterSelection.Add(id);
+                                //}
                             }
 
                             var keys = mFilterState.Keys.ToArray();
@@ -500,6 +495,8 @@ namespace KVisualisation
                 {
                     densityMap3D = densityMap.GetComponent<DensityMap3D>();
                     //densityMap3D.duration = movingObjectSettings.trailTime;
+
+                    densityMap.transform.localScale = movingObjectSettings.objectScale;
                 }
             }
 
@@ -524,7 +521,7 @@ namespace KVisualisation
                             GhostObject ghostObject = child.gameObject.GetComponent<GhostObject>();
                             if (ghostObject != null)
                             {
-                                if (ghostObject.parentId == k)
+                                if (ghostObject.parentId == k.y)
                                 {
                                     Destroy(ghostObject.gameObject);
                                 }
@@ -610,7 +607,7 @@ namespace KVisualisation
             }
         }
 
-        private bool IsFiltered(int objectId)
+        private bool IsFiltered(Vector2Int objectId)
         {
             return mFilterState.ContainsKey(objectId) && mFilterState[objectId];
         }
@@ -627,29 +624,40 @@ namespace KVisualisation
             {
                 agentData.ClearUpdatables();
 
-                if (IsFiltered(agentData.id))
+                if (IsFiltered(new Vector2Int(agentData.playerId, agentData.id)))
                 {
                     return;
                 }
                 
                 if (agentData.agentClass == VisAgent.AgentClass.MovingObject)
                 {
+                    movingObject.transform.localScale = movingObjectSettings.objectScale;
+
                     Color c = Color.white;
                     if (agentData.parentId != -1)
                     {
                         if (agentData.agentClass == VisAgent.AgentClass.MovingObject)
                         {
-                            if (!formationColours.ContainsKey(agentData.parentId))
+                            if (!formationColours.ContainsKey(new Vector2Int(agentData.playerId, agentData.parentId)))
                             {
-                                formationColours[agentData.parentId] = GetNextAgentColour();
+                                formationColours[new Vector2Int(agentData.playerId, agentData.parentId)] = GetNextAgentColour();
                             }
 
-                            c = agentColours[formationColours[agentData.parentId]];
+                            c = agentColours[formationColours[new Vector2Int(agentData.playerId, agentData.parentId)]];
                         }
                         else
                         {
                             c = weaponColour;
                         }
+                    }
+                    else
+                    {
+                        if (!formationColours.ContainsKey(new Vector2Int(agentData.playerId, agentData.id)))
+                        {
+                            formationColours[new Vector2Int(agentData.playerId, agentData.id)] = GetNextAgentColour();
+                        }
+
+                        c = agentColours[formationColours[new Vector2Int(agentData.playerId, agentData.id)]];
                     }
 
                     float pathStartTime = 0.0f;
@@ -677,6 +685,8 @@ namespace KVisualisation
                     if (movingObjectSettings.mesh)
                     {
                         GameObject meshObject = Instantiate(meshPrefab, movingObject.transform);
+                        meshObject.transform.localScale = movingObjectSettings.objectScale;
+
                         MeshRenderer meshRenderer = meshObject.GetComponent<MeshRenderer>();
                         if (meshRenderer != null)
                         {
@@ -702,7 +712,7 @@ namespace KVisualisation
                                     m.SetColor("_BaseColor", c);
                                     lineRenderer.material = m;
 
-                                    lineRenderer.widthMultiplier = transform.lossyScale.x;
+                                    lineRenderer.widthMultiplier = transform.lossyScale.x * movingObjectSettings.objectScale.x / 100.0f;
 
                                     lineRenderer.positionCount = path.Length;
                                     lineRenderer.SetPositions(path.Select((a) => a.position).ToArray());
@@ -732,7 +742,7 @@ namespace KVisualisation
                                     m.SetColor("_BaseColor", c);
                                     trailRenderer.material = m;
 
-                                    trailRenderer.widthMultiplier = transform.lossyScale.x;
+                                    trailRenderer.widthMultiplier = transform.lossyScale.x * movingObjectSettings.objectScale.x / 100.0f;
                                 }
                             }
 
@@ -753,6 +763,7 @@ namespace KVisualisation
                         ghostingObject.transform.localScale = Vector3.one;
 
                         GhostSpawner ghostSpawner = ghostingObject.AddComponent<GhostSpawner>();
+                        ghostSpawner.parentPlayer = agentData.playerId;
                         ghostSpawner.parentId = agentData.id;
                         ghostSpawner.ghostPrefab = ghostPrefab;
                         ghostSpawner.ghostParent = mGhostParent;
@@ -781,7 +792,7 @@ namespace KVisualisation
                             { 
                                 foreach (var p in ghostPath)
                                 {
-                                    ghostSpawner.Spawn(p.position, p.orientation, p.time, -1.0f);
+                                    ghostSpawner.Spawn(p.position, p.orientation, movingObjectSettings.objectScale, p.time, -1.0f);
                                 }
                             }
                         }
@@ -802,7 +813,7 @@ namespace KVisualisation
                             {
                                 foreach (var p in ghostPath)
                                 {
-                                    ghostSpawner.Spawn(p.position, p.orientation, p.time, -1.0f);
+                                    ghostSpawner.Spawn(p.position, p.orientation, movingObjectSettings.objectScale, p.time, -1.0f);
                                 }
                             }
                         }

@@ -15,6 +15,7 @@ namespace KVisualisation
         public float ghostingValue = 1.0f;
         public float duration = 30.0f;
 
+        public int parentPlayer = -1;
         public int parentId = -1;
 
         private float lastTime = -1000.0f;
@@ -32,7 +33,7 @@ namespace KVisualisation
             {
                 if (Vector3.Distance(transform.parent.localPosition, lastPosition) > ghostingValue)
                 {
-                    Spawn(transform.parent.localPosition, transform.parent.localRotation, time, duration);
+                    Spawn(transform.parent.localPosition, transform.parent.localRotation, transform.parent.localScale, time, duration);
                     lastPosition = transform.parent.localPosition;
                 }
             }
@@ -40,7 +41,7 @@ namespace KVisualisation
             {
                 if (time - lastTime > ghostingValue)
                 {
-                    Spawn(transform.parent.localPosition, transform.parent.localRotation, time, duration);
+                    Spawn(transform.parent.localPosition, transform.parent.localRotation, transform.parent.localScale, time, duration);
                     lastTime = time;
                 }
             }
@@ -58,11 +59,12 @@ namespace KVisualisation
 
         }
 
-        public void Spawn(Vector3 pos, Quaternion rot, float time, float destructTime)
+        public void Spawn(Vector3 pos, Quaternion rot, Vector3 scale, float time, float destructTime)
         {
             GameObject ghostObj = Instantiate(ghostPrefab, ghostParent);
             ghostObj.transform.localPosition = pos;
             ghostObj.transform.localRotation  = rot;
+            ghostObj.transform.localScale = scale;
 
             if (destructTime >= 0.0f)
             {
@@ -83,6 +85,7 @@ namespace KVisualisation
             {
                 if (go != null)
                 {
+                    go.parentPlayer = parentPlayer;
                     go.parentId = parentId;
                     go.spawnTime = time;
                 }

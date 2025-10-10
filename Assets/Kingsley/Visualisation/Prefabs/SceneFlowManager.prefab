@@ -59,6 +59,8 @@ MonoBehaviour:
   cameraRig: {fileID: 0}
   mainCamera: {fileID: 0}
   positionCheckPeriod: 0.5
+  roomScale: {x: 0.01, y: 0.01, z: 0.01}
+  worldScale: {x: 1, y: 1, z: 1}
   tableTopInteraction: {fileID: 0}
   roomViewInteraction: {fileID: 0}
   tableTopViewConfig:

@@ -92,7 +92,7 @@ namespace KController
         /**
          * Load the simulation from the configured settings
          */
-        public void LoadSim(int count = 1)
+        public void LoadSim(string dataset = null, string[] session = null)
         {
             if (simConfig != null)
             {
@@ -105,9 +105,9 @@ namespace KController
                         }
                     case SimType.LocalPlayback:
                         {
-                            for (int i = 0; i < count; ++i)
+                            for (int i = 0; i < session.Length; ++i)
                             {
-                                LoadSimPlayer(i);
+                                LoadSimPlayer(i, dataset, session[i]);
                             }
                             Loaded = true;
                             break;
@@ -142,13 +142,19 @@ namespace KController
             }
         }
 
-        private void LoadSimPlayer(int id)
+        private void LoadSimPlayer(int id, string dataset = null, string session = null)
         {
             GameObject player = Instantiate(simPlayerPrefab);
             player.name = "SimPlayer" + id.ToString();
             SimulationPlayer simPlayer = player.GetComponent<SimulationPlayer>();
             if (simPlayer != null)
             {
+                if (dataset != null && session != null)
+                {
+                    simPlayer.dbName = dataset;
+                    simPlayer.sessionName = session;
+                }
+
                 simPlayer.Id = id;
                 mSimPlayers.Add(simPlayer);
                 simPlayer.Load();

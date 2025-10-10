@@ -54,11 +54,9 @@ namespace KSimulation
         public delegate void OnTimeScrub(int playerId, float fromTime, float toTime);
         private event OnTimeScrub onTimeScrubbed;
 
-        [SerializeField]
-        private string dbName = "simulation";
-
-        [SerializeField]
-        private string sessionName = "session";
+        
+        public string dbName = "simulation";
+        public string sessionName = "session";
 
         [SerializeField]
         private float startTime = 0.0f;
@@ -101,6 +99,7 @@ namespace KSimulation
             SetSimTime(startTime);
 
             int[] objs = ListSimObjects();
+            Debug.Log("Simulation DB contains " + objs.Length + " moving objects for session " + sessionName);
             foreach (int obj in objs)
             {
                 UpdateTimeExtents(mSimulationDB.ReadTableTimePeriod(sessionName, obj));
@@ -288,10 +287,15 @@ namespace KSimulation
 
         private JsonSpatioTemporalDB OpenDb()
         {
-            string path = Path.Combine(Application.persistentDataPath, dbName + ".json");
+            string path = Path.Combine(Application.persistentDataPath, "TrajectoryData", dbName + ".json");
+
+            Debug.Log("Loading simulation db: " + path);
 
             JsonSpatioTemporalDB db = new JsonSpatioTemporalDB(path);
-            db.CreateOrOpen();
+            if (db.CreateOrOpen())
+            {
+                Debug.Log("Successfully Loaded simulation db: " + path);
+            }
             return db;
         }
     }

@@ -57,6 +57,18 @@ public class SceneFlowManager : MonoBehaviour
     private float positionCheckPeriod = 0.5f;
     private float lastPositionCheckTime = 0.0f;
 
+
+    [SerializeField]
+    private Vector3 roomScale = new Vector3(0.01f, 0.01f, 0.01f);
+
+    [SerializeField]
+    private Vector3 worldScale = new Vector3(1.0f, 1.0f, 1.0f);
+
+
+    public Vector3 FullScale { get { return (mFullScale) ? worldScale : roomScale; } }
+
+    private bool mFullScale = false;
+
     public VisSimController Controller { get; private set; }
 
     public float SimRelativeTime {  get { return Controller.Players[mCurrentClient].GetSimTimeAsRelativeTime();  } }
@@ -158,6 +170,43 @@ public class SceneFlowManager : MonoBehaviour
         {
             switch (cat.name)
             {
+                case "Data":
+                    {
+                        foreach (var dim in cat.dimensions)
+                        {
+                            switch (dim.name)
+                            {
+                                case "Scale":
+                                    {
+                                        int index = 0;
+                                        foreach (var opt in dim.options)
+                                        {
+                                            switch (opt)
+                                            {
+                                                case "Room Scale":
+                                                    {
+                                                        mFullScale = !dim.choices[index];
+
+                                                        clientConfigs[mCurrentClient].objectScale = FullScale;
+                                                        break;
+                                                    }
+                                                case "World Scale":
+                                                    {
+                                                        mFullScale = dim.choices[index];
+
+                                                        clientConfigs[mCurrentClient].objectScale = FullScale;
+                                                        break;
+                                                    }
+                                            }
+
+                                            index++;
+                                        }
+                                        break;
+                                    }
+                            }
+                        }
+                        break;
+                    }
                 case "Trajectories":
                     {
                         foreach (var dim in cat.dimensions)
@@ -820,10 +869,10 @@ public class SceneFlowManager : MonoBehaviour
 
     public void Launch()
     {
-        LaunchSim(mNumClients);
+        LaunchSim();
     }
 
-    public void Launch(Transform root)
+    public void Launch(Transform root, string dataset, string[] sessions, GameObject scenePrefab)
     {
         visRoot = root;
 
@@ -838,7 +887,7 @@ public class SceneFlowManager : MonoBehaviour
             player.SetActive(false);
         }
 
-        LaunchSim(1);
+        LaunchSim(dataset, sessions, scenePrefab);
     }
 
 
@@ -1114,19 +1163,19 @@ public class SceneFlowManager : MonoBehaviour
         }
     }
 
-    public void LaunchSim(int clientCount)
+    public void LaunchSim(string dataset = null, string[] sessions = null, GameObject scenePrefab = null)
     {
         //if (!(launchUI != null && launchUI.activeSelf))
         //{
         //    return;
         //}
 
-        mNumClients = clientCount;
+        mNumClients = 1;
 
         // Local parameter setting
         ResetTimeControls();
 
-        var mult = GetMultipleConfig(clientCount);
+        var mult = GetMultipleConfig(1);
         if (mult != null)
         {
             //Vector3 startPos = mult.startPos;
@@ -1143,11 +1192,11 @@ public class SceneFlowManager : MonoBehaviour
         if (Controller != null)
         {
             Controller.gameObject.SetActive(true);
-            Controller.LoadSim(clientCount);
+            Controller.LoadSim(dataset, sessions);
         }
 
         // Load the visualisation clients
-        SpawnClients(clientCount, Controller, visRoot);
+        SpawnClients(1, Controller, visRoot, scenePrefab);
 
         // Configure current view
         ActivateCurrentViewConfig();
@@ -1174,7 +1223,7 @@ public class SceneFlowManager : MonoBehaviour
         mLaunchTime = Time.time;
     }
 
-    private void SpawnClients(int clientCount, VisSimController controller, Transform root)
+    private void SpawnClients(int clientCount, VisSimController controller, Transform root, GameObject scenePrefab)
     {
         if (visPrefab == null)
         {
@@ -1209,7 +1258,7 @@ public class SceneFlowManager : MonoBehaviour
                     Visualisation visComponent = vis.GetComponent<Visualisation>();
                     if (visComponent != null)
                     {
-                        visComponent.Configure(controller, i);
+                        visComponent.Configure(controller, i, scenePrefab);
 
                         ApplyClientConfig(visComponent, config);
 

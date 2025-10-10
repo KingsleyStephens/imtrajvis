@@ -1,12 +1,15 @@
 using KVisualisation;
+using SpatioTemporalDatabase;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using static KingsleyPhD.TimelineView;
+using static System.Collections.Specialized.BitVector32;
 
 namespace KingsleyPhD
 {
@@ -27,6 +30,8 @@ namespace KingsleyPhD
         [SerializeField]
         private Transform designRoot;
         [SerializeField]
+        private GameObject scenePrefab;
+        [SerializeField]
         private GameObject cellPrototype;
         [SerializeField]
         private GameObject lineBatcherPrototype;
@@ -42,6 +47,10 @@ namespace KingsleyPhD
         private TMP_Dropdown workspaceRootDropdown;
         [SerializeField]
         private TMP_Dropdown workspaceDropdown;
+        [SerializeField]
+        private TMP_Dropdown datasetDropdown;
+        [SerializeField]
+        private TMP_Dropdown sessionDropdown;
         [SerializeField]
         private SnapshotCamera snapshotCamera;
 
@@ -71,6 +80,9 @@ namespace KingsleyPhD
 
         public string WorkspaceRoot { get; set; } = string.Empty;
         public string Workspace { get; set; } = string.Empty;
+        public string Dataset { get; set; } = string.Empty;
+        public string[] Session { get; set; } = new string[0];
+
 
         private string GetLastDirectory(string path)
         {
@@ -81,7 +93,7 @@ namespace KingsleyPhD
         {
             get
             {
-                return Directory.GetDirectories(Application.persistentDataPath).Select(d => GetLastDirectory(d)).ToArray();
+                return Directory.GetDirectories(Path.Combine(Application.persistentDataPath, "Workspaces")).Select(d => GetLastDirectory(d)).ToArray();
             }
         }
 
@@ -89,15 +101,40 @@ namespace KingsleyPhD
         {
             get
             {
-                return Directory.GetDirectories(Path.Combine(Application.persistentDataPath, WorkspaceRoot)).Select(d => GetLastDirectory(d)).ToArray();
+                return Directory.GetDirectories(Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot)).Select(d => GetLastDirectory(d)).ToArray();
             }
         }
 
+        public string[] Datasets
+        {
+            get
+            {
+                return Directory.GetFiles(Path.Combine(Application.persistentDataPath, "TrajectoryData")).Select(f => Path.GetFileNameWithoutExtension(f)).ToArray();
+            }
+        }
+
+        public string[] Sessions
+        {
+            get
+            {
+                if (Dataset != null)
+                {
+                    string dbName = Path.Combine(Application.persistentDataPath, "TrajectoryData", Dataset + ".json");
+                    JsonSpatioTemporalDB db = new JsonSpatioTemporalDB(dbName);
+                    if (db.CreateOrOpen())
+                    {
+                        return db.ListTables();
+                    }
+                }
+
+                return new string[0];
+            }
+        }
 
         public void NewWorkspace()
         {
             WorkspaceRoot = DateTime.Today.ToString("yyyy-MM-dd");
-            string workspaceRoot = Path.Combine(Application.persistentDataPath, WorkspaceRoot);
+            string workspaceRoot = Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot);
 
             if (!Directory.Exists(workspaceRoot))
             {
@@ -132,9 +169,12 @@ namespace KingsleyPhD
         public int SelectWorkspaceRoot
         {
             set 
-            { 
-                WorkspaceRoot = WorkspaceRoots[value];
-                SelectWorkspace = 0;
+            {
+                if (WorkspaceRoots.Length > 0)
+                {
+                    WorkspaceRoot = WorkspaceRoots[value];
+                    SelectWorkspace = 0;
+                }
             }
         }
 
@@ -142,9 +182,43 @@ namespace KingsleyPhD
         {
             set
             {
-                Workspace = Workspaces[value];
+                if (Workspaces.Length > 0)
+                {
+                    Workspace = Workspaces[value];
+                    SelectDataset = 0;
+                }
+            }
+        }
 
-                Reset();
+        public int SelectDataset
+        {
+            set
+            {
+                if (Datasets.Length > 0)
+                {
+                    Dataset = Datasets[value];
+
+                    SelectSession = 0;
+                }
+            }
+        }
+
+        public int SelectSession
+        {
+            set
+            {
+                if (Sessions.Length >= 3)
+                {
+                    // Session = Sessions[value];
+                    // TEMP
+                    Session = new string[3] { Sessions[0], Sessions[1], Sessions[2] };
+
+                    Reset();
+                }
+                else
+                {
+                    Reset();
+                }
             }
         }
 
@@ -192,7 +266,7 @@ namespace KingsleyPhD
 
             workspace.ViewRoot.SetParent(fullscreenRoot);
             workspace.ViewRoot.localPosition = Vector3.zero;
-            workspace.ViewRoot.localScale = Vector3.one;
+            //workspace.ViewRoot.localScale = Vector3.one;
             workspace.ViewRoot.localRotation = Quaternion.identity;
 
             UserStart us = workspace.ViewRoot.GetComponentInChildren<UserStart>();
@@ -208,12 +282,8 @@ namespace KingsleyPhD
 
         public void Shrink()
         {
-            Debug.Log("1");
-
             if (mFPVWorkspace != null)
             {
-                Debug.Log("2");
-
                 if (mDesignWorkspace != null)
                 {
                     if (designRoot != null)
@@ -329,14 +399,14 @@ namespace KingsleyPhD
             {
                 mModel.Reset();
 
-                string timelineConfig = Path.Combine(Application.persistentDataPath, WorkspaceRoot, Workspace, mTimelineConfigFile);
+                string timelineConfig = Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot, Workspace, mTimelineConfigFile);
                 if (File.Exists(timelineConfig))
                 {
                     mTimelineJSON = TimelineJSON.Load(timelineConfig);
 
                     foreach (var slot in mTimelineJSON.slots)
                     {
-                        string imageFile = Path.Combine(Application.persistentDataPath, WorkspaceRoot, Workspace, slot.id + ".png");
+                        string imageFile = Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot, Workspace, slot.id + ".png");
 
                         mModel.AddCell(slot.id, TimelineModel.Cell.CellType.Button, "", false, imageFile);
                     }
@@ -392,6 +462,34 @@ namespace KingsleyPhD
                     workspaceDropdown.value = ws.Count - 1;
                 }
             }
+
+            if (datasetDropdown != null)
+            {
+                datasetDropdown.ClearOptions();
+
+                List<string> ds = new List<string>(Datasets);
+                datasetDropdown.AddOptions(ds);
+
+                if (ds.Count > 0)
+                {
+                    Dataset = ds[ds.Count - 1];
+                    datasetDropdown.value = ds.Count - 1;
+                }
+            }
+
+            if (sessionDropdown != null)
+            {
+                sessionDropdown.ClearOptions();
+
+                List<string> ds = new List<string>(Sessions);
+                sessionDropdown.AddOptions(ds);
+
+                if (ds.Count > 0)
+                {
+                    Session = new string[1] { ds[ds.Count - 1] };
+                    sessionDropdown.value = ds.Count - 1;
+                }
+            }
         }
 
         /**
@@ -406,7 +504,7 @@ namespace KingsleyPhD
         {
             if (snapshotCamera != null && mCurrCellData != null)
             {
-                snapshotCamera.TakeSnapshot(Path.Combine(Application.persistentDataPath, WorkspaceRoot, Workspace, mCurrCellData.image));
+                snapshotCamera.TakeSnapshot(Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot, Workspace, mCurrCellData.image));
                 if (mController != null)
                 {
                     mController.Dirty = true;
@@ -449,11 +547,14 @@ namespace KingsleyPhD
                         if (workspace != null)
                         {
                             workspace.CellId = cellData.id;
+                            workspace.ScenePrefab = scenePrefab;
                             workspace.DesignInstance = instance;
                             workspace.OnChange += WorkspaceChange;
                             workspace.OnClose += WorkspaceClose;
                             workspace.OnGoFPV += Grow;
                             workspace.OnDesignMenu += OnDesignMenu;
+                            workspace.Dataset = Dataset;
+                            workspace.Sessions = Session;
                             mWorkspaces.Add(workspace);
 
                             if (mTimelineJSON != null)
@@ -593,13 +694,13 @@ namespace KingsleyPhD
         {
             if (!mDesignInstances.ContainsKey(id))
             {
-                string workspace = Path.Combine(Application.persistentDataPath, WorkspaceRoot, Workspace);
+                string workspace = Path.Combine(Application.persistentDataPath, "Workspaces",WorkspaceRoot, Workspace);
                 if (!Directory.Exists(workspace))
                 {
                     NewWorkspace();
                 }
 
-                string fileName = Path.Combine(Application.persistentDataPath, WorkspaceRoot, Workspace, id);
+                string fileName = Path.Combine(Application.persistentDataPath, "Workspaces",WorkspaceRoot, Workspace, id);
                 if (File.Exists(fileName))
                 {
                     DesignInstanceJSON instance = DesignInstanceJSON.Load(fileName);

@@ -37,8 +37,6 @@ namespace KingsleyPhD
         private Vector3 smScale = new Vector3(0.002f, 0.002f, 0.002f);
         [SerializeField]
         private Vector3 designScale = new Vector3(0.01f, 0.01f, 0.01f);
-        [SerializeField]
-        private Vector3 fpvScale = new Vector3(10.0f, 10.0f, 10.0f);
 
 
         private DesignInstanceJSON mDesignSpaceInstance;
@@ -67,6 +65,10 @@ namespace KingsleyPhD
 
         public Transform SceneRoot { get { return sceneRoot; } }
         public Transform ViewRoot { get { return viewRoot; } }
+
+        public string Dataset { get; set; }
+        public string[] Sessions { get; set; }
+        public GameObject ScenePrefab { get; set; }
 
         public SceneFlowManager SceneFlowManager { get { return mSceneFlowManager; } }
 
@@ -159,7 +161,7 @@ namespace KingsleyPhD
             mSceneFlowManager = sceneFlowGO.GetComponent<SceneFlowManager>();
             if (mSceneFlowManager != null)
             {
-                mSceneFlowManager.Launch(viewRoot);
+                mSceneFlowManager.Launch(viewRoot, Dataset, Sessions, ScenePrefab);
                 mSceneFlowManager.ConfigDesignSpace(mDesignSpaceInstance);
                 mSceneFlowManager.SimTime = mInitialTime;
             }
@@ -290,7 +292,7 @@ namespace KingsleyPhD
 
             if (mFPVActive)
             {
-                viewRoot.localScale = fpvScale;
+                viewRoot.localScale = Vector3.one;
             }
             else if (mDesignActive)
             {

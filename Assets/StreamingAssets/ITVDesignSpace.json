@@ -5,6 +5,10 @@
             { "name": "Environment Objects",
               "singular": false,
               "options": ["None", "Static"]
+            },
+            { "name": "Scale",
+              "singular": false,
+              "options": ["Room Scale", "World Scale"]
             }
           ]
         },

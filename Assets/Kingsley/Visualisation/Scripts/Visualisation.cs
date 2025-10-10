@@ -64,9 +64,18 @@ namespace SATestbed
             }
         }
 
-        public void Configure(VisSimController controller, int clientId)
+        public void Configure(VisSimController controller, int clientId, GameObject scenePrefab)
         {
             instanceId = clientId;
+
+            if (threeD != null && scenePrefab != null)
+            {
+                VisSettings visSettings = threeD.GetComponentInChildren<VisSettings>();
+                if (visSettings != null)
+                {
+                    visSettings.scenePrefab = scenePrefab;
+                }
+            }
 
             if (controller != null)
             {
