@@ -15,7 +15,7 @@ namespace SATestbed
         public float fogDensity = 0.01f;
         public Material skyboxMaterial = null;
 
-        private GameObject instance;
+        public GameObject instance;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()

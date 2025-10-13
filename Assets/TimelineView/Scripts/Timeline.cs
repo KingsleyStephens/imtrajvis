@@ -32,6 +32,8 @@ namespace KingsleyPhD
         [SerializeField]
         private GameObject scenePrefab;
         [SerializeField]
+        private GameObject underwaterPrefab;
+        [SerializeField]
         private GameObject cellPrototype;
         [SerializeField]
         private GameObject lineBatcherPrototype;
@@ -547,7 +549,15 @@ namespace KingsleyPhD
                         if (workspace != null)
                         {
                             workspace.CellId = cellData.id;
+
                             workspace.ScenePrefab = scenePrefab;
+
+                            // HACK
+                            if (Dataset == "simulation")
+                            {
+                                workspace.ScenePrefab = underwaterPrefab;
+                            }
+
                             workspace.DesignInstance = instance;
                             workspace.OnChange += WorkspaceChange;
                             workspace.OnClose += WorkspaceClose;

@@ -37,6 +37,8 @@ namespace KingsleyPhD
         private Vector3 smScale = new Vector3(0.002f, 0.002f, 0.002f);
         [SerializeField]
         private Vector3 designScale = new Vector3(0.01f, 0.01f, 0.01f);
+        [SerializeField]
+        private Vector3 fpvScale = new Vector3(1.0f, 1.0f, 1.0f);
 
 
         private DesignInstanceJSON mDesignSpaceInstance;
@@ -164,6 +166,7 @@ namespace KingsleyPhD
                 mSceneFlowManager.Launch(viewRoot, Dataset, Sessions, ScenePrefab);
                 mSceneFlowManager.ConfigDesignSpace(mDesignSpaceInstance);
                 mSceneFlowManager.SimTime = mInitialTime;
+                mSceneFlowManager.SetViewScale(VisScaler.ScaleType.Small);
             }
 
             SyncTimeSlider();
@@ -240,11 +243,13 @@ namespace KingsleyPhD
                 {
                     viewRoot.localScale = designScale;
                     viewRoot.localPosition = Vector3.zero;
+                    mSceneFlowManager.SetViewScale(VisScaler.ScaleType.Medium);
                 }
                 else
                 {
                     viewRoot.localScale = smScale;
                     viewRoot.localPosition = Vector3.zero;
+                    mSceneFlowManager.SetViewScale(VisScaler.ScaleType.Small);
                 }
 
                 if (mVisRoot != null)
@@ -292,15 +297,18 @@ namespace KingsleyPhD
 
             if (mFPVActive)
             {
-                viewRoot.localScale = Vector3.one;
+                viewRoot.localScale = fpvScale;
+                mSceneFlowManager.SetViewScale(VisScaler.ScaleType.LifeSize);
             }
             else if (mDesignActive)
             {
                 viewRoot.localScale = designScale;
+                mSceneFlowManager.SetViewScale(VisScaler.ScaleType.Medium);
             }
             else
             {
                 viewRoot.localScale = smScale;
+                mSceneFlowManager.SetViewScale(VisScaler.ScaleType.Small);
             }
 
             viewRoot.localPosition = Vector3.zero;

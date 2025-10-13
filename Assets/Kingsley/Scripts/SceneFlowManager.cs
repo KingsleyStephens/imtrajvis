@@ -1,5 +1,6 @@
 using KController;
 using KVisualisation;
+using NUnit.Framework;
 using Oculus.Interaction.Locomotion;
 using SATestbed;
 using System;
@@ -1221,6 +1222,18 @@ public class SceneFlowManager : MonoBehaviour
         // Hide launch UI
         //launchUI.SetActive(false);
         mLaunchTime = Time.time;
+    }
+
+    public void SetViewScale(KingsleyPhD.VisScaler.ScaleType scale)
+    {
+        foreach (var c in visClients)
+        {
+            Visualisation visComponent = c.GetComponent<Visualisation>();
+            if (visComponent != null)
+            {
+                visComponent.SetViewScale(scale);
+            }
+        }
     }
 
     private void SpawnClients(int clientCount, VisSimController controller, Transform root, GameObject scenePrefab)

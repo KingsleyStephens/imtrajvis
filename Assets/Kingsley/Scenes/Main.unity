@@ -2323,6 +2323,12 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
         type: 3}
+      propertyPath: underwaterPrefab
+      value: 
+      objectReference: {fileID: 1139305900334574516, guid: f1c1600ea0975e143b4112989f1708da,
+        type: 3}
+    - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
       propertyPath: sceneFlowManagerPrefab
       value: 
       objectReference: {fileID: 5077579243455525843, guid: cc22be63b5b01e74391cf6fa596fb6eb,

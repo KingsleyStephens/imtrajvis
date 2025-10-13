@@ -1,4 +1,5 @@
 using KController;
+using KingsleyPhD;
 using KVisualisation;
 using System;
 using System.Collections;
@@ -59,6 +60,22 @@ namespace SATestbed
                     if (visClient != null)
                     {
                         visClient.OnStart();
+                    }
+                }
+            }
+        }
+
+        public void SetViewScale(VisScaler.ScaleType scale)
+        {
+            if (threeD != null)
+            {
+                VisSettings visSettings = threeD.GetComponentInChildren<VisSettings>();
+                if (visSettings != null && visSettings.instance != null)
+                {
+                    VisScaler scaler = visSettings.instance.GetComponent<VisScaler>();
+                    if (scaler != null)
+                    {
+                        scaler.Scale = scale;
                     }
                 }
             }
