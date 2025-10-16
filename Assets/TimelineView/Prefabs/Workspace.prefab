@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8632228260813220775}
+  - component: {fileID: 4729300597757625111}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -38,6 +39,25 @@ Transform:
   - {fileID: 8014673836773746418}
   m_Father: {fileID: 9177420767987577202}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4729300597757625111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 87096667938082259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c57038eab79748bd0ccc3bf00056a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  closeButton: {fileID: 7436116914873454351}
+  menuButton: {fileID: 3821456684098701043}
+  fpvButton: {fileID: 5624695547135144177}
+  pinToggle: {fileID: 1590446686890811577}
+  timeSlider: {fileID: 6016516593419791598}
+  timePlayButton: {fileID: 4899134476793091761}
+  designSpace: {fileID: 8355588575375382722}
 --- !u!1 &2505798175219669414
 GameObject:
   m_ObjectHideFlags: 0
@@ -155,6 +175,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa9b52994861ad343b04340da7a32c0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneFlowManagerPrefab: {fileID: 7239819356074799158, guid: cc22be63b5b01e74391cf6fa596fb6eb,
+    type: 3}
   vis: {fileID: 1039746222870123183}
 --- !u!1 &6488595172128495091
 GameObject:
@@ -203,19 +225,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scene: {fileID: 1472336952028187273}
-  ui: {fileID: 87096667938082259}
-  sceneFlowManagerPrefab: {fileID: 7239819356074799158, guid: cc22be63b5b01e74391cf6fa596fb6eb,
-    type: 3}
-  closeButton: {fileID: 7436116914873454351}
-  menuButton: {fileID: 3821456684098701043}
-  fpvButton: {fileID: 5624695547135144177}
-  pinToggle: {fileID: 1590446686890811577}
-  timeSlider: {fileID: 6016516593419791598}
-  timePlayButton: {fileID: 4899134476793091761}
-  designSpace: {fileID: 6703485195695258102}
-  smScale: {x: 0.2, y: 0.2, z: 0.2}
-  designScale: {x: 1, y: 1, z: 1}
-  fpvScale: {x: 1, y: 1, z: 1}
+  ui: {fileID: 4729300597757625111}
 --- !u!1 &6703485195695258102
 GameObject:
   m_ObjectHideFlags: 0

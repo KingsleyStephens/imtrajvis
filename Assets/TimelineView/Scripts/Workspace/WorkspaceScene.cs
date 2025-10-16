@@ -52,9 +52,7 @@ namespace KingsleyPhD
                 if (mSceneFlowManager != null)
                 {
                     mSceneFlowManager.Launch(vis, dataset, sessions, scenePrefab);
-                    //mSceneFlowManager.ConfigDesignSpace(mDesignSpaceInstance);
-                    //mSceneFlowManager.SimTime = mInitialTime;
-                    //mSceneFlowManager.SetViewScale(VisScaler.ScaleType.Small);
+                    mSceneFlowManager.SimTime = 0.0f;
                 }
             }
         }
@@ -79,6 +77,50 @@ namespace KingsleyPhD
             }
         }
 
+        public void Configure(DesignInstanceJSON designInstance)
+        {
+            if (mSceneFlowManager != null)
+            {
+                mSceneFlowManager.ConfigDesignSpace(designInstance);
+            }
+        }
+
+        public void Resize()
+        {
+            if (vis != null)
+            {
+                SphereCollider sphereCollider = vis.parent.GetComponent<SphereCollider>();
+                if (sphereCollider != null)
+                {
+                    float r = sphereCollider.radius;
+
+                    SceneTag sceneTag = vis.GetComponentInChildren<SceneTag>();
+                    if (sceneTag != null)
+                    {
+                        BoxCollider sceneCollider = sceneTag.gameObject.GetComponent<BoxCollider>();
+                        if (sceneCollider != null)
+                        {
+                            float halfWidth = sceneCollider.bounds.max.magnitude;
+                            
+                            Debug.Log(halfWidth);
+
+                            halfWidth *= sceneCollider.transform.localScale.x;
+                            float ratio = r / halfWidth;
+                            vis.localScale = new Vector3(ratio, ratio, ratio);
+                        }
+                    }
+                }
+                else
+                {
+                    vis.localScale = Vector3.one;   // Standard size for FPV
+                }
+            }
+
+            if (mSceneFlowManager != null)
+            {
+                mSceneFlowManager.Resize();
+            }
+        }
 
     }
 

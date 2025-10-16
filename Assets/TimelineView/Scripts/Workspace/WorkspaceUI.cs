@@ -18,9 +18,8 @@ namespace KingsleyPhD
         public delegate void SliderDelegate(float relativeValue);
 
         public event ButtonDelegate OnClose;
-        public event ButtonDelegate OnMenu;
-        public event ButtonDelegate OnFPV;
-        public event ToggleButtonDelegate OnPin;
+        public event ToggleButtonDelegate OnMenu;
+        public event ToggleButtonDelegate OnFPV;
         public event ToggleButtonDelegate OnTimePlay;
         public event ToggleButtonDelegate OnStaticTimeChange;
         public event ButtonDelegate OnDesignSpaceChange;
@@ -53,29 +52,21 @@ namespace KingsleyPhD
         private bool mLockTimeSldier = false;
         private bool mTimePaused = true;
         private DesignInstanceJSON mDesignSpaceInstance;
+        private bool mIsPinned = false;
+        private bool mIsStaticTime = false;
+        private bool mDesignActive = false;
+        private bool mFPVActive = false;
 
         // PUBLIC
 
         public float Time { set { if (!mLockTimeSldier) OnTimeChange?.Invoke(value); } }
         public bool Pause { set { SetTimePlayButton(!value); } }
         public DesignSpace DesignSpace { get { return designSpace; } }
-        public DesignInstanceJSON DesignInstance
-        {
-            get { return mDesignSpaceInstance; }
-            set
-            {
-                mDesignSpaceInstance = value;
-                if (designSpace != null)
-                {
-                    if (designSpace != null)
-                    {
-                        designSpace.DesignInstance = mDesignSpaceInstance;
-                    }
-                }
-
-                OnStaticTimeChange?.Invoke(!mDesignSpaceInstance.Query("Space/Time", "Time", "+ 1D animation"));
-            }
-        }
+        public DesignInstanceJSON DesignInstance { get { return mDesignSpaceInstance; } }
+        public bool Pinned { get { return mIsPinned; } }
+        public bool StaticTime { get { return mIsStaticTime; } }
+        public bool DesignActive { get { return mDesignActive; } }
+        public bool FPVActive { get { return mFPVActive; } set { mFPVActive = value;  } }
 
 
         public void SetTime(float time) 
@@ -103,17 +94,19 @@ namespace KingsleyPhD
             if (menuButton != null)
             {
                 menuButton.OnActivateButton += MenuChange;
-                menuButton.OnActivateButton += () => OnMenu?.Invoke();
+                menuButton.OnActivateButton += () => OnMenu?.Invoke(mDesignActive);
             }
 
             if (fpvButton != null)
             {
-                fpvButton.OnActivateButton += () => OnFPV?.Invoke();
+                
+                fpvButton.OnActivateButton += () => mFPVActive = !mFPVActive;
+                fpvButton.OnActivateButton += () => OnFPV?.Invoke(mFPVActive);
             }
 
             if (pinToggle != null)
             {
-                pinToggle.OnToggleButton += (bool on) => OnPin?.Invoke(on);
+                pinToggle.OnToggleButton += (bool on) => mIsPinned = on;
             }
 
             if (timePlayButton != null)
@@ -130,16 +123,26 @@ namespace KingsleyPhD
 
                 designSpace.OnChange += () => OnDesignSpaceChange?.Invoke();
                 designSpace.OnTimeChange += DoTimeChange;
-                designSpace.OnTimeChange += (bool staticTime) => OnStaticTimeChange?.Invoke(staticTime);
             }
         }
 
-        public void Register(ButtonDelegate onClose, ButtonDelegate onMenu, ButtonDelegate onFPV, ToggleButtonDelegate onPin, ToggleButtonDelegate onTimePlay, ToggleButtonDelegate onStaticTimeChange, ButtonDelegate onDesignSpaceChange, SliderDelegate onTimeChange)
+        public void Init(DesignInstanceJSON designInstance)
+        {
+            mDesignSpaceInstance = designInstance;
+            if (designSpace != null)
+            {
+                designSpace.DesignInstance = mDesignSpaceInstance;
+            }
+
+            mIsStaticTime = !mDesignSpaceInstance.Query("Space/Time", "Time", "+ 1D animation");
+            DoTimeChange(mIsStaticTime);
+        }
+
+        public void Register(ButtonDelegate onClose, ToggleButtonDelegate onMenu, ToggleButtonDelegate onFPV, ToggleButtonDelegate onTimePlay, ToggleButtonDelegate onStaticTimeChange, ButtonDelegate onDesignSpaceChange, SliderDelegate onTimeChange)
         {
             OnClose += onClose;
             OnMenu += onMenu;
             OnFPV += onFPV;
-            OnPin += onPin;
             OnTimePlay += onTimePlay;
             OnStaticTimeChange += onStaticTimeChange;
             OnDesignSpaceChange += onDesignSpaceChange;
@@ -148,23 +151,29 @@ namespace KingsleyPhD
 
         private void MenuChange()
         {
+            mDesignActive = !mDesignActive;
+
             if (designSpace != null)
             {
-                designSpace.gameObject.SetActive(!designSpace.gameObject.activeSelf);
+                designSpace.gameObject.SetActive(mDesignActive);
             }
         }
 
         private void DoTimeChange(bool staticTime)
         {
+            mIsStaticTime = staticTime;
+
             if (timeSlider != null)
             {
-                timeSlider.gameObject.SetActive(!staticTime);
+                timeSlider.gameObject.SetActive(!mIsStaticTime);
             }
 
             if (timePlayButton != null)
             {
-                timePlayButton.gameObject.SetActive(!staticTime);
+                timePlayButton.gameObject.SetActive(!mIsStaticTime);
             }
+
+            OnStaticTimeChange?.Invoke(mIsStaticTime);
         }
 
         private void SetTimePlayButton(bool playing)

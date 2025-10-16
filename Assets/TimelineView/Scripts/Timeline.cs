@@ -293,7 +293,7 @@ namespace KingsleyPhD
 
             workspace.Scene.Vis.SetParent(fullscreenRoot);
             workspace.Scene.Vis.localPosition = Vector3.zero;
-            //workspace.Vis.localScale = Vector3.one;
+            workspace.Scene.Vis.localScale = Vector3.one;
             workspace.Scene.Vis.localRotation = Quaternion.identity;
 
             UserStart us = workspace.Scene.Vis.GetComponentInChildren<UserStart>();
@@ -763,7 +763,7 @@ namespace KingsleyPhD
                 }
 
                 Shrink();
-                mWorkspaces[index].ToggleFPV();
+                mWorkspaces[index].ToggleFPV(false);
             }
         }
 
@@ -779,7 +779,7 @@ namespace KingsleyPhD
                 }
 
                 Shrink();
-                mWorkspaces[index].ToggleFPV();
+                mWorkspaces[index].ToggleFPV(false);
             }
         }
     }

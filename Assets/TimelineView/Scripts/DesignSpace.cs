@@ -66,6 +66,12 @@ namespace KingsleyPhD
          */
         void Start()
         {
+            if (DesignInstance == null)
+            {
+                Debug.LogWarning("DesignInstance in null");
+                return;
+            }
+
             DesignSpaceJSON designSpaceJSON = DesignSpaceJSON.Load(Path.Combine(Application.streamingAssetsPath,jsonFile));
             if (designSpaceJSON != null)
             {

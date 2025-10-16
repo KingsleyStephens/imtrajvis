@@ -1,4 +1,5 @@
 using KVisualisation;
+using System.Collections;
 using TMPro;
 using Unity.Android.Gradle.Manifest;
 using UnityEngine;
@@ -35,70 +36,17 @@ namespace KingsleyPhD
         [SerializeField]
         private WorkspaceUI ui;             // The UI
 
-
-
-
-        //[SerializeField]
-        //private Vector3 smScale = new Vector3(0.002f, 0.002f, 0.002f);
-        //[SerializeField]
-        //private Vector3 designScale = new Vector3(0.01f, 0.01f, 0.01f);
-        //[SerializeField]
-        //private Vector3 fpvScale = new Vector3(1.0f, 1.0f, 1.0f);
-
-
-
-
-
-
         // PUBLIC
 
         public WorkspaceScene Scene { get { return scene; } }
         public string Id { get; private set; }
-
-
-
-
-        public bool Pinned { get; private set; }
-        public bool IsFPV { get; private set; }
-        public bool DesignActive { get { return mDesignActive; } }
-
-        public DesignInstanceJSON DesignInstance
-        {
-            get { return ui?.DesignInstance; }
-            set
-            {
-                if (ui != null)
-                {
-                    ui.DesignInstance = value;
-                }
-            }
-        }
-
+        public bool Pinned { get { return (ui != null) ? ui.Pinned : false; } }
+        public bool DesignActive { get { return (ui != null) ? ui.DesignActive : false; } }
+        public bool IsFPV { get { return (ui != null) ? ui.FPVActive : false; } }
+        public DesignInstanceJSON DesignInstance { get { return ui?.DesignInstance; } }
         public SceneFlowManager SceneFlowManager { get { return scene?.SceneFlowManager; } }
 
-
-
-        // PRIVATE DATA
-
-        private DesignInstanceJSON mDesignSpaceInstance;
-        private bool mFPVActive = false;
-
-
-
-        private bool mDesignActive = false;
-
-        private bool mLockTimeEvents = false;
-        private bool mIsStaticTime = false;
-
-
-
-
-
-        private float mInitialTime = 0.0f;
-
-
         // PUBLIC
-
 
         /**
          * Initialise
@@ -106,7 +54,11 @@ namespace KingsleyPhD
         public void Create(string id, DesignInstanceJSON designInstance, string dataset, string[] sessions, GameObject scenePrefab)
         {
             Id = id;
+
+            ui?.Init(designInstance);
             scene?.Init(dataset, sessions, scenePrefab);
+
+            OnDesignSpaceChange();
         }
 
         /**
@@ -114,7 +66,6 @@ namespace KingsleyPhD
          */
         public void Apply(Vector3 rotation, float zoom, float initialTime)
         {
-            mInitialTime = initialTime;
             scene?.Transform(rotation, zoom);
         }
 
@@ -124,19 +75,17 @@ namespace KingsleyPhD
         {
             if (ui != null)
             {
-                ui.Register(DoClose, Menu, ToggleFPV, Pin, TimePlayToggle, DoTimeChange, OnDesignSpaceChange, OnTimeChange);
+                ui.Register(DoClose, Menu, ToggleFPV, TimePlayToggle, DoTimeChange, OnDesignSpaceChange, OnTimeChange);
 
                 SyncTime();
+
+                scene?.Resize();
             }
         }
 
         private void OnDesignSpaceChange()
         {
-            if (mSceneFlowManager != null)
-            {
-                mSceneFlowManager.ConfigDesignSpace(mDesignSpaceInstance);
-            }
-
+            scene?.Configure(ui?.DesignInstance);
             OnChange?.Invoke();
         }
 
@@ -148,14 +97,12 @@ namespace KingsleyPhD
             }
         } 
 
-
         void DoTimeChange(bool staticTime)
         {
-            mIsStaticTime = staticTime;
-
-            if (!mIsStaticTime && mSceneFlowManager != null)
+            // Changing back to dynamic time, do a reset
+            if (!staticTime && scene != null)
             {
-                mSceneFlowManager.ScrubTime = 0.0f;
+                scene.ScrubTime = 0.0f;
             }
         }
 
@@ -183,103 +130,51 @@ namespace KingsleyPhD
             }
         }
 
-        public void Menu()
+        public void Menu(bool active)
         {
-            if (scene != null)
-            {
-                Transform vis = scene.Vis;
-                if (vis != null)
-                {
-                    mDesignActive = !mDesignActive;
+            OnDesignMenu?.Invoke(this);
 
-                    OnDesignMenu?.Invoke(this);
+            StartCoroutine(DelayResize());
+        }
 
-                    if (mDesignActive)
-                    {
-                        vis.localScale = designScale;
-                        vis.localPosition = Vector3.zero;
-                        mSceneFlowManager.SetViewScale(VisScaler.ScaleType.Medium);
-                    }
-                    else
-                    {
-                        vis.localScale = smScale;
-                        vis.localPosition = Vector3.zero;
-                        mSceneFlowManager.SetViewScale(VisScaler.ScaleType.Small);
-                    }
-                }
-            }
+        private IEnumerator DelayResize()
+        {
+            yield return new WaitForEndOfFrame();
+
+            scene?.Resize();
         }
 
         public void Shrink()
         {
-            if (mFPVActive)
+            if (ui != null && ui.FPVActive)
             {
-                ToggleFPV();
-
-                mSceneFlowManager.Resize();
+                ui.FPVActive = false;
+                ToggleFPV(ui.FPVActive);
+                scene?.Resize();
             }
         }
 
         public void Grow()
         {
-            mSceneFlowManager.Resize();
+            scene?.Resize();
         }
 
-        public void ToggleFPV()
+        public void ToggleFPV(bool fpvActive)
         {
-            if (scene != null)
+            if (scene != null && ui != null)
             {
-                Transform vis = scene.Vis;
-                if (vis != null)
+                if (ui != null)
                 {
-                    mFPVActive = !mFPVActive;
+                    ui.gameObject.SetActive(!fpvActive);
+                }
 
-                    if (mFPVActive && designSpace != null)
-                    {
-                        designSpace.SetActive(false);
-                    }
-                    else if (!mFPVActive && mDesignActive && designSpace != null)
-                    {
-                        designSpace.SetActive(true);
-                    }
+                scene?.Resize();
 
-                    if (mFPVActive)
-                    {
-                        vis.localScale = fpvScale;
-                        mSceneFlowManager.SetViewScale(VisScaler.ScaleType.LifeSize);
-                    }
-                    else if (mDesignActive)
-                    {
-                        vis.localScale = designScale;
-                        mSceneFlowManager.SetViewScale(VisScaler.ScaleType.Medium);
-                    }
-                    else
-                    {
-                        vis.localScale = smScale;
-                        mSceneFlowManager.SetViewScale(VisScaler.ScaleType.Small);
-                    }
-
-                    vis.localPosition = Vector3.zero;
-
-                    if (ui != null)
-                    {
-                        ui.SetActive(!mFPVActive);
-                    }
-
-                    IsFPV = mFPVActive;
-
-                    if (mFPVActive)
-                    {
-                        OnGoFPV?.Invoke(this);
-                    }
+                if (fpvActive)
+                {
+                    OnGoFPV?.Invoke(this);
                 }
             }
-            
-        }
-
-        public void Pin(bool pinned)
-        {
-            Pinned = pinned;
         }
 
         public void TimePlayToggle(bool playing)
