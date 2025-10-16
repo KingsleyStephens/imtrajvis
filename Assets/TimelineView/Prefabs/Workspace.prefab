@@ -48,7 +48,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1039746222870123183}
   m_Layer: 0
-  m_Name: VisRoot
+  m_Name: Vis
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,6 +80,7 @@ GameObject:
   - component: {fileID: 8816565063359627776}
   - component: {fileID: 842755768097965963}
   - component: {fileID: 979032933576242566}
+  - component: {fileID: 1472336952028187273}
   m_Layer: 0
   m_Name: Scene
   m_TagString: Untagged
@@ -142,6 +143,19 @@ MonoBehaviour:
   zoomSpeed: 1
   minZoomDistance: 0.25
   maxZoomDistance: 2
+--- !u!114 &1472336952028187273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5512296212775214703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa9b52994861ad343b04340da7a32c0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vis: {fileID: 1039746222870123183}
 --- !u!1 &6488595172128495091
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,11 +202,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5544c0d797cb8d040a8346dca0ba4b52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scene: {fileID: 1472336952028187273}
+  ui: {fileID: 87096667938082259}
   sceneFlowManagerPrefab: {fileID: 7239819356074799158, guid: cc22be63b5b01e74391cf6fa596fb6eb,
     type: 3}
-  sceneRoot: {fileID: 8816565063359627776}
-  viewRoot: {fileID: 1039746222870123183}
-  ui: {fileID: 87096667938082259}
   closeButton: {fileID: 7436116914873454351}
   menuButton: {fileID: 3821456684098701043}
   fpvButton: {fileID: 5624695547135144177}
@@ -202,6 +215,7 @@ MonoBehaviour:
   designSpace: {fileID: 6703485195695258102}
   smScale: {x: 0.2, y: 0.2, z: 0.2}
   designScale: {x: 1, y: 1, z: 1}
+  fpvScale: {x: 1, y: 1, z: 1}
 --- !u!1 &6703485195695258102
 GameObject:
   m_ObjectHideFlags: 0

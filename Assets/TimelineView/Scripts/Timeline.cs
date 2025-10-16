@@ -7,6 +7,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using TMPro;
+using UnityEditor.Graphs;
 using UnityEngine;
 using static KingsleyPhD.TimelineView;
 using static System.Collections.Specialized.BitVector32;
@@ -95,7 +96,13 @@ namespace KingsleyPhD
         {
             get
             {
-                return Directory.GetDirectories(Path.Combine(Application.persistentDataPath, "Workspaces")).Select(d => GetLastDirectory(d)).ToArray();
+                string dir = Path.Combine(Application.persistentDataPath, "Workspaces");
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                return Directory.GetDirectories(dir).Select(d => GetLastDirectory(d)).ToArray();
             }
         }
 
@@ -103,7 +110,13 @@ namespace KingsleyPhD
         {
             get
             {
-                return Directory.GetDirectories(Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot)).Select(d => GetLastDirectory(d)).ToArray();
+                string dir = Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot);
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                return Directory.GetDirectories(dir).Select(d => GetLastDirectory(d)).ToArray();
             }
         }
 
@@ -111,7 +124,13 @@ namespace KingsleyPhD
         {
             get
             {
-                return Directory.GetFiles(Path.Combine(Application.persistentDataPath, "TrajectoryData")).Select(f => Path.GetFileNameWithoutExtension(f)).ToArray();
+                string dir = Path.Combine(Application.persistentDataPath, "TrajectoryData");
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                return Directory.GetFiles(dir).Select(f => Path.GetFileNameWithoutExtension(f)).ToArray();
             }
         }
 
@@ -121,7 +140,13 @@ namespace KingsleyPhD
             {
                 if (Dataset != null)
                 {
-                    string dbName = Path.Combine(Application.persistentDataPath, "TrajectoryData", Dataset + ".json");
+                    string dir = Path.Combine(Application.persistentDataPath, "TrajectoryData");
+                    if (!Directory.Exists(dir))
+                    {
+                        Directory.CreateDirectory(dir);
+                    }
+
+                    string dbName = Path.Combine(dir, Dataset + ".json");
                     JsonSpatioTemporalDB db = new JsonSpatioTemporalDB(dbName);
                     if (db.CreateOrOpen())
                     {
@@ -253,25 +278,25 @@ namespace KingsleyPhD
             {
                 if (mTimelineJSON != null)
                 {
-                    mTimelineJSON.UpdateSlot(workspace.CellId, designRoot.localRotation.eulerAngles, designRoot.localScale.x, workspace.SceneFlowManager.SimTime);
+                    mTimelineJSON.UpdateSlot(workspace.Id, designRoot.localRotation.eulerAngles, designRoot.localScale.x, workspace.SceneFlowManager.SimTime);
                 }
             }
             else
             {
-                if (mTimelineJSON != null)
+                if (mTimelineJSON != null && workspace.Scene != null)
                 {
-                    mTimelineJSON.UpdateSlot(workspace.CellId, workspace.SceneRoot.localRotation.eulerAngles, workspace.SceneRoot.localScale.x, workspace.SceneFlowManager.SimTime);
+                    mTimelineJSON.UpdateSlot(workspace.Id, workspace.Scene.transform.localRotation.eulerAngles, workspace.Scene.transform.localScale.x, workspace.SceneFlowManager.SimTime);
                 }
             }
 
             mFPVWorkspace = workspace;
 
-            workspace.ViewRoot.SetParent(fullscreenRoot);
-            workspace.ViewRoot.localPosition = Vector3.zero;
-            //workspace.ViewRoot.localScale = Vector3.one;
-            workspace.ViewRoot.localRotation = Quaternion.identity;
+            workspace.Scene.Vis.SetParent(fullscreenRoot);
+            workspace.Scene.Vis.localPosition = Vector3.zero;
+            //workspace.Vis.localScale = Vector3.one;
+            workspace.Scene.Vis.localRotation = Quaternion.identity;
 
-            UserStart us = workspace.ViewRoot.GetComponentInChildren<UserStart>();
+            UserStart us = workspace.Scene.Vis.GetComponentInChildren<UserStart>();
             if (us != null && cameraRig != null)
             {
                 cameraRig.transform.position = us.transform.position;
@@ -290,12 +315,12 @@ namespace KingsleyPhD
                 {
                     if (designRoot != null)
                     {
-                        mFPVWorkspace.ViewRoot.SetParent(designRoot);
+                        mFPVWorkspace.Scene.Vis.SetParent(designRoot);
                         designRoot.gameObject.SetActive(true);
 
                         if (mTimelineJSON != null)
                         {
-                            TimelineSlot slot = mTimelineJSON.GetSlot(mDesignWorkspace.CellId);
+                            TimelineSlot slot = mTimelineJSON.GetSlot(mDesignWorkspace.Id);
                             if (slot != null)
                             {
                                 designRoot.localRotation = Quaternion.Euler(slot.orientation);
@@ -310,15 +335,15 @@ namespace KingsleyPhD
                 }
                 else
                 {
-                    mFPVWorkspace.ViewRoot.SetParent(mFPVWorkspace.SceneRoot);
+                    mFPVWorkspace.Scene.Vis.SetParent(mFPVWorkspace.Scene.transform);
 
                     if (mTimelineJSON != null)
                     {
-                        TimelineSlot slot = mTimelineJSON.GetSlot(mFPVWorkspace.CellId);
+                        TimelineSlot slot = mTimelineJSON.GetSlot(mFPVWorkspace.Id);
                         if (slot != null)
                         {
-                            mFPVWorkspace.SceneRoot.localRotation = Quaternion.Euler(slot.orientation);
-                            TrackballControl tb = mFPVWorkspace.SceneRoot.GetComponent<TrackballControl>();
+                            mFPVWorkspace.Scene.transform.localRotation = Quaternion.Euler(slot.orientation);
+                            TrackballControl tb = mFPVWorkspace.Scene.GetComponent<TrackballControl>();
                             if (tb != null)
                             {
                                 tb.ZoomDistance = slot.zoom;
@@ -327,8 +352,8 @@ namespace KingsleyPhD
                     }
                 }
 
-                mFPVWorkspace.ViewRoot.localPosition = Vector3.zero;
-                mFPVWorkspace.ViewRoot.localRotation = Quaternion.identity;
+                mFPVWorkspace.Scene.Vis.localPosition = Vector3.zero;
+                mFPVWorkspace.Scene.Vis.localRotation = Quaternion.identity;
                 mFPVWorkspace.Shrink();
 
                 if (cameraRig != null)
@@ -499,7 +524,10 @@ namespace KingsleyPhD
          */
         void Update()
         {
-            mController.Update();
+            if (mController != null)
+            {
+                mController.Update();
+            }
         }
 
         void WorkspaceChange()
@@ -530,7 +558,7 @@ namespace KingsleyPhD
                 }
             }
 
-            Workspace ws = mWorkspaces.Find(x => x.CellId == cellData.id);
+            Workspace ws = mWorkspaces.Find(x => x.Id == cellData.id);
             if (ws == null)
             {
                 if (cellButtonIndex < workspaceRoots.Length)
@@ -541,40 +569,25 @@ namespace KingsleyPhD
 
                     if (wsRoot != null)
                     {
-                        GameObject wsObj = Instantiate(workspacePrototype, wsRoot, true);
-                        wsObj.transform.localPosition = Vector3.zero;
-                        wsObj.transform.localScale = Vector3.one;
-
-                        Workspace workspace = wsObj.GetComponent<Workspace>();
+                        GameObject workspaceGameObject = Instantiate(workspacePrototype, wsRoot);
+                        Workspace workspace = workspaceGameObject.GetComponent<Workspace>();
                         if (workspace != null)
                         {
-                            workspace.CellId = cellData.id;
+                            mWorkspaces.Add(workspace);
 
-                            workspace.ScenePrefab = scenePrefab;
-
-                            // HACK
-                            if (Dataset == "simulation")
-                            {
-                                workspace.ScenePrefab = underwaterPrefab;
-                            }
-
-                            workspace.DesignInstance = instance;
                             workspace.OnChange += WorkspaceChange;
                             workspace.OnClose += WorkspaceClose;
                             workspace.OnGoFPV += Grow;
                             workspace.OnDesignMenu += OnDesignMenu;
-                            workspace.Dataset = Dataset;
-                            workspace.Sessions = Session;
-                            mWorkspaces.Add(workspace);
+
+                            workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "simulation" ? underwaterPrefab : scenePrefab);
 
                             if (mTimelineJSON != null)
                             {
                                 TimelineSlot slot = mTimelineJSON.GetSlot(cellData.id);
                                 if (slot != null)
                                 {
-                                    workspace.SceneRoot.localRotation = Quaternion.Euler(slot.orientation);
-                                    workspace.SceneRoot.localScale = new Vector3(slot.zoom, slot.zoom, slot.zoom);
-                                    workspace.Init(slot.time);
+                                    workspace.Apply(slot.orientation, slot.zoom, slot.time);
                                 }
                             }
                         }
@@ -602,8 +615,8 @@ namespace KingsleyPhD
 
                 if (designRoot != null)
                 {
-                    mDesignWorkspace.ViewRoot.SetParent(designRoot);
-                    mDesignWorkspace.ViewRoot.localPosition = Vector3.zero;
+                    mDesignWorkspace.Scene.Vis.SetParent(designRoot);
+                    mDesignWorkspace.Scene.Vis.localPosition = Vector3.zero;
                     designRoot.gameObject.SetActive(true);
                 }
 
@@ -619,8 +632,8 @@ namespace KingsleyPhD
                     }
                 }
 
-                mDesignWorkspace.ViewRoot.SetParent(mDesignWorkspace.SceneRoot);
-                mDesignWorkspace.ViewRoot.localPosition = Vector3.zero;
+                mDesignWorkspace.Scene.Vis.SetParent(mDesignWorkspace.Scene.transform);
+                mDesignWorkspace.Scene.Vis.localPosition = Vector3.zero;
                 mDesignWorkspace = null;
 
                 if (designRoot != null)
@@ -636,7 +649,7 @@ namespace KingsleyPhD
         {
             if (mCurrCellData != null && mCurrCellData.id == cellData.id)
             {
-                Workspace ws = mWorkspaces.Find(x => x.CellId == cellData.id);
+                Workspace ws = mWorkspaces.Find(x => x.Id == cellData.id);
                 if (ws != null)
                 {
                     int index = mWorkspaces.IndexOf(ws);
@@ -681,12 +694,12 @@ namespace KingsleyPhD
 
         private void WorkspaceClose(Workspace workspace)
         {
-            Workspace ws = mWorkspaces.Find(x => x.CellId == workspace.CellId);
+            Workspace ws = mWorkspaces.Find(x => x.Id == workspace.Id);
             if (ws != null)
             {
                 if (mTimelineJSON != null)
                 {
-                    mTimelineJSON.UpdateSlot(ws.CellId, ws.SceneRoot.localRotation.eulerAngles, ws.SceneRoot.localScale.x, ws.SceneFlowManager.SimTime);
+                    mTimelineJSON.UpdateSlot(ws.Id, ws.Scene.transform.localRotation.eulerAngles, ws.Scene.transform.localScale.x, ws.SceneFlowManager.SimTime);
                 }
 
                 if (mDesignWorkspace != null)

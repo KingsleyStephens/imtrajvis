@@ -19,7 +19,6 @@ namespace KingsleyPhD
         private bool isDragging = false;
         private Vector3 lastMousePosition;
         private Quaternion targetRotation;
-        private Transform targetTransform;
         private float currentZoomDistance = 1.0f;
 
         private SphereCollider sphereCollider;
@@ -27,10 +26,19 @@ namespace KingsleyPhD
 
         public float ZoomDistance { set {  currentZoomDistance = value; } }
 
+        public void Set(Vector3 rotation, float zoom)
+        {
+            targetRotation = Quaternion.Euler(rotation);
+            ApplyRotation(targetRotation);
+
+            currentZoomDistance = zoom;
+            ApplyZoom(currentZoomDistance);
+        }
+
+
         void Start()
         {
-            targetTransform = transform;
-            targetRotation = targetTransform.rotation;
+            targetRotation = transform.rotation;
             currentZoomDistance = transform.localScale.x;
             sphereCollider = GetComponent<SphereCollider>();
 
@@ -88,7 +96,7 @@ namespace KingsleyPhD
             }
 
             // Smooth rotation interpolation
-            targetTransform.rotation = Quaternion.Slerp(targetTransform.rotation, targetRotation, Time.deltaTime * damping);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * damping);
         }
 
         void HandleZoom()
@@ -106,8 +114,18 @@ namespace KingsleyPhD
                 //Vector3 direction = (targetCamera.transform.position - targetTransform.position).normalized;
                 //targetCamera.transform.position = targetTransform.position + direction * currentZoomDistance;
 
-                targetTransform.localScale = new Vector3(currentZoomDistance, currentZoomDistance, currentZoomDistance);
+                ApplyZoom(currentZoomDistance);
             }
+        }
+
+        private void ApplyZoom(float zoom)
+        {
+            transform.localScale = new Vector3(zoom, zoom, zoom);
+        }
+
+        private void ApplyRotation(Quaternion rotation)
+        {
+            transform.rotation = rotation;
         }
     }
 
