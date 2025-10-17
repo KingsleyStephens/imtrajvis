@@ -6,6 +6,8 @@ namespace KingsleyPhD
     [RequireComponent(typeof(SphereCollider))]
     public class TrackballControl : MonoBehaviour
     {
+        public UIMouseEvents inputEvents;
+
         [Header("Rotation Settings")]
         public float rotationSpeed = 200.0f;
         public float damping = 5.0f;
@@ -50,71 +52,80 @@ namespace KingsleyPhD
 
         void Update()
         {
-            Ray ray = targetCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
+            if (inputEvents != null)
             {
-                colliderHover = (hit.collider == sphereCollider);
-            }
-            else
-            {
-                colliderHover = false;
-            }
+                Ray ray = inputEvents.GetRay();
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit))
+                {
+                    colliderHover = (hit.collider == sphereCollider);
+                }
+                else
+                {
+                    colliderHover = false;
+                }
 
-            HandleRotation();
-            HandleZoom();
+                HandleRotation();
+                HandleZoom();
+            }
         }
 
         void HandleRotation()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (inputEvents != null)
             {
-                if (colliderHover)
+                if (inputEvents.GetSelectDown())
                 {
-                    isDragging = true;
-                    lastMousePosition = Input.mousePosition;
+                    if (colliderHover)
+                    {
+                        isDragging = true;
+                        lastMousePosition = Input.mousePosition;
+                    }
                 }
-            } 
-            else if (Input.GetMouseButtonUp(0))
-            {
-                isDragging = false;
+                else if (inputEvents.GetSelectDown())
+                {
+                    isDragging = false;
+                }
+
+                if (isDragging)
+                {
+                    Vector3 delta = Input.mousePosition - lastMousePosition;
+                    lastMousePosition = Input.mousePosition;
+
+                    // Calculate rotation based on mouse movement
+                    float rotX = delta.y * rotationSpeed * Time.deltaTime;
+                    float rotY = -delta.x * rotationSpeed * Time.deltaTime;
+
+                    Quaternion xQuat = Quaternion.AngleAxis(rotX, targetCamera.transform.right);
+                    Quaternion yQuat = Quaternion.AngleAxis(rotY, Vector3.up);
+
+                    targetRotation = yQuat * xQuat * targetRotation;
+                }
+
+                // Smooth rotation interpolation
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * damping);
             }
-
-            if (isDragging)
-            {
-                Vector3 delta = Input.mousePosition - lastMousePosition;
-                lastMousePosition = Input.mousePosition;
-
-                // Calculate rotation based on mouse movement
-                float rotX = delta.y * rotationSpeed * Time.deltaTime;
-                float rotY = -delta.x * rotationSpeed * Time.deltaTime;
-
-                Quaternion xQuat = Quaternion.AngleAxis(rotX, targetCamera.transform.right);
-                Quaternion yQuat = Quaternion.AngleAxis(rotY, Vector3.up);
-
-                targetRotation = yQuat * xQuat * targetRotation;
-            }
-
-            // Smooth rotation interpolation
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * damping);
         }
 
         void HandleZoom()
         {
-            if (colliderHover)
-            {
-                float scroll = Input.GetAxis("Mouse ScrollWheel");
-                if (Mathf.Abs(scroll) > 0.0001f)
+            if (inputEvents != null)
+            { 
+                if (colliderHover)
                 {
-                    currentZoomDistance -= scroll * zoomSpeed;
-                    currentZoomDistance = Mathf.Clamp(currentZoomDistance, minZoomDistance, maxZoomDistance);
+                    float scroll = inputEvents.GetScroll();
+                    if (Mathf.Abs(scroll) > 0.01f)
+                    {
+                        currentZoomDistance -= scroll * zoomSpeed;
+                        currentZoomDistance = Mathf.Clamp(currentZoomDistance, minZoomDistance, maxZoomDistance);
+                    }
+
+                    // Move camera along its forward axis to zoom
+                    //Vector3 direction = (targetCamera.transform.position - targetTransform.position).normalized;
+                    //targetCamera.transform.position = targetTransform.position + direction * currentZoomDistance;
+
+                    ApplyZoom(currentZoomDistance);
                 }
-
-                // Move camera along its forward axis to zoom
-                //Vector3 direction = (targetCamera.transform.position - targetTransform.position).normalized;
-                //targetCamera.transform.position = targetTransform.position + direction * currentZoomDistance;
-
-                ApplyZoom(currentZoomDistance);
             }
         }
 

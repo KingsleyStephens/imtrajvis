@@ -21,6 +21,8 @@ namespace KingsleyPhD
     public class TimelineJSON
     {
         public TimelineSlot[] slots;
+        public string datasetName;
+        public int sessionValue;
 
         private string mFileName;
 
@@ -104,6 +106,14 @@ namespace KingsleyPhD
             {
                 Debug.LogError("Failed to save JSON: " + ex.Message);
             }
+        }
+
+        public void UpdateSession(string dataset, int session)
+        {
+            datasetName = dataset;
+            sessionValue = session;
+
+            Save();
         }
     }
 

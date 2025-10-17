@@ -463,10 +463,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scenePrefab: {fileID: 1139305900334574516, guid: f1c1600ea0975e143b4112989f1708da,
     type: 3}
-  fog: 1
+  fog: 0
   fogColour: {r: 1, g: 1, b: 1, a: 1}
   fogDensity: 0.001
   skyboxMaterial: {fileID: 0}
+  instance: {fileID: 0}
 --- !u!114 &7018252799458278969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,6 +493,7 @@ MonoBehaviour:
     ghostingDropValue: 20
     overrideGhostColour: 0
     ghostColour: {r: 1, g: 1, b: 1, a: 1}
+    objectScale: {x: 1, y: 1, z: 1}
   objectPrefab: {fileID: 5326158167213279261, guid: 1ab958ddd09ab4a43a00f6d3f23f2ecb,
     type: 3}
   meshPrefab: {fileID: 5326158167213279261, guid: 66b841103770e25488cc5e83bdd1a1fb,
@@ -704,6 +706,7 @@ MonoBehaviour:
   fogColour: {r: 0, g: 0, b: 0, a: 1}
   fogDensity: 0.01
   skyboxMaterial: {fileID: 0}
+  instance: {fileID: 0}
 --- !u!114 &4978569099441209170
 MonoBehaviour:
   m_ObjectHideFlags: 0

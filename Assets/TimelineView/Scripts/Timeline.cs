@@ -56,7 +56,8 @@ namespace KingsleyPhD
         private TMP_Dropdown sessionDropdown;
         [SerializeField]
         private SnapshotCamera snapshotCamera;
-
+        [SerializeField]
+        private UIMouseEvents inputEvents;
 
         // PRIVATE DATA
 
@@ -78,6 +79,8 @@ namespace KingsleyPhD
         private Workspace mDesignWorkspace;
 
         private Vector3 mStartPos = Vector3.zero;
+
+        private bool mLockLoadConfig = false;
 
         // PUBLIC
 
@@ -224,7 +227,8 @@ namespace KingsleyPhD
                 if (Datasets.Length > 0)
                 {
                     Dataset = Datasets[value];
-
+                    
+                    UpdateSessionsDropdown();
                     SelectSession = 0;
                 }
             }
@@ -234,18 +238,18 @@ namespace KingsleyPhD
         {
             set
             {
-                if (Sessions.Length >= 3)
+                if (value == 0) // all
                 {
-                    // Session = Sessions[value];
-                    // TEMP
-                    Session = new string[3] { Sessions[0], Sessions[1], Sessions[2] };
-
-                    Reset();
+                    Session = Sessions;
                 }
                 else
                 {
-                    Reset();
+                    Session = new string[1] { Sessions[value - 1] };
                 }
+
+                mTimelineJSON?.UpdateSession(Dataset, value);
+
+                Reset();
             }
         }
 
@@ -422,6 +426,13 @@ namespace KingsleyPhD
 
         private void LoadConfig()
         {
+            if (mLockLoadConfig)
+            {
+                return;
+            }
+
+            mLockLoadConfig = true;
+
             if (mModel != null)
             {
                 mModel.Reset();
@@ -437,6 +448,10 @@ namespace KingsleyPhD
 
                         mModel.AddCell(slot.id, TimelineModel.Cell.CellType.Button, "", false, imageFile);
                     }
+
+                    int index = new List<string>(Datasets).IndexOf(mTimelineJSON.datasetName);
+                    datasetDropdown.value = index;
+                    sessionDropdown.value = mTimelineJSON.sessionValue;
                 }
                 else
                 {
@@ -449,6 +464,8 @@ namespace KingsleyPhD
             {
                 mController.Dirty = true;
             }
+
+            mLockLoadConfig = false;
         }
 
         private void CellNew(string id)
@@ -497,25 +514,31 @@ namespace KingsleyPhD
                 List<string> ds = new List<string>(Datasets);
                 datasetDropdown.AddOptions(ds);
 
-                if (ds.Count > 0)
-                {
-                    Dataset = ds[ds.Count - 1];
-                    datasetDropdown.value = ds.Count - 1;
-                }
+                //if (ds.Count > 0)
+                //{
+                //    Dataset = ds[0];
+                //    datasetDropdown.value = 0;
+                //}
             }
 
+            UpdateSessionsDropdown();
+        }
+
+        private void UpdateSessionsDropdown()
+        {
             if (sessionDropdown != null)
             {
                 sessionDropdown.ClearOptions();
+                sessionDropdown.AddOptions(new List<string>() { "All" });
 
                 List<string> ds = new List<string>(Sessions);
                 sessionDropdown.AddOptions(ds);
 
-                if (ds.Count > 0)
-                {
-                    Session = new string[1] { ds[ds.Count - 1] };
-                    sessionDropdown.value = ds.Count - 1;
-                }
+                //if (ds.Count > 0)
+                //{
+                //    Session = Sessions.ToArray();   // Default to all
+                //    sessionDropdown.value = 0;
+                //}
             }
         }
 
@@ -581,6 +604,8 @@ namespace KingsleyPhD
                             workspace.OnDesignMenu += OnDesignMenu;
 
                             workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "simulation" ? underwaterPrefab : scenePrefab);
+
+                            workspace.Scene.transform.GetComponent<TrackballControl>().inputEvents = inputEvents;
 
                             if (mTimelineJSON != null)
                             {

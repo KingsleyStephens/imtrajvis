@@ -8,6 +8,11 @@ namespace KingsleyPhD
 {
     public class UIMouseEvents : MonoBehaviour
     {
+        [SerializeField]
+        private bool isVR = false;
+        [SerializeField]
+        private Transform rightController;
+
         private Button mCurrCloseButton;
         private CellView mCurrentlySelectedCellView;
         private Toggle mCurrToggleButton;
@@ -32,7 +37,7 @@ namespace KingsleyPhD
             MouseRaycast();
             MouseClick();
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if ((isVR && OVRInput.GetDown(OVRInput.Button.Start)) || (!isVR && Input.GetKeyDown(KeyCode.Escape)))
             {
                 OnEsc?.Invoke();
             }
@@ -56,7 +61,7 @@ namespace KingsleyPhD
 
         private void MouseClick()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (GetSelectDown())
             {
                 if (mCurrCloseButton != null)
                 {
@@ -80,7 +85,7 @@ namespace KingsleyPhD
                 }
             }
 
-            if (Input.GetMouseButtonUp(0))
+            if (GetSelectUp())
             {
                 if (mCurrCloseButton != null)
                 {
@@ -93,9 +98,29 @@ namespace KingsleyPhD
             }
         }
 
+        public bool GetSelectDown()
+        {
+            return (isVR && OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger)) || (!isVR && Input.GetMouseButtonDown(0));
+        }
+
+        public bool GetSelectUp()
+        {
+            return (isVR && OVRInput.GetUp(OVRInput.Button.SecondaryIndexTrigger)) || (!isVR && Input.GetMouseButtonUp(0));
+        }
+
+        public Ray GetRay()
+        {
+            return (isVR) ? new Ray(rightController.position, rightController.forward) : Camera.main.ScreenPointToRay(Input.mousePosition);
+        }
+
+        public float GetScroll()
+        {
+            return (isVR) ? OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y * 0.5f : Input.GetAxis("Mouse ScrollWheel");
+        }
+
         private void MouseRaycast()
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = GetRay();
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 100.0f, 1 << LayerMask.NameToLayer("UI")))
             {
