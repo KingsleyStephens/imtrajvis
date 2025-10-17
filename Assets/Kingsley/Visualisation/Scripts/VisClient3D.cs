@@ -176,7 +176,7 @@ namespace KVisualisation
 
                             if (updateDensity && !IsFiltered(id))
                             {
-                                densityMap3D.UpdatePosition(obj.transform.localPosition);
+                                densityMap3D.UpdatePosition(obj.transform.position);
                             }
 
                             if (movingObjectSettings.trail)

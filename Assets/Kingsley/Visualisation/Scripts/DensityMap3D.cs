@@ -15,8 +15,8 @@ namespace KVisualisation
 
         private Dictionary<int, Dictionary<int, Dictionary<int, GameObject>>> cubes = new Dictionary<int, Dictionary<int, Dictionary<int, GameObject>>>();
 
-        private int nextCubeId = 0;
-        private Dictionary<int, GameObject> cubeLookup = new Dictionary<int, GameObject>();
+        //private int nextCubeId = 0;
+        //private Dictionary<int, GameObject> cubeLookup = new Dictionary<int, GameObject>();
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -29,31 +29,39 @@ namespace KVisualisation
 
         }
 
+        /**
+         * Update an agent's position
+         * 
+         * @param position Position of the agent in world space
+         */
         public void UpdatePosition(Vector3 position)
         {
             float halfWidth = widthDistance * 0.5f;
+            
+            float scaledHalfWidth = halfWidth * transform.localScale.x;
+            float scaledCubeSize = cubeSize * transform.localScale.x;
 
             int x = -1, y = -1, z = -1;
 
-            if (position.x > transform.localPosition.x - halfWidth && position.x < transform.localPosition.x + halfWidth)
+            if (position.x > transform.localPosition.x - scaledHalfWidth && position.x < transform.localPosition.x + scaledHalfWidth)
             {
-                float xRelative = position.x - (transform.localPosition.x - halfWidth);
+                float xRelative = position.x - (transform.localPosition.x - scaledHalfWidth);
 
-                x = (int)(xRelative / cubeSize);
+                x = (int)(xRelative / scaledCubeSize);
             }
 
-            if (position.y > transform.localPosition.y - halfWidth && position.y < transform.localPosition.y + halfWidth)
+            if (position.y > transform.localPosition.y - scaledHalfWidth && position.y < transform.localPosition.y + scaledHalfWidth)
             {
-                float yRelative = position.y - (transform.localPosition.y - halfWidth);
+                float yRelative = position.y - (transform.localPosition.y - scaledHalfWidth);
 
-                y = (int)(yRelative / cubeSize);
+                y = (int)(yRelative / scaledCubeSize);
             }
 
-            if (position.z > transform.localPosition.z - halfWidth && position.z < transform.localPosition.z + halfWidth)
+            if (position.z > transform.localPosition.z - scaledHalfWidth && position.z < transform.localPosition.z + scaledHalfWidth)
             {
-                float zRelative = position.z - (transform.localPosition.z - halfWidth);
+                float zRelative = position.z - (transform.localPosition.z - scaledHalfWidth);
 
-                z = (int)(zRelative / cubeSize);
+                z = (int)(zRelative / scaledCubeSize);
             }
 
             if (!cubes.ContainsKey(x))

@@ -187,6 +187,7 @@ public class SceneFlowManager : MonoBehaviour
                                                             Debug.Log("Setting objectscale to room scale mCurrentClient " + mCurrentClient.ToString());
 
                                                             clientConfigs[mCurrentClient].objectScale = new Vector3(0.01f, 0.01f, 0.01f);
+                                                            clientConfigs[mCurrentClient].densityUpdateFrequence = 0.2f;
                                                         }
                                                         break;
                                                     }
@@ -199,6 +200,7 @@ public class SceneFlowManager : MonoBehaviour
                                                             Debug.Log("Setting objectscale to world scale mCurrentClient " + mCurrentClient.ToString());
 
                                                             clientConfigs[mCurrentClient].objectScale = Vector3.one;
+                                                            clientConfigs[mCurrentClient].densityUpdateFrequence = 2.0f;
                                                         }
                                                         break;
                                                     }
