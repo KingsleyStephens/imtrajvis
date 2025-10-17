@@ -59,14 +59,14 @@ public class SceneFlowManager : MonoBehaviour
     private float lastPositionCheckTime = 0.0f;
 
 
-    [SerializeField]
-    private Vector3 roomScale = new Vector3(0.01f, 0.01f, 0.01f);
+    //[SerializeField]
+    //private Vector3 roomScale = new Vector3(0.01f, 0.01f, 0.01f);
 
-    [SerializeField]
-    private Vector3 worldScale = new Vector3(1.0f, 1.0f, 1.0f);
+    //[SerializeField]
+    //private Vector3 worldScale = new Vector3(1.0f, 1.0f, 1.0f);
 
 
-    public Vector3 FullScale { get { return (mFullScale) ? worldScale : roomScale; } }
+    //public Vector3 FullScale { get { return (mFullScale) ? worldScale : roomScale; } }
 
     private bool mFullScale = false;
 
@@ -159,14 +159,8 @@ public class SceneFlowManager : MonoBehaviour
     public bool IncreaseTime { get; set; } = false;
     public bool DecreaseTime { get; set; } = false;
 
-    public void ConfigDesignSpace(KingsleyPhD.DesignInstanceJSON designSpace)
+    public void ConfigDesignSpace(KingsleyPhD.DesignInstanceJSON designSpace, float scale)
     {
-        //        public bool Mesh { get { return clientConfigs[mCurrentClient].mesh; } set { clientConfigs[mCurrentClient].mesh = value; ApplyCurrentConfig(); } }
-        //public bool Trails { get { return clientConfigs[mCurrentClient].trail; } set { clientConfigs[mCurrentClient].trail = value; ApplyCurrentConfig(); } }
-        //public bool Ghosting { get { return clientConfigs[mCurrentClient].ghosting; } set { clientConfigs[mCurrentClient].ghosting = value; ApplyCurrentConfig(); } }
-        //public bool Density { get { return clientConfigs[mCurrentClient].density; } set { clientConfigs[mCurrentClient].density = value; ApplyCurrentConfig(); } }
-        //public int TimeType { get { return (int)clientConfigs[mCurrentClient].timeType; } set { clientConfigs[mCurrentClient].timeType = (VisClient.MovingObjectSettings.TimeType)value; ApplyCurrentConfig(); } }
-
         foreach (var cat in designSpace.categories)
         {
             switch (cat.name)
@@ -188,14 +182,24 @@ public class SceneFlowManager : MonoBehaviour
                                                     {
                                                         mFullScale = !dim.choices[index];
 
-                                                        clientConfigs[mCurrentClient].objectScale = FullScale;
+                                                        if (!mFullScale)
+                                                        {
+                                                            Debug.Log("Setting objectscale to room scale mCurrentClient " + mCurrentClient.ToString());
+
+                                                            clientConfigs[mCurrentClient].objectScale = new Vector3(0.01f, 0.01f, 0.01f);
+                                                        }
                                                         break;
                                                     }
                                                 case "World Scale":
                                                     {
                                                         mFullScale = dim.choices[index];
 
-                                                        clientConfigs[mCurrentClient].objectScale = FullScale;
+                                                        if (mFullScale)
+                                                        {
+                                                            Debug.Log("Setting objectscale to world scale mCurrentClient " + mCurrentClient.ToString());
+
+                                                            clientConfigs[mCurrentClient].objectScale = Vector3.one;
+                                                        }
                                                         break;
                                                     }
                                             }
@@ -316,7 +320,7 @@ public class SceneFlowManager : MonoBehaviour
             }
         }
 
-
+        ApplyCurrentConfig();
     }
 
     private void ApplyViewConfig(ViewConfigType config)

@@ -64,6 +64,7 @@ namespace KVisualisation
                 ghostingDropValue= other.ghostingDropValue;
                 overrideGhostColour = other.overrideGhostColour;
                 ghostColour = other.ghostColour;
+                objectScale = other.objectScale;
             }
         }
 
@@ -91,9 +92,13 @@ namespace KVisualisation
 
         public void ApplySettings(int id, MovingObjectSettings settings)
         {
+            Debug.Log("ApplySettings settings: " + settings.objectScale.ToString());
+
             mId = id;
             movingObjectSettings = new MovingObjectSettings(settings);
-                
+
+            Debug.Log("ApplySettings: " + movingObjectSettings.objectScale.ToString());
+
             OnSettingsUpdate();
         }
 

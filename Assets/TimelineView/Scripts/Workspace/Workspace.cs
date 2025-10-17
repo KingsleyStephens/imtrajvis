@@ -134,13 +134,6 @@ namespace KingsleyPhD
         {
             OnDesignMenu?.Invoke(this);
 
-            StartCoroutine(DelayResize());
-        }
-
-        private IEnumerator DelayResize()
-        {
-            yield return new WaitForEndOfFrame();
-
             scene?.Resize();
         }
 

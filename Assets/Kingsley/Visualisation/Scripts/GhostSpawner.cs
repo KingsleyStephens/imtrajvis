@@ -31,9 +31,9 @@ namespace KVisualisation
         {
             if (ghostingDropType == VisClient.MovingObjectSettings.GhostingDrop.Distance)
             {
-                if (Vector3.Distance(transform.parent.localPosition, lastPosition) > ghostingValue)
+                if (Vector3.Distance(transform.parent.localPosition, lastPosition) > ghostingValue * transform.parent.localScale.x)
                 {
-                    Spawn(transform.parent.localPosition, transform.parent.localRotation, transform.parent.localScale, time, duration);
+                    Spawn(transform.parent.position, transform.parent.rotation, transform.parent.localScale, time, duration);
                     lastPosition = transform.parent.localPosition;
                 }
             }
@@ -41,7 +41,7 @@ namespace KVisualisation
             {
                 if (time - lastTime > ghostingValue)
                 {
-                    Spawn(transform.parent.localPosition, transform.parent.localRotation, transform.parent.localScale, time, duration);
+                    Spawn(transform.parent.position, transform.parent.rotation, transform.parent.localScale, time, duration);
                     lastTime = time;
                 }
             }
@@ -61,9 +61,9 @@ namespace KVisualisation
 
         public void Spawn(Vector3 pos, Quaternion rot, Vector3 scale, float time, float destructTime)
         {
-            GameObject ghostObj = Instantiate(ghostPrefab, ghostParent);
-            ghostObj.transform.localPosition = pos;
-            ghostObj.transform.localRotation  = rot;
+            GameObject ghostObj = Instantiate(ghostPrefab, ghostParent, true);
+            ghostObj.transform.position = pos;
+            ghostObj.transform.rotation  = rot;
             ghostObj.transform.localScale = scale;
 
             if (destructTime >= 0.0f)
@@ -72,7 +72,7 @@ namespace KVisualisation
                 destruct.duration = destructTime;
             }
 
-            MeshRenderer meshRenderer = ghostObj.GetComponent<MeshRenderer>();
+            MeshRenderer meshRenderer = ghostObj.GetComponentInChildren<MeshRenderer>();
             if (meshRenderer != null)
             {
                 var m = meshRenderer.material;

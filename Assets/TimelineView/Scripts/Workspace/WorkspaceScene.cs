@@ -53,6 +53,7 @@ namespace KingsleyPhD
                 {
                     mSceneFlowManager.Launch(vis, dataset, sessions, scenePrefab);
                     mSceneFlowManager.SimTime = 0.0f;
+                    Pause = true;
                 }
             }
         }
@@ -81,7 +82,7 @@ namespace KingsleyPhD
         {
             if (mSceneFlowManager != null)
             {
-                mSceneFlowManager.ConfigDesignSpace(designInstance);
+                mSceneFlowManager.ConfigDesignSpace(designInstance, vis.localScale.x);
             }
         }
 
@@ -92,7 +93,7 @@ namespace KingsleyPhD
                 SphereCollider sphereCollider = vis.parent.GetComponent<SphereCollider>();
                 if (sphereCollider != null)
                 {
-                    float r = sphereCollider.radius;
+                    float r = sphereCollider.radius * 2.0f;
 
                     SceneTag sceneTag = vis.GetComponentInChildren<SceneTag>();
                     if (sceneTag != null)
@@ -100,10 +101,7 @@ namespace KingsleyPhD
                         BoxCollider sceneCollider = sceneTag.gameObject.GetComponent<BoxCollider>();
                         if (sceneCollider != null)
                         {
-                            float halfWidth = sceneCollider.bounds.max.magnitude;
-                            
-                            Debug.Log(halfWidth);
-
+                            float halfWidth = sceneCollider.size.magnitude;
                             halfWidth *= sceneCollider.transform.localScale.x;
                             float ratio = r / halfWidth;
                             vis.localScale = new Vector3(ratio, ratio, ratio);

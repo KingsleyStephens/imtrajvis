@@ -685,7 +685,6 @@ namespace KVisualisation
                     if (movingObjectSettings.mesh)
                     {
                         GameObject meshObject = Instantiate(meshPrefab, movingObject.transform);
-                        meshObject.transform.localScale = movingObjectSettings.objectScale;
 
                         MeshRenderer meshRenderer = meshObject.GetComponent<MeshRenderer>();
                         if (meshRenderer != null)
@@ -712,7 +711,7 @@ namespace KVisualisation
                                     m.SetColor("_BaseColor", c);
                                     lineRenderer.material = m;
 
-                                    lineRenderer.widthMultiplier = transform.lossyScale.x * movingObjectSettings.objectScale.x / 100.0f;
+                                    lineRenderer.widthMultiplier = transform.lossyScale.x * movingObjectSettings.objectScale.x;
 
                                     lineRenderer.positionCount = path.Length;
                                     lineRenderer.SetPositions(path.Select((a) => a.position).ToArray());
@@ -742,7 +741,7 @@ namespace KVisualisation
                                     m.SetColor("_BaseColor", c);
                                     trailRenderer.material = m;
 
-                                    trailRenderer.widthMultiplier = transform.lossyScale.x * movingObjectSettings.objectScale.x / 100.0f;
+                                    trailRenderer.widthMultiplier = transform.lossyScale.x * movingObjectSettings.objectScale.x;
                                 }
                             }
 
