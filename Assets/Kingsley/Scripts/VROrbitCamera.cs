@@ -14,7 +14,10 @@ namespace Oculus.Interaction.Locomotion
         [SerializeField]
         private CharacterController _characterController;
 
-        
+        [SerializeField]
+        private Transform pivotParent;
+
+
         [Header("VR Player")]
         /// <summary>
         /// Root of the actual VR player so it
@@ -336,6 +339,8 @@ namespace Oculus.Interaction.Locomotion
             this.AssertField(_playerEyes, nameof(_playerEyes));
 
             this.EndStart(ref _started);
+
+            ParentPivotPos(Vector3.zero, pivotParent);
         }
 
         protected virtual void OnEnable()

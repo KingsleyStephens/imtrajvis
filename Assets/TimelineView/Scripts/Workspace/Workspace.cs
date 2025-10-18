@@ -51,11 +51,11 @@ namespace KingsleyPhD
         /**
          * Initialise
          */
-        public void Create(string id, DesignInstanceJSON designInstance, string dataset, string[] sessions, GameObject scenePrefab)
+        public void Create(string id, DesignInstanceJSON designInstance, string dataset, string[] sessions, GameObject scenePrefab, Camera mainCamera)
         {
             Id = id;
 
-            ui?.Init(designInstance);
+            ui?.Init(designInstance, mainCamera);
             scene?.Init(dataset, sessions, scenePrefab);
 
             OnDesignSpaceChange();

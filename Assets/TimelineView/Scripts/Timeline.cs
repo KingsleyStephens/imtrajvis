@@ -25,6 +25,8 @@ namespace KingsleyPhD
         [SerializeField]
         private VRCameraSwitcher cameraSwitcher;
         [SerializeField]
+        private Camera mainCamera;
+        [SerializeField]
         private GameObject workspacePrototype;
         [SerializeField]
         private Transform[] workspaceRoots;
@@ -622,7 +624,7 @@ namespace KingsleyPhD
                             workspace.OnGoFPV += Grow;
                             workspace.OnDesignMenu += OnDesignMenu;
 
-                            workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "simulation" ? underwaterPrefab : scenePrefab);
+                            workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "simulation" ? underwaterPrefab : scenePrefab, mainCamera);
 
                             workspace.Scene.transform.GetComponent<TrackballControl>().inputEvents = inputEvents;
 

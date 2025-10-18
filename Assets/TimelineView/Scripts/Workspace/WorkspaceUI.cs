@@ -126,7 +126,7 @@ namespace KingsleyPhD
             }
         }
 
-        public void Init(DesignInstanceJSON designInstance)
+        public void Init(DesignInstanceJSON designInstance, Camera mainCamera)
         {
             mDesignSpaceInstance = designInstance;
             if (designSpace != null)
@@ -136,6 +136,15 @@ namespace KingsleyPhD
 
             mIsStaticTime = !mDesignSpaceInstance.Query("Space/Time", "Time", "+ 1D animation");
             DoTimeChange(mIsStaticTime);
+
+            if (timeSlider != null)
+            {
+                Canvas c = timeSlider.GetComponent<Canvas>();
+                if (c != null)
+                {
+                    c.worldCamera = mainCamera;
+                }
+            }
         }
 
         public void Register(ButtonDelegate onClose, ToggleButtonDelegate onMenu, ToggleButtonDelegate onFPV, ToggleButtonDelegate onTimePlay, ToggleButtonDelegate onStaticTimeChange, ButtonDelegate onDesignSpaceChange, SliderDelegate onTimeChange)

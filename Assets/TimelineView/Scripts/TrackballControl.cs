@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace KingsleyPhD
 {
@@ -19,12 +20,13 @@ namespace KingsleyPhD
         public float maxZoomDistance = 2.0f;
 
         private bool isDragging = false;
-        private Vector3 lastMousePosition;
         private Quaternion targetRotation;
         private float currentZoomDistance = 1.0f;
 
         private SphereCollider sphereCollider;
         private bool colliderHover = false;
+        private Vector3 mCurrControlPos = Vector3.zero;
+        private Vector3 mLastControlPos = Vector3.zero;
 
         public float ZoomDistance { set {  currentZoomDistance = value; } }
 
@@ -56,9 +58,11 @@ namespace KingsleyPhD
             {
                 Ray ray = inputEvents.GetRay();
                 RaycastHit hit;
-                if (Physics.Raycast(ray, out hit))
+                if (Physics.Raycast(ray, out hit, 100.0f, 1 << gameObject.layer))
                 {
                     colliderHover = (hit.collider == sphereCollider);
+
+                    mCurrControlPos = ray.origin;
                 }
                 else
                 {
@@ -79,24 +83,26 @@ namespace KingsleyPhD
                     if (colliderHover)
                     {
                         isDragging = true;
-                        lastMousePosition = Input.mousePosition;
+                        mLastControlPos = mCurrControlPos;
                     }
                 }
-                else if (inputEvents.GetSelectDown())
+                else if (inputEvents.GetSelectUp())
                 {
                     isDragging = false;
                 }
 
                 if (isDragging)
                 {
-                    Vector3 delta = Input.mousePosition - lastMousePosition;
-                    lastMousePosition = Input.mousePosition;
+                    Vector3 delta = (mCurrControlPos - mLastControlPos);
+                    mLastControlPos = mCurrControlPos;
 
-                    // Calculate rotation based on mouse movement
-                    float rotX = delta.y * rotationSpeed * Time.deltaTime;
+                    // Calculate rotation based on movement
+                    float rotX = -delta.y * rotationSpeed * Time.deltaTime;
                     float rotY = -delta.x * rotationSpeed * Time.deltaTime;
 
-                    Quaternion xQuat = Quaternion.AngleAxis(rotX, targetCamera.transform.right);
+                    Ray ray = inputEvents.GetRay();
+
+                    Quaternion xQuat = Quaternion.AngleAxis(rotX, Vector3.Cross(ray.direction, Vector3.up));
                     Quaternion yQuat = Quaternion.AngleAxis(rotY, Vector3.up);
 
                     targetRotation = yQuat * xQuat * targetRotation;

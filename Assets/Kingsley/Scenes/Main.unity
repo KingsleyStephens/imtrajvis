@@ -1749,7 +1749,7 @@ PrefabInstance:
     - target: {fileID: 6191744978866041550, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0.2
       objectReference: {fileID: 0}
     - target: {fileID: 6191744978866041550, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
@@ -2557,6 +2557,11 @@ PrefabInstance:
       objectReference: {fileID: 887585984}
     - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
         type: 3}
+      propertyPath: mainCamera
+      value: 
+      objectReference: {fileID: 421945463}
+    - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
       propertyPath: inputEvents
       value: 
       objectReference: {fileID: 1194551849}
@@ -3205,9 +3210,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _characterController: {fileID: 1223047554}
+  pivotParent: {fileID: 810952515}
   _playerOrigin: {fileID: 1635954689}
   _playerEyes: {fileID: 421945462}
-  _pivotMarkerPrefab: {fileID: 1315512768075282996, guid: eba7bf4b982542e40bcd088a3a3cc95a,
+  _pivotMarkerPrefab: {fileID: 1315512768075282996, guid: b3ffe69e459c70b46b8777c744918f47,
     type: 3}
   moveSpeed: 10
   orbitDistance: 5
@@ -3381,7 +3387,7 @@ GameObject:
   - component: {fileID: 887585984}
   - component: {fileID: 887585986}
   - component: {fileID: 887585985}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: DesignRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3415,11 +3421,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbf5b4d710b307942affc473c85b11bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputEvents: {fileID: 0}
-  rotationSpeed: 150
+  inputEvents: {fileID: 1194551849}
+  rotationSpeed: 50000
   damping: 10
   targetCamera: {fileID: 0}
-  zoomSpeed: 1
+  zoomSpeed: 0.1
   minZoomDistance: 0.25
   maxZoomDistance: 2
 --- !u!135 &887585986
@@ -5437,6 +5443,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _characterController: {fileID: 1223047554}
+  pivotParent: {fileID: 810952515}
   _playerOrigin: {fileID: 1635954689}
   _playerEyes: {fileID: 421945462}
   _pivotMarkerPrefab: {fileID: 1315512768075282996, guid: eba7bf4b982542e40bcd088a3a3cc95a,
@@ -6080,7 +6087,7 @@ MonoBehaviour:
   _playerEyes: {fileID: 421945462}
   moveSpeed: 2
   rotateSnapAngle: 15
-  verticalSnapSpeed: 1
+  verticalSnapSpeed: 0.25
 --- !u!114 &1696697944
 MonoBehaviour:
   m_ObjectHideFlags: 0

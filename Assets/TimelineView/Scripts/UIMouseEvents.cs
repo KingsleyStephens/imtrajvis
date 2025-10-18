@@ -26,6 +26,8 @@ namespace KingsleyPhD
         public UnityEvent OnViewForward;
         public UnityEvent OnViewBackward;
 
+        private Vector2 mLastDragPosition;
+
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
@@ -49,11 +51,11 @@ namespace KingsleyPhD
             {
                 OnTimeBackward?.Invoke();
             }
-            else if (Input.GetKeyDown(KeyCode.RightBracket))
+            else if (Input.GetKeyDown(KeyCode.RightBracket) || (isVR && OVRInput.GetDown(OVRInput.Button.Three)))
             {
                 OnViewForward?.Invoke();
             }
-            else if (Input.GetKeyDown(KeyCode.LeftBracket))
+            else if (Input.GetKeyDown(KeyCode.LeftBracket) || (isVR && OVRInput.GetDown(OVRInput.Button.Four)))
             {
                 OnViewBackward?.Invoke();
             }
@@ -116,6 +118,16 @@ namespace KingsleyPhD
         public float GetScroll()
         {
             return (isVR) ? OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y * 0.5f : Input.GetAxis("Mouse ScrollWheel");
+        }
+
+        public void BeginDrag()
+        {
+            mLastDragPosition = mCurrControlPos;
+        }
+
+        public Vector2 GetDragDelta()
+        {
+            return mCurrControlPos - mLastDragPosition;
         }
 
         private void MouseRaycast()
