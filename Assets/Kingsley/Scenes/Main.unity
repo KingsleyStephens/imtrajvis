@@ -3614,6 +3614,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _characterController: {fileID: 1223047554}
+  _playerOrigin: {fileID: 1635954689}
+  _playerEyes: {fileID: 421945462}
 --- !u!1 &1074807247
 GameObject:
   m_ObjectHideFlags: 0
