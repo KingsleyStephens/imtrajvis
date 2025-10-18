@@ -1709,37 +1709,117 @@ PrefabInstance:
     - target: {fileID: 992368518653939265, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 992368518653939265, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 992368518653939265, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.8200002
+      objectReference: {fileID: 0}
+    - target: {fileID: 992368518653939265, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9835242
+      objectReference: {fileID: 0}
+    - target: {fileID: 992368518653939265, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.18077667
+      objectReference: {fileID: 0}
+    - target: {fileID: 992368518653939265, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 20.83
       objectReference: {fileID: 0}
     - target: {fileID: 1340951593576733889, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3
+      value: -4.3
       objectReference: {fileID: 0}
     - target: {fileID: 1340951593576733889, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1340951593576733889, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 1340951593576733889, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86746633
+      objectReference: {fileID: 0}
+    - target: {fileID: 1340951593576733889, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1340951593576733889, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.49749598
+      objectReference: {fileID: 0}
+    - target: {fileID: 1340951593576733889, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1340951593576733889, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -59.669
+      objectReference: {fileID: 0}
     - target: {fileID: 5131123325166232009, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3
+      value: -1.5
       objectReference: {fileID: 0}
     - target: {fileID: 5131123325166232009, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5131123325166232009, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.82
+      objectReference: {fileID: 0}
+    - target: {fileID: 5131123325166232009, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9835236
+      objectReference: {fileID: 0}
+    - target: {fileID: 5131123325166232009, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5131123325166232009, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.18077983
+      objectReference: {fileID: 0}
+    - target: {fileID: 5131123325166232009, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5131123325166232009, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -20.83
       objectReference: {fileID: 0}
     - target: {fileID: 6191744978866041550, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6191744978866041550, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
@@ -1749,7 +1829,7 @@ PrefabInstance:
     - target: {fileID: 6191744978866041550, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.2
+      value: -7
       objectReference: {fileID: 0}
     - target: {fileID: 6191744978866041550, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
@@ -1799,12 +1879,32 @@ PrefabInstance:
     - target: {fileID: 8480251761794138137, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3
+      value: 4.3
       objectReference: {fileID: 0}
     - target: {fileID: 8480251761794138137, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8480251761794138137, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 8480251761794138137, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86746603
+      objectReference: {fileID: 0}
+    - target: {fileID: 8480251761794138137, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.4974963
+      objectReference: {fileID: 0}
+    - target: {fileID: 8480251761794138137, guid: d7daf73af6a53934a975b9fb8ea8ea89,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 59.669
       objectReference: {fileID: 0}
     - target: {fileID: 8577904272759389832, guid: d7daf73af6a53934a975b9fb8ea8ea89,
         type: 3}
@@ -4589,6 +4689,66 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f64ec4fe7114244cb71ac83004ba460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnRightThumbClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1443061654}
+        m_TargetAssemblyTypeName: KingsleyPhD.Timeline, TimelineView
+        m_MethodName: TimeToggle
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnRightThumbRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1443061654}
+        m_TargetAssemblyTypeName: KingsleyPhD.Timeline, TimelineView
+        m_MethodName: TimeForward
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnRightThumbLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1443061654}
+        m_TargetAssemblyTypeName: KingsleyPhD.Timeline, TimelineView
+        m_MethodName: TimeBackward
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnRightThumbNeutral:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1443061654}
+        m_TargetAssemblyTypeName: KingsleyPhD.Timeline, TimelineView
+        m_MethodName: TimeControlReset
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   cameraSwitcher: {fileID: 1223047570}
 --- !u!1 &1267879672
 GameObject:
@@ -6510,10 +6670,6 @@ GameObject:
   - component: {fileID: 1914829016}
   - component: {fileID: 1914829029}
   - component: {fileID: 1914829028}
-  - component: {fileID: 1914829027}
-  - component: {fileID: 1914829026}
-  - component: {fileID: 1914829025}
-  - component: {fileID: 1914829024}
   - component: {fileID: 1914829023}
   - component: {fileID: 1914829022}
   - component: {fileID: 1914829021}
@@ -6527,7 +6683,7 @@ GameObject:
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1914829016
 Transform:
   m_ObjectHideFlags: 0
@@ -6559,9 +6715,9 @@ MonoBehaviour:
   _whenActivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SceneFlowManager, ImTrajVis
-        m_MethodName: TimeControlToggle
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: RightThumbClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6605,25 +6761,25 @@ MonoBehaviour:
   _whenActivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SceneFlowManager, ImTrajVis
-        m_MethodName: set_DecreaseTime
-        m_Mode: 6
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: RightThumbLeft
+        m_Mode: 4
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
-          m_FloatArgument: 0
+          m_FloatArgument: 1
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
   _whenDeactivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SceneFlowManager, ImTrajVis
-        m_MethodName: set_DecreaseTime
-        m_Mode: 6
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: RightThumbNeutral
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -6666,25 +6822,25 @@ MonoBehaviour:
   _whenActivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SceneFlowManager, ImTrajVis
-        m_MethodName: set_IncreaseTime
-        m_Mode: 6
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: RightThumbRight
+        m_Mode: 4
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
-          m_FloatArgument: 0
+          m_FloatArgument: 1
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
   _whenDeactivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SceneFlowManager, ImTrajVis
-        m_MethodName: set_IncreaseTime
-        m_Mode: 6
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: RightThumbNeutral
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -6725,98 +6881,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _controller: {fileID: 1334009799}
   _axis: 1
---- !u!114 &1914829024
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1914829015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d2705674196dfc4da9c25fbacda72d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _activeState: {fileID: 1914829025}
-  _whenActivated:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SceneFlowManager, ImTrajVis
-        m_MethodName: MoveToPrevClient
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  _whenDeactivated:
-    m_PersistentCalls:
-      m_Calls: []
-  _emitOnFirstUpdate: 0
---- !u!114 &1914829025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1914829015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad374a43a946e7d4496818c6b194809f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _controller: {fileID: 1914829028}
-  _controllerButtonUsage: 4
---- !u!114 &1914829026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1914829015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d2705674196dfc4da9c25fbacda72d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _activeState: {fileID: 1914829027}
-  _whenActivated:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SceneFlowManager, ImTrajVis
-        m_MethodName: MoveToNextClient
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  _whenDeactivated:
-    m_PersistentCalls:
-      m_Calls: []
-  _emitOnFirstUpdate: 0
---- !u!114 &1914829027
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1914829015}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad374a43a946e7d4496818c6b194809f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _controller: {fileID: 1914829028}
-  _controllerButtonUsage: 1
 --- !u!114 &1914829028
 MonoBehaviour:
   m_ObjectHideFlags: 0

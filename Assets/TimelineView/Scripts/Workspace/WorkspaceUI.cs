@@ -66,7 +66,7 @@ namespace KingsleyPhD
         public bool Pinned { get { return mIsPinned; } }
         public bool StaticTime { get { return mIsStaticTime; } }
         public bool DesignActive { get { return mDesignActive; } }
-        public bool FPVActive { get { return mFPVActive; } set { mFPVActive = value;  } }
+        public bool FPVActive { get { return mFPVActive; } set { mFPVActive = value; OnFPV?.Invoke(mFPVActive); } }
 
 
         public void SetTime(float time) 
@@ -82,8 +82,8 @@ namespace KingsleyPhD
         // PRIVATE
 
         /**
-            * Start
-            */
+         * Start
+         */
         private void Start()
         {
             if (closeButton != null)
@@ -99,9 +99,7 @@ namespace KingsleyPhD
 
             if (fpvButton != null)
             {
-                
-                fpvButton.OnActivateButton += () => mFPVActive = !mFPVActive;
-                fpvButton.OnActivateButton += () => OnFPV?.Invoke(mFPVActive);
+                fpvButton.OnActivateButton += () => FPVActive = !FPVActive;
             }
 
             if (pinToggle != null)

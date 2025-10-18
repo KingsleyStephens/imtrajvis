@@ -86,6 +86,8 @@ namespace KingsleyPhD
 
         private bool mLockLoadConfig = false;
 
+        private bool mSwitchingScene = false;
+
         // PUBLIC
 
         public string WorkspaceRoot { get; set; } = string.Empty;
@@ -304,10 +306,13 @@ namespace KingsleyPhD
             workspace.Scene.Vis.localScale = Vector3.one;
             workspace.Scene.Vis.localRotation = Quaternion.identity;
 
-            UserStart us = workspace.Scene.Vis.GetComponentInChildren<UserStart>();
-            if (us != null && cameraRig != null)
+            if (!mSwitchingScene)
             {
-                cameraRig.transform.position = us.transform.position;
+                UserStart us = workspace.Scene.Vis.GetComponentInChildren<UserStart>();
+                if (us != null && cameraRig != null)
+                {
+                    cameraRig.transform.position = us.transform.position;
+                }
             }
 
             if (cameraSwitcher != null)
@@ -371,14 +376,17 @@ namespace KingsleyPhD
                 mFPVWorkspace.Scene.Vis.localRotation = Quaternion.identity;
                 mFPVWorkspace.Shrink();
 
-                if (cameraRig != null)
+                if (!mSwitchingScene)
                 {
-                    cameraRig.transform.position = mStartPos;
-                }
+                    if (cameraRig != null)
+                    {
+                        cameraRig.transform.position = mStartPos;
+                    }
 
-                if (cameraSwitcher != null)
-                {
-                    cameraSwitcher.ActivateCamera(VRCameraSwitcher.CameraType.Menu, VRCameraSwitcher.CameraCollection.CameraModeType.Static);
+                    if (cameraSwitcher != null)
+                    {
+                        cameraSwitcher.ActivateCamera(VRCameraSwitcher.CameraType.Menu, VRCameraSwitcher.CameraCollection.CameraModeType.Static);
+                    }
                 }
 
                 mFPVWorkspace = null;
@@ -393,23 +401,28 @@ namespace KingsleyPhD
 
         public void TimeForward()
         {
-            if (mFPVWorkspace != null)
+            if (mFPVWorkspace != null && mFPVWorkspace.SceneFlowManager != null)
             {
-                if (mFPVWorkspace.SceneFlowManager != null)
-                {
-                    mFPVWorkspace.SceneFlowManager.TimeIncrease();
-                }
+                mFPVWorkspace.SceneFlowManager.DecreaseTime = false;
+                mFPVWorkspace.SceneFlowManager.IncreaseTime = true;
             }
         }
 
         public void TimeBackward()
         {
-            if (mFPVWorkspace != null)
+            if (mFPVWorkspace != null && mFPVWorkspace.SceneFlowManager != null)
             {
-                if (mFPVWorkspace.SceneFlowManager != null)
-                {
-                    mFPVWorkspace.SceneFlowManager.TimeDecrease();
-                }
+                mFPVWorkspace.SceneFlowManager.DecreaseTime = true;
+                mFPVWorkspace.SceneFlowManager.IncreaseTime = false;
+            }
+        }
+
+        public void TimeControlReset()
+        {
+            if (mFPVWorkspace != null && mFPVWorkspace.SceneFlowManager != null)
+            {
+                mFPVWorkspace.SceneFlowManager.DecreaseTime = false;
+                mFPVWorkspace.SceneFlowManager.IncreaseTime = false;
             }
         }
 
@@ -417,8 +430,8 @@ namespace KingsleyPhD
 
 
         /**
-            * Start
-            */
+         * Start
+         */
         void Start()
         {
             mModel = new TimelineModel();
@@ -565,6 +578,8 @@ namespace KingsleyPhD
 
         /**
          * Update
+         * 
+         * Not active in FPV
          */
         void Update()
         {
@@ -801,15 +816,18 @@ namespace KingsleyPhD
         {
             if (mFPVWorkspace != null)
             {
+                mSwitchingScene = true;
                 int index = mWorkspaces.IndexOf(mFPVWorkspace);
+                Shrink(); // Current
+
                 index++;
                 if (index >= mWorkspaces.Count)
                 {
                     index = 0;
                 }
 
-                Shrink();
-                mWorkspaces[index].ToggleFPV(false);
+                mWorkspaces[index].UI.FPVActive = true;
+                mSwitchingScene = false;
             }
         }
 
@@ -817,15 +835,26 @@ namespace KingsleyPhD
         {
             if (mFPVWorkspace != null)
             {
+                mSwitchingScene = true;
                 int index = mWorkspaces.IndexOf(mFPVWorkspace);
+                Shrink();       // Current
+
                 index--;
                 if (index < 0)
                 {
                     index = mWorkspaces.Count - 1;
                 }
 
-                Shrink();
-                mWorkspaces[index].ToggleFPV(false);
+                mWorkspaces[index].UI.FPVActive = true;
+                mSwitchingScene = false;
+            }
+        }
+
+        public void TimeToggle()
+        {
+            if (mFPVWorkspace != null)
+            {
+                mFPVWorkspace.Scene.SceneFlowManager.TimeControlToggle();
             }
         }
     }

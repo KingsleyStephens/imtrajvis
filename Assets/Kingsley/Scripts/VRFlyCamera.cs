@@ -440,6 +440,37 @@ namespace Oculus.Interaction.Locomotion
             StopVerticalMovement();
         }
 
+        // RIGHT
+        public void RightThumbClick()
+        {
+
+        }
+
+        public void RightThumbUp(float stickValue)
+        {
+
+        }
+
+        public void RightThumbDown(float stickValue)
+        {
+
+        }
+
+        public void RightThumbRight(float stickValue)
+        {
+
+        }
+
+        public void RightThumbLeft(float stickValue)
+        {
+
+        }
+
+        public void RightThumbNeutral()
+        {
+
+        }
+
 
         #region Inject
 

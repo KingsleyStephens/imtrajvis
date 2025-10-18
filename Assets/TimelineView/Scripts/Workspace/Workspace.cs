@@ -39,6 +39,7 @@ namespace KingsleyPhD
         // PUBLIC
 
         public WorkspaceScene Scene { get { return scene; } }
+        public WorkspaceUI UI { get { return ui; } }
         public string Id { get; private set; }
         public bool Pinned { get { return (ui != null) ? ui.Pinned : false; } }
         public bool DesignActive { get { return (ui != null) ? ui.DesignActive : false; } }

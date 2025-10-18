@@ -213,7 +213,7 @@ Transform:
   m_GameObject: {fileID: 5512296212775214703}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.01732, y: 0.29844, z: -0.40079}
+  m_LocalPosition: {x: 0.01732, y: 0.29844, z: -1.589}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -458,7 +458,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _position: {x: 0, y: 0, z: 0}
-  _size: {x: 140, y: 20, z: 0.01}
+  _size: {x: 100, y: 20, z: 0.01}
 --- !u!114 &6704508957129911301
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1022,7 +1022,12 @@ PrefabInstance:
     - target: {fileID: 287478631625234016, guid: e300c083b96128740b941c545669cae8,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 140
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 287478631625234016, guid: e300c083b96128740b941c545669cae8,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 287478631625234016, guid: e300c083b96128740b941c545669cae8,
         type: 3}
@@ -1142,7 +1147,7 @@ PrefabInstance:
     - target: {fileID: 8284129681089228532, guid: e300c083b96128740b941c545669cae8,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 140
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 8284129681089228532, guid: e300c083b96128740b941c545669cae8,
         type: 3}
@@ -1197,7 +1202,7 @@ PrefabInstance:
     - target: {fileID: 8284129681089228532, guid: e300c083b96128740b941c545669cae8,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0.1
+      value: 0.522
       objectReference: {fileID: 0}
     - target: {fileID: 8284129681089228532, guid: e300c083b96128740b941c545669cae8,
         type: 3}
@@ -1284,7 +1289,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 140, y: 20, z: 0.01}
+  m_Size: {x: 100, y: 20, z: 0.01}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &6016516593419791598
 MonoBehaviour:
@@ -1562,7 +1567,7 @@ PrefabInstance:
     - target: {fileID: 3850686294595260339, guid: d291892a90d2cff4c9d11873fc190512,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -1.59
+      value: -0.769
       objectReference: {fileID: 0}
     - target: {fileID: 3850686294595260339, guid: d291892a90d2cff4c9d11873fc190512,
         type: 3}

@@ -51,11 +51,11 @@ namespace KingsleyPhD
             {
                 OnTimeBackward?.Invoke();
             }
-            else if (Input.GetKeyDown(KeyCode.RightBracket) || (isVR && OVRInput.GetDown(OVRInput.Button.Three)))
+            else if (Input.GetKeyDown(KeyCode.RightBracket) || (isVR && OVRInput.GetDown(OVRInput.Button.One)))
             {
                 OnViewForward?.Invoke();
             }
-            else if (Input.GetKeyDown(KeyCode.LeftBracket) || (isVR && OVRInput.GetDown(OVRInput.Button.Four)))
+            else if (Input.GetKeyDown(KeyCode.LeftBracket) || (isVR && OVRInput.GetDown(OVRInput.Button.Two)))
             {
                 OnViewBackward?.Invoke();
             }

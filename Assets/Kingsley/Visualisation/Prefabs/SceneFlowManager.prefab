@@ -59,8 +59,6 @@ MonoBehaviour:
   cameraRig: {fileID: 0}
   mainCamera: {fileID: 0}
   positionCheckPeriod: 0.5
-  roomScale: {x: 0.01, y: 0.01, z: 0.01}
-  worldScale: {x: 1, y: 1, z: 1}
   tableTopInteraction: {fileID: 0}
   roomViewInteraction: {fileID: 0}
   tableTopViewConfig:
@@ -81,7 +79,8 @@ MonoBehaviour:
     scale: {x: 1, y: 1, z: 1}
   - position: {x: 0, y: 0, z: 0}
     scale: {x: 1, y: 1, z: 1}
-  speedChangeDelta: 0.05
+  speedChangeDeltaRoom: 1
+  speedChangeDeltaWorld: 5
 --- !u!1001 &2863837188631524614
 PrefabInstance:
   m_ObjectHideFlags: 0

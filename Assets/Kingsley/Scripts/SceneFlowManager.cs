@@ -160,7 +160,11 @@ public class SceneFlowManager : MonoBehaviour
     public float ScrubTime { set { Controller.Players[mCurrentClient].ScrubTime(value); } }
 
     [SerializeField]
-    private float speedChangeDelta = 0.01f;
+    private float speedChangeDeltaRoom = 0.01f;
+    [SerializeField]
+    private float speedChangeDeltaWorld = 0.05f;
+
+    private float SpeedChangeDelta { get { return (mFullScale) ? speedChangeDeltaWorld : speedChangeDeltaRoom;} }
 
     private bool mTimeSpeedControl = true;
 
@@ -629,16 +633,16 @@ public class SceneFlowManager : MonoBehaviour
 
     public void IncreasePlaybackSpeed()
     {
-        ChangePlaybackSpeed(speedChangeDelta);
+        ChangePlaybackSpeed(SpeedChangeDelta);
     }
     public void DecreasePlaybackSpeed()
     {
-        ChangePlaybackSpeed(-speedChangeDelta);
+        ChangePlaybackSpeed(-SpeedChangeDelta);
     }
 
     public void ChangePlaybackSpeed(float delta)
     {
-        PlaybackSpeed += delta;
+        PlaybackSpeed += delta * Time.deltaTime;
     }
 
 
@@ -652,7 +656,7 @@ public class SceneFlowManager : MonoBehaviour
     }
     public void ChangeSimTime(float delta)
     {
-        SimTime += delta;
+        SimTime += delta * Time.deltaTime;
     }
 
 

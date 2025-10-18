@@ -73,6 +73,43 @@ namespace KVisualisation
         {
             controllerInputs?.LeftSecondaryButtonUp();
         }
+
+        // RIGHT
+
+        public void RightThumbClick()
+        {
+            controllerInputs?.RightThumbClick();
+        }
+
+        public void RightThumbUp(float stickValue)
+        {
+            controllerInputs?.RightThumbUp(stickValue);
+
+        }
+
+        public void RightThumbDown(float stickValue)
+        {
+            controllerInputs?.RightThumbDown(stickValue);
+
+        }
+
+        public void RightThumbRight(float stickValue)
+        {
+            controllerInputs?.RightThumbRight(stickValue);
+
+        }
+
+        public void RightThumbLeft(float stickValue)
+        {
+            controllerInputs?.RightThumbLeft(stickValue);
+
+        }
+
+        public void RightThumbNeutral()
+        {
+            controllerInputs?.RightThumbNeutral();
+
+        }
     }
 
 }
