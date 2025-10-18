@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 1057353730712071898}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.9999962, y: -13, z: -5.9999695}
+  m_LocalPosition: {x: 2.9999962, y: -22, z: -5.9999695}
   m_LocalScale: {x: 100, y: 1, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: dfc08c90188302847afb04f628582097, type: 2}
+  - {fileID: 2100000, guid: 3115a10f99d0ecd46a52db81259e1b6b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -230,12 +230,12 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: b245b868c7a83da4aa4108fe2d3dbe0e, type: 2}
+      objectReference: {fileID: 2100000, guid: 3115a10f99d0ecd46a52db81259e1b6b, type: 2}
     - target: {fileID: 2288299157033020217, guid: 902401020c302374f8e3712854ced7e4,
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: b245b868c7a83da4aa4108fe2d3dbe0e, type: 2}
+      objectReference: {fileID: 2100000, guid: 3115a10f99d0ecd46a52db81259e1b6b, type: 2}
     - target: {fileID: 2467075155990672917, guid: 902401020c302374f8e3712854ced7e4,
         type: 3}
       propertyPath: m_Layer
@@ -360,7 +360,12 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: b245b868c7a83da4aa4108fe2d3dbe0e, type: 2}
+      objectReference: {fileID: 2100000, guid: 3115a10f99d0ecd46a52db81259e1b6b, type: 2}
+    - target: {fileID: 6004818200858800965, guid: 902401020c302374f8e3712854ced7e4,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 3115a10f99d0ecd46a52db81259e1b6b, type: 2}
     - target: {fileID: 6799506037090397307, guid: 902401020c302374f8e3712854ced7e4,
         type: 3}
       propertyPath: m_LocalScale.z
@@ -430,7 +435,7 @@ PrefabInstance:
         type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: b245b868c7a83da4aa4108fe2d3dbe0e, type: 2}
+      objectReference: {fileID: 2100000, guid: 3115a10f99d0ecd46a52db81259e1b6b, type: 2}
     m_RemovedComponents:
     - {fileID: 1405566034890552036, guid: 902401020c302374f8e3712854ced7e4, type: 3}
     - {fileID: 5288859179594504190, guid: 902401020c302374f8e3712854ced7e4, type: 3}
@@ -476,7 +481,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 1000, y: 300, z: 1000}
   m_Center: {x: 0, y: 125, z: 0}
