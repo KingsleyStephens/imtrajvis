@@ -23,6 +23,8 @@ namespace KingsleyPhD
         [SerializeField]
         private GameObject cameraRig;
         [SerializeField]
+        private VRCameraSwitcher cameraSwitcher;
+        [SerializeField]
         private GameObject workspacePrototype;
         [SerializeField]
         private Transform[] workspaceRoots;
@@ -306,6 +308,13 @@ namespace KingsleyPhD
                 cameraRig.transform.position = us.transform.position;
             }
 
+            if (cameraSwitcher != null)
+            {
+                VRCameraSwitcher.CameraType camType = (workspace.SceneFlowManager.FullScale) ? VRCameraSwitcher.CameraType.WorldScale : VRCameraSwitcher.CameraType.RoomScale;
+                VRCameraSwitcher.CameraCollection.CameraModeType camMode = (workspace.SceneFlowManager.FreeFly) ? VRCameraSwitcher.CameraCollection.CameraModeType.FreeFly : VRCameraSwitcher.CameraCollection.CameraModeType.Orbit;
+                cameraSwitcher.ActivateCamera(camType, camMode);
+            }
+
             workspace.Grow();
 
             Hide();
@@ -365,6 +374,11 @@ namespace KingsleyPhD
                     cameraRig.transform.position = mStartPos;
                 }
 
+                if (cameraSwitcher != null)
+                {
+                    cameraSwitcher.ActivateCamera(VRCameraSwitcher.CameraType.Menu, VRCameraSwitcher.CameraCollection.CameraModeType.Static);
+                }
+
                 mFPVWorkspace = null;
             }
 
@@ -421,6 +435,11 @@ namespace KingsleyPhD
             if (cameraRig != null)
             {
                 mStartPos = cameraRig.transform.position;
+            }
+
+            if (cameraSwitcher != null)
+            {
+                cameraSwitcher.ActivateCamera(VRCameraSwitcher.CameraType.Menu, VRCameraSwitcher.CameraCollection.CameraModeType.Static);
             }
         }
 

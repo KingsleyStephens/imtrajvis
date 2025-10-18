@@ -92,13 +92,8 @@ namespace KVisualisation
 
         public void ApplySettings(int id, MovingObjectSettings settings)
         {
-            Debug.Log("ApplySettings settings: " + settings.objectScale.ToString());
-
             mId = id;
             movingObjectSettings = new MovingObjectSettings(settings);
-
-            Debug.Log("ApplySettings: " + movingObjectSettings.objectScale.ToString());
-
             OnSettingsUpdate();
         }
 

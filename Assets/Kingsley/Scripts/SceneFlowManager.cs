@@ -16,11 +16,15 @@ using UnityEngine.UI;
 
 public class SceneFlowManager : MonoBehaviour
 {
+    // ENUMS
+
     public enum RunType
     {
         Record,
         Play
     }
+
+    // GAMEOBJECT FIELDS
 
     [SerializeField]
     private RunType runType = RunType.Play;
@@ -68,11 +72,18 @@ public class SceneFlowManager : MonoBehaviour
 
     //public Vector3 FullScale { get { return (mFullScale) ? worldScale : roomScale; } }
 
+    // PRIVATE DATA
+
     private bool mFullScale = false;
+    private bool mFreeFly = true;
+
+    // PUBLIC PROPERTIES
 
     public VisSimController Controller { get; private set; }
-
     public float SimRelativeTime {  get { return Controller.Players[mCurrentClient].GetSimTimeAsRelativeTime();  } }
+    public bool FullScale { get { return mFullScale; } }
+    public bool FreeFly { get { return mFreeFly; } }
+
 
     [Serializable]
     private class ViewConfig
@@ -184,8 +195,6 @@ public class SceneFlowManager : MonoBehaviour
 
                                                         if (!mFullScale)
                                                         {
-                                                            Debug.Log("Setting objectscale to room scale mCurrentClient " + mCurrentClient.ToString());
-
                                                             clientConfigs[mCurrentClient].objectScale = new Vector3(0.01f, 0.01f, 0.01f);
                                                             clientConfigs[mCurrentClient].densityUpdateFrequence = 0.2f;
                                                         }
@@ -197,11 +206,42 @@ public class SceneFlowManager : MonoBehaviour
 
                                                         if (mFullScale)
                                                         {
-                                                            Debug.Log("Setting objectscale to world scale mCurrentClient " + mCurrentClient.ToString());
-
                                                             clientConfigs[mCurrentClient].objectScale = Vector3.one;
                                                             clientConfigs[mCurrentClient].densityUpdateFrequence = 2.0f;
                                                         }
+                                                        break;
+                                                    }
+                                            }
+
+                                            index++;
+                                        }
+                                        break;
+                                    }
+                            }
+                        }
+                        break;
+                    }
+                case "Interaction":
+                    {
+                        foreach (var dim in cat.dimensions)
+                        {
+                            switch (dim.name)
+                            {
+                                case "Navigate":
+                                    {
+                                        int index = 0;
+                                        foreach (var opt in dim.options)
+                                        {
+                                            switch (opt)
+                                            {
+                                                case "Direct":
+                                                    {
+                                                        mFreeFly = dim.choices[index];
+                                                        break;
+                                                    }
+                                                case "Indirect":
+                                                    {
+                                                        mFreeFly = !dim.choices[index];
                                                         break;
                                                     }
                                             }
