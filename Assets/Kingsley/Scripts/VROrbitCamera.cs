@@ -1,3 +1,4 @@
+using KVisualisation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using static UnityEngine.GraphicsBuffer;
 
 namespace Oculus.Interaction.Locomotion
 {
-    public class VROrbitCamera : MonoBehaviour, ILocomotionEventHandler, IDeltaTimeConsumer
+    public class VROrbitCamera : MonoBehaviour, ILocomotionEventHandler, IDeltaTimeConsumer, IVRControllerInputs
     {
         [Header("Character")]
         [SerializeField]
@@ -628,6 +629,60 @@ namespace Oculus.Interaction.Locomotion
                 + Vector3.down * (_characterController.Height * 0.5f + _characterController.SkinWidth);
             return characterFeet;
         }
+
+
+        // INTERFACE
+
+        public void LeftThumbClick()
+        {
+            TogglePanning();
+        }
+
+        public void LeftThumbUp(float stickValue)
+        {
+            StickUp();
+        }
+
+        public void LeftThumbDown(float stickValue)
+        {
+            StickDown();
+        }
+
+        public void LeftThumbRight(float stickValue)
+        {
+            StickRight();
+        }
+
+        public void LeftThumbLeft(float stickValue)
+        {
+            StickLeft();
+        }
+
+        public void LeftThumbNeutral()
+        {
+            StickRelease();
+        }
+
+        public void LeftPrimaryButtonDown()
+        {
+            RaiseUp();
+        }
+
+        public void LeftPrimaryButtonUp()
+        {
+            StopRaise();
+        }
+
+        public void LeftSecondaryButtonDown()
+        {
+            RaiseDown();
+        }
+
+        public void LeftSecondaryButtonUp()
+        {
+            StopRaise();
+        }
+
 
         #region Inject
 

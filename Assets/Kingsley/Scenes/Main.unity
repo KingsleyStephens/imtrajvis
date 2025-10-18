@@ -3169,6 +3169,7 @@ GameObject:
   m_Component:
   - component: {fileID: 845033832}
   - component: {fileID: 845033833}
+  - component: {fileID: 845033834}
   m_Layer: 0
   m_Name: OrbitCamRoom
   m_TagString: Untagged
@@ -3217,6 +3218,18 @@ MonoBehaviour:
   zoomSpeed: 10
   panSpeed: 10
   verticleSpeed: 0.25
+--- !u!114 &845033834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 845033831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3386111f44f53704ca255212d4c72c62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &868130310
 GameObject:
   m_ObjectHideFlags: 0
@@ -4402,6 +4415,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1223047570}
+    - targetCorrespondingSourceObject: {fileID: 3903482225804038116, guid: 0a7d2469f24041c4284c66706f84c45e,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1223047571}
     - targetCorrespondingSourceObject: {fileID: 3903482226191059931, guid: 0a7d2469f24041c4284c66706f84c45e,
         type: 3}
       insertIndex: -1
@@ -4429,14 +4446,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3903482226191059931, guid: 0a7d2469f24041c4284c66706f84c45e,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1925978483}
-    - targetCorrespondingSourceObject: {fileID: 3903482226191059931, guid: 0a7d2469f24041c4284c66706f84c45e,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1925978482}
-    - targetCorrespondingSourceObject: {fileID: 3903482226191059931, guid: 0a7d2469f24041c4284c66706f84c45e,
-        type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1925978490}
     - targetCorrespondingSourceObject: {fileID: 3903482226191059931, guid: 0a7d2469f24041c4284c66706f84c45e,
         type: 3}
@@ -4458,6 +4467,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1925978491}
+    - targetCorrespondingSourceObject: {fileID: 3903482226191059931, guid: 0a7d2469f24041c4284c66706f84c45e,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1925978494}
+    - targetCorrespondingSourceObject: {fileID: 3903482226191059931, guid: 0a7d2469f24041c4284c66706f84c45e,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1925978495}
   m_SourcePrefab: {fileID: 100100000, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
 --- !u!4 &1223047551 stripped
 Transform:
@@ -4552,6 +4569,19 @@ MonoBehaviour:
     staticCamera: {fileID: 0}
     freefly: {fileID: 1491656292}
     orbit: {fileID: 1488173618}
+--- !u!114 &1223047571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1223047555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f64ec4fe7114244cb71ac83004ba460, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraSwitcher: {fileID: 1223047570}
 --- !u!1 &1267879672
 GameObject:
   m_ObjectHideFlags: 0
@@ -5384,6 +5414,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1488173620}
   - component: {fileID: 1488173619}
+  - component: {fileID: 1488173621}
   m_Layer: 0
   m_Name: OrbitCamWorld
   m_TagString: Untagged
@@ -5432,6 +5463,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1223047567}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1488173621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1488173618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3386111f44f53704ca255212d4c72c62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1491656292
 GameObject:
   m_ObjectHideFlags: 0
@@ -5442,6 +5485,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1491656293}
   - component: {fileID: 1491656294}
+  - component: {fileID: 1491656295}
   m_Layer: 0
   m_Name: FlyCamWorld
   m_TagString: Untagged
@@ -5482,6 +5526,18 @@ MonoBehaviour:
   moveSpeed: 20
   rotateSnapAngle: 15
   verticalSnapSpeed: 10
+--- !u!114 &1491656295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1491656292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3386111f44f53704ca255212d4c72c62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1515065240
 GameObject:
   m_ObjectHideFlags: 0
@@ -5982,6 +6038,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1696697942}
   - component: {fileID: 1696697943}
+  - component: {fileID: 1696697944}
   m_Layer: 0
   m_Name: FlyCamRoom
   m_TagString: Untagged
@@ -6022,6 +6079,18 @@ MonoBehaviour:
   moveSpeed: 2
   rotateSnapAngle: 15
   verticalSnapSpeed: 1
+--- !u!114 &1696697944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696697941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3386111f44f53704ca255212d4c72c62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1701682344
 GameObject:
   m_ObjectHideFlags: 0
@@ -6799,9 +6868,9 @@ MonoBehaviour:
   _whenActivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: MoveUp
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftPrimaryButtonDown
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6814,9 +6883,9 @@ MonoBehaviour:
   _whenDeactivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: StopVerticalMovement
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftPrimaryButtonUp
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6843,9 +6912,9 @@ MonoBehaviour:
   _whenActivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: MoveDown
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftSecondaryButtonDown
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6858,9 +6927,9 @@ MonoBehaviour:
   _whenDeactivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: StopVerticalMovement
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftSecondaryButtonUp
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6887,24 +6956,24 @@ MonoBehaviour:
   _whenActivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: SnapRight
-        m_Mode: 1
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftThumbRight
+        m_Mode: 4
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
-          m_FloatArgument: 0
+          m_FloatArgument: 1
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
   _whenDeactivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: ResetSnap
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftThumbNeutral
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6948,24 +7017,24 @@ MonoBehaviour:
   _whenActivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: SnapLeft
-        m_Mode: 1
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftThumbLeft
+        m_Mode: 4
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
-          m_FloatArgument: 0
+          m_FloatArgument: 1
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
   _whenDeactivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: ResetSnap
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftThumbNeutral
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7005,64 +7074,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3673df66324d8f34d9433049c54de631, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1925978479 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3903482226191059924, guid: 0a7d2469f24041c4284c66706f84c45e,
-    type: 3}
-  m_PrefabInstance: {fileID: 1223047550}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925978449}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3673df66324d8f34d9433049c54de631, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1925978482
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925978449}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d2705674196dfc4da9c25fbacda72d8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _activeState: {fileID: 1925978483}
-  _whenActivated:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SceneFlowManager, ImTrajVis
-        m_MethodName: ShowConfigScreen
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  _whenDeactivated:
-    m_PersistentCalls:
-      m_Calls: []
-  _emitOnFirstUpdate: 0
---- !u!114 &1925978483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925978449}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ad374a43a946e7d4496818c6b194809f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _controller: {fileID: 1925978479}
-  _controllerButtonUsage: 64
 --- !u!114 &1925978487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7079,15 +7090,15 @@ MonoBehaviour:
   _whenActivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: MoveBackward
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftThumbDown
         m_Mode: 4
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
-          m_FloatArgument: 2
+          m_FloatArgument: 1
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
@@ -7128,15 +7139,15 @@ MonoBehaviour:
   _whenActivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: MoveForward
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftThumbUp
         m_Mode: 4
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
-          m_FloatArgument: 2
+          m_FloatArgument: 1
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
@@ -7177,15 +7188,15 @@ MonoBehaviour:
   _whenActivated:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Oculus.Interaction.Locomotion.VRFlyCamera, ImTrajVis
-        m_MethodName: Stop
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftThumbNeutral
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
-          m_FloatArgument: 2
+          m_FloatArgument: 1
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
@@ -7210,6 +7221,52 @@ MonoBehaviour:
   _comparison: 1
   _absoluteValues: 1
   _thresold: {x: 0, y: 0.5}
+--- !u!114 &1925978494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925978449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad374a43a946e7d4496818c6b194809f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _controller: {fileID: 1925978475}
+  _controllerButtonUsage: 128
+--- !u!114 &1925978495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925978449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d2705674196dfc4da9c25fbacda72d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _activeState: {fileID: 1925978494}
+  _whenActivated:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1223047571}
+        m_TargetAssemblyTypeName: KVisualisation.VRControllerInputs, ImTrajVis
+        m_MethodName: LeftThumbClick
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  _whenDeactivated:
+    m_PersistentCalls:
+      m_Calls: []
+  _emitOnFirstUpdate: 0
 --- !u!1 &1970088138
 GameObject:
   m_ObjectHideFlags: 0

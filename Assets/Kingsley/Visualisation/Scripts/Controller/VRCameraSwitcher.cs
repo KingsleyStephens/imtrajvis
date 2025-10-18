@@ -45,7 +45,7 @@ namespace KVisualisation
                 }
             }
 
-            public void ActivateMode(CameraModeType mode)
+            public GameObject ActivateMode(CameraModeType mode)
             {
                 var cams = GetAllCameras();
                 int index = (int)mode;
@@ -54,13 +54,15 @@ namespace KVisualisation
                     if (cams[index] != null)
                     {
                         cams[index].SetActive(true);
+                        return cams[index];
                     }
                     else
                     {
                         Debug.LogWarning("[VRCameraSwitcher] ActivateMode can't find camera mode type object for " + mode.ToString());
                     }
-                    
                 }
+
+                return null;
             }
 
             private GameObject[] GetAllCameras()
@@ -91,6 +93,13 @@ namespace KVisualisation
         // PRIVATE
 
         private CameraCollection[] mAllCameraCollections;
+        private GameObject mCurrentCamera;
+
+
+        // PUBLIC PROPERTIES
+
+        public GameObject CurrentCamera { get { return mCurrentCamera; } }
+
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -106,12 +115,9 @@ namespace KVisualisation
 
             var cols = GetAllCameraCollections();
             int index = (int)cameraType;
-
-            Debug.Log("cols.length " + cols.Length.ToString() + " index " + index.ToString());
-
             if (index < cols.Length)
             {
-                cols[index].ActivateMode(mode);
+                mCurrentCamera = cols[index].ActivateMode(mode);
             }
         }
 
