@@ -15,7 +15,7 @@ namespace KingsleyPhD
     {
         // EVENTS
 
-        public delegate void Change();
+        public delegate void Change(Workspace workspace);
         public event Change OnChange;
 
         public delegate void Close(Workspace workspace);
@@ -36,6 +36,12 @@ namespace KingsleyPhD
         [SerializeField]
         private WorkspaceUI ui;             // The UI
 
+        [SerializeField]
+        private Transform designViewAnchor;
+
+        [SerializeField]
+        private Transform snapshotAnchor;
+
         // PUBLIC
 
         public WorkspaceScene Scene { get { return scene; } }
@@ -46,6 +52,8 @@ namespace KingsleyPhD
         public bool IsFPV { get { return (ui != null) ? ui.FPVActive : false; } }
         public DesignInstanceJSON DesignInstance { get { return ui?.DesignInstance; } }
         public SceneFlowManager SceneFlowManager { get { return scene?.SceneFlowManager; } }
+        public Transform DesignViewAnchor { get { return designViewAnchor; } }
+        public Transform SnapshotAnchor { get { return snapshotAnchor; } }
 
         // PUBLIC
 
@@ -87,7 +95,7 @@ namespace KingsleyPhD
         private void OnDesignSpaceChange()
         {
             scene?.Configure(ui?.DesignInstance);
-            OnChange?.Invoke();
+            OnChange?.Invoke(this);
         }
 
         public void OnTimeChange(float time)

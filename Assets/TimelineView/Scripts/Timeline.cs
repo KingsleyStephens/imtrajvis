@@ -589,10 +589,13 @@ namespace KingsleyPhD
             }
         }
 
-        void WorkspaceChange()
+        void WorkspaceChange(Workspace w)
         {
             if (snapshotCamera != null && mCurrCellData != null)
             {
+                snapshotCamera.transform.position = w.SnapshotAnchor.position;
+                snapshotCamera.transform.rotation = w.SnapshotAnchor.rotation;
+
                 snapshotCamera.TakeSnapshot(Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot, Workspace, mCurrCellData.image));
                 if (mController != null)
                 {
@@ -678,6 +681,8 @@ namespace KingsleyPhD
                 {
                     mDesignWorkspace.Scene.Vis.SetParent(designRoot);
                     mDesignWorkspace.Scene.Vis.localPosition = Vector3.zero;
+                    designRoot.position = mDesignWorkspace.DesignViewAnchor.position;
+                    designRoot.rotation = mDesignWorkspace.DesignViewAnchor.rotation;
                     designRoot.gameObject.SetActive(true);
                 }
 

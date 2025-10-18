@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static KingsleyPhD.TimelineModel;
 
 namespace KingsleyPhD
 {
@@ -138,6 +139,9 @@ namespace KingsleyPhD
             foreach (var cellData in cellsData)
             {
                 GameObject cell = GameObject.Instantiate(mCellPrototype, mParent, true);
+                cell.transform.localPosition = Vector3.zero;
+                cell.transform.localRotation = Quaternion.identity;
+
                 Canvas[] canvases = cell.GetComponentsInChildren<Canvas>();
                 foreach (var c in canvases)
                 {
@@ -146,7 +150,7 @@ namespace KingsleyPhD
                     {
                         if (rt.name == "Toggle" || rt.name == "Radio")
                         {
-                            rt.position = rt.position + new Vector3(0.6f, 0, 0);
+                            rt.localPosition = rt.localPosition + new Vector3(50.0f, 0.0f, 0.0f);
 
                             RectTransform[] rts = c.GetComponentsInChildren<RectTransform>();
                             foreach (var r in rts)
@@ -200,6 +204,8 @@ namespace KingsleyPhD
             DoLayout(mDisplayConfig, mParent);
 
             GameObject lineBatcher = GameObject.Instantiate(mLineBatcherPrototype, mParent, true);
+            lineBatcher.transform.localPosition = Vector3.zero;
+            lineBatcher.transform.localRotation = Quaternion.identity;
             DrawGrid(mDisplayConfig, lineBatcher);
         }
 
@@ -221,7 +227,7 @@ namespace KingsleyPhD
             List<Vector3> vertices = new List<Vector3>();
             List<int> indices = new List<int>();
 
-            Vector3 topLeft = mParent.position + new Vector3(displayConfig.anchorPosition.x - displayConfig.cellSize.x * 0.5f,
+            Vector3 topLeft = new Vector3(displayConfig.anchorPosition.x - displayConfig.cellSize.x * 0.5f,
                                displayConfig.anchorPosition.y + displayConfig.cellSize.y * 0.5f,
                                0.0f);
 
@@ -275,9 +281,7 @@ namespace KingsleyPhD
             GetDimensions(out width, out height);
 
 
-            Vector3 topLeft = mParent.position + new Vector3(displayConfig.anchorPosition.x,
-                   displayConfig.anchorPosition.y,
-                   0.0f);
+            Vector3 topLeft = new Vector3(displayConfig.anchorPosition.x, displayConfig.anchorPosition.y, 0.0f);
 
             Vector3 currentPos = topLeft;
 
@@ -285,7 +289,7 @@ namespace KingsleyPhD
             int vIndex = 0;
             foreach (Transform cell in cellsParent)
             {
-                cell.position = currentPos;
+                cell.localPosition = currentPos;
 
                 hIndex++;
                 if (hIndex >= width)

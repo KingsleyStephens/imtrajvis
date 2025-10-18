@@ -26,7 +26,6 @@ namespace KingsleyPhD
         [SerializeField]
         private string jsonFile;
 
-
         // PRIVATE DATA
 
         private class CellLine
@@ -51,6 +50,7 @@ namespace KingsleyPhD
 
         // PUBLIC
         public DesignInstanceJSON DesignInstance { get; set; }
+        public Transform MainCamera { get; set; }
 
         public delegate void Change();
         public event Change OnChange;
@@ -59,6 +59,15 @@ namespace KingsleyPhD
         public event TimeChange OnTimeChange;
 
         // PRIVATE
+
+        private Vector3 CalcRadialPos(float x, float r)
+        {
+            float angle = Mathf.Asin(x * 0.5f / r) * 2.0f * Mathf.Rad2Deg;
+            Vector3 dir = new Vector3(0.0f, 0.0f, -r);
+            Quaternion rot = Quaternion.AngleAxis(angle, Vector3.up);
+            Vector3 pos = rot * -dir;
+            return dir + pos;
+        }
 
 
         /**
@@ -90,7 +99,8 @@ namespace KingsleyPhD
                     spacing = cellConfig.cellSize.x * category.dimensions.Length;
                     GameObject catParent = new GameObject("Category " + category.name);
                     catParent.transform.SetParent(transform);
-                    catParent.transform.localPosition = new Vector3(start + pos, 0.0f, 0.0f);
+                    catParent.transform.localPosition = CalcRadialPos(start + pos, (MainCamera.position - transform.position).magnitude);
+                    catParent.transform.LookAt(catParent.transform.position - (MainCamera.position - catParent.transform.position));
 
                     CellLine catRow = new CellLine();
 
@@ -108,7 +118,9 @@ namespace KingsleyPhD
 
                     GameObject dimParent = new GameObject("Dimensions " + category.name);
                     dimParent.transform.SetParent(transform);
-                    dimParent.transform.position = catParent.transform.position + new Vector3(0.0f, -2.5f, 0.0f);
+                    dimParent.transform.rotation = catParent.transform.rotation;
+                    dimParent.transform.localPosition = catParent.transform.localPosition - catParent.transform.InverseTransformDirection(catParent.transform.up) * (cellConfig.cellSize.y * 1.1f);
+
                     CellLine dimRow = new CellLine();
                     dimRow.model = new TimelineModel();
 
@@ -120,7 +132,9 @@ namespace KingsleyPhD
                         GameObject optParent = new GameObject("Options " + category.name);
                         optParent.AddComponent<ToggleGroup>();
                         optParent.transform.SetParent(transform);
-                        optParent.transform.position = dimParent.transform.position + new Vector3(subIndex * cellConfig.cellSize.x, -2.5f, 0.0f);
+                        optParent.transform.rotation = dimParent.transform.rotation;
+                        optParent.transform.localPosition = dimParent.transform.localPosition + transform.InverseTransformDirection(dimParent.transform.TransformDirection(dimParent.transform.InverseTransformDirection(dimParent.transform.right) * (subIndex * cellConfig.cellSize.x) - dimParent.transform.InverseTransformDirection(dimParent.transform.up) * (cellConfig.cellSize.y * 1.1f)));
+
                         CellLine optCol = new CellLine();
                         optCol.model = new TimelineModel();
 

@@ -130,6 +130,7 @@ namespace KingsleyPhD
             if (designSpace != null)
             {
                 designSpace.DesignInstance = mDesignSpaceInstance;
+                designSpace.MainCamera = mainCamera.transform;
             }
 
             mIsStaticTime = !mDesignSpaceInstance.Query("Space/Time", "Time", "+ 1D animation");
