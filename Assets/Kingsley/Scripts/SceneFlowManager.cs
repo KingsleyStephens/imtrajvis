@@ -84,6 +84,8 @@ public class SceneFlowManager : MonoBehaviour
     public bool FullScale { get { return mFullScale; } }
     public bool FreeFly { get { return mFreeFly; } }
 
+    public VisClient3D VisClient3D { get {  return visClients[mCurrentClient].GetComponent<Visualisation>().VisClient3D; } }
+
 
     [Serializable]
     private class ViewConfig
@@ -200,7 +202,7 @@ public class SceneFlowManager : MonoBehaviour
                                                         if (!mFullScale)
                                                         {
                                                             clientConfigs[mCurrentClient].objectScale = new Vector3(0.01f, 0.01f, 0.01f);
-                                                            clientConfigs[mCurrentClient].densityUpdateFrequence = 0.2f;
+                                                            clientConfigs[mCurrentClient].densityUpdateFrequence = 0.1f;
                                                         }
                                                         break;
                                                     }
@@ -1160,9 +1162,9 @@ public class SceneFlowManager : MonoBehaviour
     public int TimeType { get { return (int)clientConfigs[mCurrentClient].timeType; } set { clientConfigs[mCurrentClient].timeType = (VisClient.MovingObjectSettings.TimeType)value; ApplyCurrentConfig(); } }
 
 
-    public void ApplyFilter(int filterId)
+    public void ApplyFilter(VisClient.MovingObjectSettings.FilterType filter)
     {
-        clientConfigs[mCurrentClient].filter = (VisClient.MovingObjectSettings.FilterType)filterId; 
+        clientConfigs[mCurrentClient].filter = filter; 
         ApplyCurrentConfig(); 
         clientConfigs[mCurrentClient].filter = VisClient.MovingObjectSettings.FilterType.None;
     }

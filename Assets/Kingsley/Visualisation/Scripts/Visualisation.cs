@@ -43,6 +43,8 @@ namespace SATestbed
 
         private bool mActive = false;
 
+        public VisClient3D VisClient3D { get { return threeD.GetComponent<VisClient3D>(); } }
+
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {

@@ -58,6 +58,7 @@ namespace KVisualisation
         private Dictionary<Vector2Int, bool> mFilterState= new Dictionary<Vector2Int, bool>();
 
         public float SimTime {  get { return mVisSimController.Players[mId].SimTime; } }
+        public bool IsPaused { get { return mVisSimController.Players[mId].PlaybackSpeed == 0.0f; } }
 
         private int NumPlayers { get { return mVisSimController.Players.Count; } }
 
@@ -155,10 +156,10 @@ namespace KVisualisation
                 bool updateDensity = false;
                 if (movingObjectSettings.density && densityMap3D != null)
                 {
-                    if (Time.time > mLastDensityUpdateTime + movingObjectSettings.densityUpdateFrequence)
+                    if (SimTime > mLastDensityUpdateTime + movingObjectSettings.densityUpdateFrequence)
                     {
                         updateDensity = true;
-                        mLastDensityUpdateTime = Time.time;
+                        mLastDensityUpdateTime = SimTime;
                     }
                 }
 
@@ -176,7 +177,7 @@ namespace KVisualisation
 
                             if (updateDensity && !IsFiltered(id))
                             {
-                                densityMap3D.UpdatePosition(obj.transform.position);
+                                densityMap3D.UpdatePosition(obj.transform.position, SimTime);
                             }
 
                             if (movingObjectSettings.trail)
@@ -244,19 +245,14 @@ namespace KVisualisation
 
                 if (toTime < fromTime)
                 {
-                    foreach (Transform child in mGhostParent)
+                    if (movingObjectSettings.density && densityMap3D != null)
                     {
-                        GhostObject ghostObject = child.gameObject.GetComponent<GhostObject>();
-                        if (ghostObject != null)
-                        {
-                            if (ghostObject.spawnTime > toTime)
-                            {
-                                Destroy(ghostObject.gameObject);
-                            }
-                        }
+                        mLastDensityUpdateTime = toTime;
+
+                        densityMap3D.SpliceTime(toTime);
                     }
 
-                    foreach (Transform child in mTrailParent)
+                    foreach (Transform child in mGhostParent)
                     {
                         GhostObject ghostObject = child.gameObject.GetComponent<GhostObject>();
                         if (ghostObject != null)
@@ -371,7 +367,7 @@ namespace KVisualisation
                 VisAgent agentData = instance.GetComponent<VisAgent>();
                 if (agentData != null)
                 {
-
+                    agentData.VisClient3D = this;
                     agentData.playerId = parent;
                     agentData.id = data.id;
                     agentData.parentId = data.parentId;
@@ -460,10 +456,10 @@ namespace KVisualisation
                                     selectable.State = SelectableObject.StateType.None;
                                 }
 
-                                //if (isSelected)
-                                //{
-                                //    mFilterSelection.Add(id);
-                                //}
+                                if (isSelected)
+                                {
+                                    mFilterSelection.Add(id);
+                                }
                             }
 
                             var keys = mFilterState.Keys.ToArray();

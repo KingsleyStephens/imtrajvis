@@ -18,6 +18,8 @@ namespace KVisualisation
         public int id = -1;
         public int parentId = -1;
 
+        public VisClient3D VisClient3D { get; set; }
+
         private List<ITimeUpdater> updatables = new List<ITimeUpdater>();
 
         public void AddUpdatable(ITimeUpdater updatable)

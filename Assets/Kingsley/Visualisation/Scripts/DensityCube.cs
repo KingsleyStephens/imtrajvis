@@ -1,4 +1,5 @@
-using System.Net.Sockets;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace KVisualisation
@@ -12,10 +13,32 @@ namespace KVisualisation
         private float density = 0.0f;
         private MeshRenderer meshRenderer;
 
+        private List<float> mDensityTimestamps = new List<float>();
+
         public float Density
         {
             set { density = value; UpdateCube(density); }
             get { return density; }
+        }
+
+        public void SpliceDensity(float time)
+        {
+            mDensityTimestamps = mDensityTimestamps.Where(x => x <= time).ToList();
+            CalculateDensity();
+        }
+
+        public void UpdateDensity(float time)
+        {
+            if (mDensityTimestamps.Count == 0 || (mDensityTimestamps.Count > 0 && time > mDensityTimestamps[mDensityTimestamps.Count - 1]))
+            {
+                mDensityTimestamps.Add(time);
+                CalculateDensity();
+            }
+        }
+
+        private void CalculateDensity()
+        {
+            Density = mDensityTimestamps.Count;
         }
 
         private void Start()
@@ -25,16 +48,23 @@ namespace KVisualisation
 
         private void UpdateCube(float density)
         {
-            if (meshRenderer != null)
+            if (density == 0.0f)
             {
-                Material mat = meshRenderer.material;
+                gameObject.SetActive(false);
+            }
+            else
+            {
+                if (meshRenderer != null)
+                {
+                    Material mat = meshRenderer.material;
 
-                Color c = GetColour(density / maxDensity);
-                c.a = 0.1f;
+                    Color c = GetColour(density / maxDensity);
+                    c.a = 0.1f;
 
-                mat.SetColor("_BaseColor", c);
+                    mat.SetColor("_BaseColor", c);
 
-                meshRenderer.material = mat;
+                    meshRenderer.material = mat;
+                }
             }
         }
 

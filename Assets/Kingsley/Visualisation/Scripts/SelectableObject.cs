@@ -54,22 +54,22 @@ namespace KVisualisation
             {
                 if (data.parentId >= 0)
                 {
-                    //GameObject[] formation = VisClient3D.Instance.GetAllOjectsOfFormation(data.parentId);
-                    //foreach (var f in formation)
-                    //{
-                    //    VisAgent fData = f.GetComponent<VisAgent>();
-                    //    if (fData  != null)
-                    //    {
-                    //        if (fData.id != data.id)
-                    //        {
-                    //            SelectableObject formationObject = f.GetComponent<SelectableObject>();
-                    //            if (formationObject != null)
-                    //            {
-                    //                formationObject.State = state;
-                    //            }
-                    //        }
-                    //    }
-                    //}
+                    GameObject[] formation = data.VisClient3D.GetAllOjectsOfFormation(data.playerId, data.parentId);
+                    foreach (var f in formation)
+                    {
+                        VisAgent fData = f.GetComponent<VisAgent>();
+                        if (fData != null)
+                        {
+                            if (fData.id != data.id)
+                            {
+                                SelectableObject formationObject = f.GetComponent<SelectableObject>();
+                                if (formationObject != null)
+                                {
+                                    formationObject.State = state;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

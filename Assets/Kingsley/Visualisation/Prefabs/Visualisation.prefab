@@ -409,7 +409,7 @@ MonoBehaviour:
   cubeSize: 5
   widthDistance: 1000
   maxDensity: 20
-  duration: 30
+  duration: 3000
 --- !u!1 &2965864724362866161
 GameObject:
   m_ObjectHideFlags: 0

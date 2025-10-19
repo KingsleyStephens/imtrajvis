@@ -88,7 +88,20 @@ namespace KingsleyPhD
 
         private bool mSwitchingScene = false;
 
+        private static Timeline instance;
+
         // PUBLIC
+
+        public static Timeline Instance {  get { return instance; } }
+
+        public VisClient3D VisClient3D { get {
+                if (mFPVWorkspace != null)
+                {
+                    return mFPVWorkspace.SceneFlowManager.VisClient3D;
+                }
+                return null;
+            } 
+        }
 
         public string WorkspaceRoot { get; set; } = string.Empty;
         public string Workspace { get; set; } = string.Empty;
@@ -426,8 +439,36 @@ namespace KingsleyPhD
             }
         }
 
+        public void FilterIsolate()
+        {
+            if (mFPVWorkspace != null && mFPVWorkspace.SceneFlowManager != null)
+            {
+                mFPVWorkspace.SceneFlowManager.ApplyFilter(VisClient.MovingObjectSettings.FilterType.InverseSelection);
+            }
+        }
+
+        public void FilterRemove()
+        {
+            if (mFPVWorkspace != null && mFPVWorkspace.SceneFlowManager != null)
+            {
+                mFPVWorkspace.SceneFlowManager.ApplyFilter(VisClient.MovingObjectSettings.FilterType.Selection);
+            }
+        }
+
+        public void FilterShowAll()
+        {
+            if (mFPVWorkspace != null && mFPVWorkspace.SceneFlowManager != null)
+            {
+                mFPVWorkspace.SceneFlowManager.ApplyFilter(VisClient.MovingObjectSettings.FilterType.Clear);
+            }
+        }
+
         // PRIVATE
 
+        private void Awake()
+        {
+            instance = this;
+        }
 
         /**
          * Start

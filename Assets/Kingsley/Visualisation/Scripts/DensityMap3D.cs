@@ -1,3 +1,4 @@
+using KController;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,37 +30,61 @@ namespace KVisualisation
 
         }
 
+        public void SpliceTime(float time)
+        {
+            foreach (var x in cubes.Keys)
+            {
+                foreach (var y in cubes[x].Keys)
+                {
+                    foreach (var z in cubes[x][y].Keys)
+                    {
+                        GameObject cubeObj = cubes[x][y][z];
+                        if (cubeObj != null)
+                        {
+                            DensityCube dc = cubeObj.GetComponent<DensityCube>();
+                            if (dc != null)
+                            {
+                                dc.SpliceDensity(time);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         /**
          * Update an agent's position
          * 
          * @param position Position of the agent in world space
          */
-        public void UpdatePosition(Vector3 position)
+        public void UpdatePosition(Vector3 position, float simTime)
         {
+            Vector3 localPos = transform.InverseTransformPoint(position);
+
             float halfWidth = widthDistance * 0.5f;
-            
-            float scaledHalfWidth = halfWidth * transform.localScale.x;
-            float scaledCubeSize = cubeSize * transform.localScale.x;
+
+            float scaledHalfWidth = halfWidth;// * transform.localScale.x;
+            float scaledCubeSize = cubeSize;// * transform.localScale.x;
 
             int x = -1, y = -1, z = -1;
 
-            if (position.x > transform.localPosition.x - scaledHalfWidth && position.x < transform.localPosition.x + scaledHalfWidth)
+            if (localPos.x > -scaledHalfWidth && localPos.x < scaledHalfWidth)
             {
-                float xRelative = position.x - (transform.localPosition.x - scaledHalfWidth);
+                float xRelative = localPos.x + scaledHalfWidth;
 
                 x = (int)(xRelative / scaledCubeSize);
             }
 
-            if (position.y > transform.localPosition.y - scaledHalfWidth && position.y < transform.localPosition.y + scaledHalfWidth)
+            if (localPos.y > -scaledHalfWidth && localPos.y < scaledHalfWidth)
             {
-                float yRelative = position.y - (transform.localPosition.y - scaledHalfWidth);
+                float yRelative = localPos.y + scaledHalfWidth;
 
                 y = (int)(yRelative / scaledCubeSize);
             }
 
-            if (position.z > transform.localPosition.z - scaledHalfWidth && position.z < transform.localPosition.z + scaledHalfWidth)
+            if (localPos.z > -scaledHalfWidth && localPos.z < scaledHalfWidth)
             {
-                float zRelative = position.z - (transform.localPosition.z - scaledHalfWidth);
+                float zRelative = localPos.z + scaledHalfWidth;
 
                 z = (int)(zRelative / scaledCubeSize);
             }
@@ -76,7 +101,7 @@ namespace KVisualisation
 
             if (!cubes[x][y].ContainsKey(z))
             {
-                GameObject cube = Instantiate(cubePrefab, transform, true);
+                GameObject cube = Instantiate(cubePrefab, transform);
                 DensityCube densityCube = cube.GetComponent<DensityCube>();
                 if (densityCube != null)
                 {
@@ -87,10 +112,11 @@ namespace KVisualisation
                 {
                     timer.duration = duration;
                 }
+                cube.transform.localRotation = Quaternion.identity;
                 cube.transform.localScale = new Vector3(cubeSize, cubeSize, cubeSize);
-                cube.transform.localPosition = new Vector3(-halfWidth + x * cubeSize + cubeSize * 0.5f,
-                    -halfWidth + y * cubeSize + cubeSize * 0.5f,
-                    -halfWidth + z * cubeSize + cubeSize * 0.5f);
+                cube.transform.localPosition = new Vector3(-scaledHalfWidth + x * scaledCubeSize + scaledCubeSize * 0.5f,
+                    -scaledHalfWidth + y * scaledCubeSize + scaledCubeSize * 0.5f ,
+                    -scaledHalfWidth + z * scaledCubeSize + scaledCubeSize * 0.5f);
                 cubes[x][y].Add(z, cube);
             }
 
@@ -105,7 +131,7 @@ namespace KVisualisation
                 DensityCube dc = cubeObj.GetComponent<DensityCube>();
                 if (dc != null)
                 {
-                    dc.Density = dc.Density + 1.0f;
+                    dc.UpdateDensity(simTime);
                 }
             }
         }
