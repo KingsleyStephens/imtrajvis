@@ -28,6 +28,8 @@ namespace KingsleyPhD
 
         private Vector2 mLastDragPosition;
 
+        public bool SliderSelected { get { return mCurrSlider != null; } }
+
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
@@ -81,7 +83,7 @@ namespace KingsleyPhD
                 {
                     mCurrEventHandler.Click();
                 }
-                else if (mCurrSlider != null)
+                else if (mCurrSlider != null && !isVR)
                 {
                     mCurrSlider.OnActivate(mCurrControlPos.x);
                 }
@@ -134,7 +136,7 @@ namespace KingsleyPhD
         {
             Ray ray = GetRay();
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, 100.0f, 1 << LayerMask.NameToLayer("UI")))
+            if (Physics.Raycast(ray, out hit, 100.0f, 1 << gameObject.layer))
             {
                 // Check if the object has a BoxCollider
                 BoxCollider box = hit.collider as BoxCollider;
@@ -233,6 +235,11 @@ namespace KingsleyPhD
                 if (mCurrEventHandler != null)
                 {
                     mCurrEventHandler = null;
+                }
+
+                if (mCurrSlider != null)
+                {
+                    mCurrSlider = null;
                 }
             }
         }

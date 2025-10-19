@@ -54,7 +54,7 @@ namespace KingsleyPhD
 
         void Update()
         {
-            if (inputEvents != null)
+            if (inputEvents != null && !inputEvents.SliderSelected)
             {
                 Ray ray = inputEvents.GetRay();
                 RaycastHit hit;
