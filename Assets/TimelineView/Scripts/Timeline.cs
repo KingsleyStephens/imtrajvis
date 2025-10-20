@@ -1,16 +1,14 @@
 using KVisualisation;
 using SpatioTemporalDatabase;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using TMPro;
-using UnityEditor.Graphs;
 using UnityEngine;
-using static KingsleyPhD.TimelineView;
-using static System.Collections.Specialized.BitVector32;
+
+
 
 namespace KingsleyPhD
 {
@@ -235,6 +233,14 @@ namespace KingsleyPhD
                 {
                     Workspace = Workspaces[value];
                     SelectDataset = 0;
+
+                    string currentTime = DateTime.Now.ToString("HH_mm_ss");
+                    string eventLogName = "Events_" + currentTime + ".log";
+                    string telemetryLogName = "Telemetry_" + currentTime + ".log";
+                    string workspace = Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot, Workspace);
+
+                    KCore.Logger.OpenEventLog(Path.Combine(workspace, eventLogName));
+                    KCore.Logger.OpenTelemetryLog(Path.Combine(workspace, telemetryLogName));
                 }
             }
         }
@@ -497,6 +503,8 @@ namespace KingsleyPhD
             {
                 cameraSwitcher.ActivateCamera(VRCameraSwitcher.CameraType.Menu, VRCameraSwitcher.CameraCollection.CameraModeType.Static);
             }
+
+            KCore.Logger.LogMessage("Session Start");
         }
 
         private void LoadConfig()
@@ -695,6 +703,8 @@ namespace KingsleyPhD
                                     workspace.Apply(slot.orientation, slot.zoom, slot.time);
                                 }
                             }
+
+                            KCore.Logger.LogMessage($"Load workspace {cellData.id}, {cellData.name}");
                         }
 
                         mCurrCellData = cellData;
@@ -728,6 +738,8 @@ namespace KingsleyPhD
                 }
 
                 transform.parent.gameObject.SetActive(false);
+
+                KCore.Logger.LogMessage($"Open design space for workspace {workspace.Id}");
             }
             else
             {
@@ -749,6 +761,8 @@ namespace KingsleyPhD
                 }
 
                 transform.parent.gameObject.SetActive(true);
+
+                KCore.Logger.LogMessage($"Close design space for workspace {workspace.Id}");
             }
         }
 
@@ -781,6 +795,8 @@ namespace KingsleyPhD
                 }
 
                 mCurrCellData = null;
+
+                KCore.Logger.LogMessage($"Remove workspace {cellData.id}");
             }
         }
 
@@ -817,6 +833,8 @@ namespace KingsleyPhD
                 int index = mWorkspaces.IndexOf(ws);
                 Destroy(ws.gameObject);
                 mWorkspaces.RemoveAt(index);
+
+                KCore.Logger.LogMessage($"Close workspace {workspace.Id}");
             }
         }
 
@@ -850,6 +868,8 @@ namespace KingsleyPhD
                     }
                 }
             }
+
+            KCore.Logger.LogMessage($"Activate cell {id}");
 
             if (mDesignInstances.ContainsKey(id))
             {

@@ -5982,7 +5982,7 @@ PrefabInstance:
     - target: {fileID: 7667975952142567259, guid: 7ba77105f48cbd0428f8fccb7c6437dc,
         type: 3}
       propertyPath: isVR
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7667975952142567259, guid: 7ba77105f48cbd0428f8fccb7c6437dc,
         type: 3}
