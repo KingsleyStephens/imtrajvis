@@ -34,8 +34,15 @@ namespace KVisualisation
                         state = value;
                         UpdateChildren(state);
                     }
+
+                    VisAgent data = gameObject.GetComponent<VisAgent>();
+                    if (data != null)
+                    {
+                        KCore.Logger.LogMessage($"Object {gameObject.name} Id ({data.playerId},{data.id}) at SimTime {data.VisClient3D.SimTime} selection state {value.ToString()}");
+                    }
                 }
-            } }
+            } 
+        }
 
 
         public void UpdateChildren(StateType state)

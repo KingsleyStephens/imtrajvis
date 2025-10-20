@@ -1,4 +1,5 @@
 using KVisualisation;
+using System;
 using System.Collections;
 using TMPro;
 using Unity.Android.Gradle.Manifest;
@@ -42,6 +43,13 @@ namespace KingsleyPhD
         [SerializeField]
         private Transform snapshotAnchor;
 
+        [SerializeField]
+        private float telemetryLogDelta = 0.1f;
+
+        public Camera mainCamera;
+        public Transform leftController;
+        public Transform rightController;
+
         // PUBLIC
 
         public WorkspaceScene Scene { get { return scene; } }
@@ -54,6 +62,10 @@ namespace KingsleyPhD
         public SceneFlowManager SceneFlowManager { get { return scene?.SceneFlowManager; } }
         public Transform DesignViewAnchor { get { return designViewAnchor; } }
         public Transform SnapshotAnchor { get { return snapshotAnchor; } }
+
+        // PRIVATE
+
+        private float mLastTelemetryLog = 0.0f;
 
         // PUBLIC
 
@@ -119,6 +131,20 @@ namespace KingsleyPhD
         void Update()
         {
             SyncTime();
+
+            if (IsFPV)
+            {
+                float time = Time.time;
+                if (time - mLastTelemetryLog > telemetryLogDelta)
+                {
+                    string timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+                    KCore.Logger.LogTelemetry(timestamp, SceneFlowManager.SimTime, mainCamera.name, mainCamera.transform.position, mainCamera.transform.rotation.eulerAngles);
+                    KCore.Logger.LogTelemetry(timestamp, SceneFlowManager.SimTime, leftController.gameObject.name, leftController.position, leftController.rotation.eulerAngles);
+                    KCore.Logger.LogTelemetry(timestamp, SceneFlowManager.SimTime, rightController.gameObject.name, rightController.position, rightController.rotation.eulerAngles);
+
+                    mLastTelemetryLog = time;
+                }
+            }
         }
 
         private void SyncTime()

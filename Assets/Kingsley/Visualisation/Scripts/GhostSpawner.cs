@@ -13,7 +13,7 @@ namespace KVisualisation
 
         public VisClient.MovingObjectSettings.GhostingDrop ghostingDropType = VisClient.MovingObjectSettings.GhostingDrop.Distance;
         public float ghostingValue = 1.0f;
-        public float duration = 30.0f;
+        public float duration = 0.0f;
 
         public int parentPlayer = -1;
         public int parentId = -1;
@@ -66,7 +66,7 @@ namespace KVisualisation
             ghostObj.transform.rotation  = rot;
             ghostObj.transform.localScale = scale;
 
-            if (destructTime >= 0.0f)
+            if (destructTime > 0.0f)
             {
                 DestructTimer destruct = ghostObj.AddComponent<DestructTimer>();
                 destruct.duration = destructTime;

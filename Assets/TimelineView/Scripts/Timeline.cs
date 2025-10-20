@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using TMPro;
 using UnityEngine;
+using static KingsleyPhD.TimelineView;
 
 
 
@@ -24,6 +26,10 @@ namespace KingsleyPhD
         private VRCameraSwitcher cameraSwitcher;
         [SerializeField]
         private Camera mainCamera;
+        [SerializeField]
+        private Transform leftController;
+        [SerializeField]
+        private Transform rightController;
         [SerializeField]
         private GameObject workspacePrototype;
         [SerializeField]
@@ -211,6 +217,8 @@ namespace KingsleyPhD
                 mTimelineJSON = new TimelineJSON(timelineConfig);
                 mTimelineJSON.Save();
             }
+
+            KCore.Logger.LogMessage($"Create new workspace {Workspace}");
         }
 
         public int SelectWorkspaceRoot
@@ -220,6 +228,9 @@ namespace KingsleyPhD
                 if (WorkspaceRoots.Length > 0)
                 {
                     WorkspaceRoot = WorkspaceRoots[value];
+ 
+                    KCore.Logger.LogMessage($"Select workspace root folder {WorkspaceRoot}");
+
                     SelectWorkspace = 0;
                 }
             }
@@ -232,6 +243,9 @@ namespace KingsleyPhD
                 if (Workspaces.Length > 0)
                 {
                     Workspace = Workspaces[value];
+
+                    KCore.Logger.LogMessage($"Select workspace folder {Workspace}");
+
                     SelectDataset = 0;
 
                     string currentTime = DateTime.Now.ToString("HH_mm_ss");
@@ -241,6 +255,7 @@ namespace KingsleyPhD
 
                     KCore.Logger.OpenEventLog(Path.Combine(workspace, eventLogName));
                     KCore.Logger.OpenTelemetryLog(Path.Combine(workspace, telemetryLogName));
+                    KCore.Logger.LogTelemetryHeader("Time,SimTime,Name,X,Y,Z,RX,RY,RZ");
                 }
             }
         }
@@ -252,7 +267,9 @@ namespace KingsleyPhD
                 if (Datasets.Length > 0)
                 {
                     Dataset = Datasets[value];
-                    
+
+                    KCore.Logger.LogMessage($"Select dataset {Dataset}");
+
                     UpdateSessionsDropdown();
                     SelectSession = 0;
                 }
@@ -275,6 +292,17 @@ namespace KingsleyPhD
                 mTimelineJSON?.UpdateSession(Dataset, value);
 
                 Reset();
+
+                string sessionString = "";
+                for (int i = 0; i < Sessions.Length; i++) {
+                    sessionString += Sessions[i].ToString();
+                    if (i < Sessions.Length - 2)
+                    {
+                        sessionString += ",";
+                    }
+                }
+
+                KCore.Logger.LogMessage($"Select session(s) {sessionString}");
             }
         }
 
@@ -308,6 +336,7 @@ namespace KingsleyPhD
                 if (mTimelineJSON != null)
                 {
                     mTimelineJSON.UpdateSlot(workspace.Id, designRoot.localRotation.eulerAngles, designRoot.localScale.x, workspace.SceneFlowManager.SimTime);
+                    KCore.Logger.LogMessage($"Design space orbit control rotation for workspace {workspace.Id} is {designRoot.localRotation.eulerAngles.x}, {designRoot.localRotation.eulerAngles.y}, {designRoot.localRotation.eulerAngles.z} and scale {designRoot.localScale.x}");
                 }
             }
             else
@@ -315,6 +344,7 @@ namespace KingsleyPhD
                 if (mTimelineJSON != null && workspace.Scene != null)
                 {
                     mTimelineJSON.UpdateSlot(workspace.Id, workspace.Scene.transform.localRotation.eulerAngles, workspace.Scene.transform.localScale.x, workspace.SceneFlowManager.SimTime);
+                    KCore.Logger.LogMessage($"Orbit control rotation for workspace {workspace.Id} is {workspace.Scene.transform.localRotation.eulerAngles.x}, {workspace.Scene.transform.localRotation.eulerAngles.y}, {workspace.Scene.transform.localRotation.eulerAngles.z} and scale {workspace.Scene.transform.localScale.x}");
                 }
             }
 
@@ -344,6 +374,8 @@ namespace KingsleyPhD
             workspace.Grow();
 
             Hide();
+
+            KCore.Logger.LogMessage($"Go first person view {workspace.Id}");
         }
 
         public void Shrink()
@@ -408,6 +440,8 @@ namespace KingsleyPhD
                     }
                 }
 
+                KCore.Logger.LogMessage($"Exit first person view {mFPVWorkspace.Id}");
+
                 mFPVWorkspace = null;
             }
 
@@ -424,6 +458,8 @@ namespace KingsleyPhD
             {
                 mFPVWorkspace.SceneFlowManager.DecreaseTime = false;
                 mFPVWorkspace.SceneFlowManager.IncreaseTime = true;
+
+                KCore.Logger.LogMessage($"Time forwards at SimTime {mFPVWorkspace.SceneFlowManager.SimTime} for {mFPVWorkspace.Id}");
             }
         }
 
@@ -433,6 +469,8 @@ namespace KingsleyPhD
             {
                 mFPVWorkspace.SceneFlowManager.DecreaseTime = true;
                 mFPVWorkspace.SceneFlowManager.IncreaseTime = false;
+
+                KCore.Logger.LogMessage($"Time backwards at SimTime {mFPVWorkspace.SceneFlowManager.SimTime} for {mFPVWorkspace.Id}");
             }
         }
 
@@ -442,6 +480,8 @@ namespace KingsleyPhD
             {
                 mFPVWorkspace.SceneFlowManager.DecreaseTime = false;
                 mFPVWorkspace.SceneFlowManager.IncreaseTime = false;
+
+                KCore.Logger.LogMessage($"Time neutral at SimTime {mFPVWorkspace.SceneFlowManager.SimTime} for {mFPVWorkspace.Id}");
             }
         }
 
@@ -450,6 +490,8 @@ namespace KingsleyPhD
             if (mFPVWorkspace != null && mFPVWorkspace.SceneFlowManager != null)
             {
                 mFPVWorkspace.SceneFlowManager.ApplyFilter(VisClient.MovingObjectSettings.FilterType.InverseSelection);
+
+                KCore.Logger.LogMessage($"Filter isolate at SimTime {mFPVWorkspace.SceneFlowManager.SimTime} for {mFPVWorkspace.Id}");
             }
         }
 
@@ -458,6 +500,8 @@ namespace KingsleyPhD
             if (mFPVWorkspace != null && mFPVWorkspace.SceneFlowManager != null)
             {
                 mFPVWorkspace.SceneFlowManager.ApplyFilter(VisClient.MovingObjectSettings.FilterType.Selection);
+
+                KCore.Logger.LogMessage($"Filter remove at SimTime {mFPVWorkspace.SceneFlowManager.SimTime} for {mFPVWorkspace.Id}");
             }
         }
 
@@ -466,6 +510,8 @@ namespace KingsleyPhD
             if (mFPVWorkspace != null && mFPVWorkspace.SceneFlowManager != null)
             {
                 mFPVWorkspace.SceneFlowManager.ApplyFilter(VisClient.MovingObjectSettings.FilterType.Clear);
+
+                KCore.Logger.LogMessage($"Filter show all at SimTime {mFPVWorkspace.SceneFlowManager.SimTime} for {mFPVWorkspace.Id}");
             }
         }
 
@@ -558,6 +604,8 @@ namespace KingsleyPhD
                 mTimelineJSON.AddSlot(id);
 
                 LoadConfig();
+
+                KCore.Logger.LogMessage($"Add slot {id}");
             }
         }
 
@@ -690,6 +738,10 @@ namespace KingsleyPhD
                             workspace.OnClose += WorkspaceClose;
                             workspace.OnGoFPV += Grow;
                             workspace.OnDesignMenu += OnDesignMenu;
+
+                            workspace.mainCamera = mainCamera;
+                            workspace.leftController = leftController;
+                            workspace.rightController = rightController;
 
                             workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "simulation" ? underwaterPrefab : scenePrefab, mainCamera);
 
@@ -894,6 +946,8 @@ namespace KingsleyPhD
 
                 mWorkspaces[index].UI.FPVActive = true;
                 mSwitchingScene = false;
+
+                KCore.Logger.LogMessage($"Next workspace at SimTime {mFPVWorkspace.SceneFlowManager.SimTime} for {mWorkspaces[index].Id}");
             }
         }
 
@@ -913,6 +967,8 @@ namespace KingsleyPhD
 
                 mWorkspaces[index].UI.FPVActive = true;
                 mSwitchingScene = false;
+
+                KCore.Logger.LogMessage($"Previous workspace at SimTime {mFPVWorkspace.SceneFlowManager.SimTime} for {mWorkspaces[index].Id}");
             }
         }
 
@@ -921,6 +977,8 @@ namespace KingsleyPhD
             if (mFPVWorkspace != null)
             {
                 mFPVWorkspace.Scene.SceneFlowManager.TimeControlToggle();
+
+                KCore.Logger.LogMessage($"Time toggle at SimTime {mFPVWorkspace.SceneFlowManager.SimTime} for {mFPVWorkspace.Id}");
             }
         }
     }

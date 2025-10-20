@@ -397,32 +397,44 @@ namespace Oculus.Interaction.Locomotion
         public void LeftThumbUp(float stickValue)
         {
             MoveForward(stickValue);
+
+            KCore.Logger.LogMessage($"FlyCamera {gameObject.name} MoveForward");
         }
 
         public void LeftThumbDown(float stickValue)
         {
             MoveBackward(stickValue);
+
+            KCore.Logger.LogMessage($"FlyCamera {gameObject.name} MoveBackward");
         }
 
         public void LeftThumbRight(float stickValue)
         {
             SnapRight();
+
+            KCore.Logger.LogMessage($"FlyCamera {gameObject.name} SnapRight");
         }
 
         public void LeftThumbLeft(float stickValue)
         {
             SnapLeft();
+
+            KCore.Logger.LogMessage($"FlyCamera {gameObject.name} SnapLeft");
         }
 
         public void LeftThumbNeutral()
         {
             Stop();
             ResetSnap();
+
+            KCore.Logger.LogMessage($"FlyCamera {gameObject.name} Stop");
         }
 
         public void LeftPrimaryButtonDown()
         {
             MoveUp();
+
+            KCore.Logger.LogMessage($"FlyCamera {gameObject.name} MoveUp");
         }
 
         public void LeftPrimaryButtonUp()
@@ -433,6 +445,8 @@ namespace Oculus.Interaction.Locomotion
         public void LeftSecondaryButtonDown()
         {
             MoveDown();
+
+            KCore.Logger.LogMessage($"FlyCamera {gameObject.name} MoveDown");
         }
 
         public void LeftSecondaryButtonUp()

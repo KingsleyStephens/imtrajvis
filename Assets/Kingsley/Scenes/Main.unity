@@ -3411,6 +3411,11 @@ PrefabInstance:
       objectReference: {fileID: 810952515}
     - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
         type: 3}
+      propertyPath: leftController
+      value: 
+      objectReference: {fileID: 1515065241}
+    - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
       propertyPath: snapshotCamera
       value: 
       objectReference: {fileID: 1184636205}
@@ -3424,6 +3429,11 @@ PrefabInstance:
       propertyPath: designSpaceFile
       value: ITVDesignSpace.json
       objectReference: {fileID: 0}
+    - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
+        type: 3}
+      propertyPath: rightController
+      value: 
+      objectReference: {fileID: 1081259235}
     - target: {fileID: 2335875386860624293, guid: 4176d37a193b2744381851d10a219844,
         type: 3}
       propertyPath: sceneFlowManager
@@ -5982,7 +5992,7 @@ PrefabInstance:
     - target: {fileID: 7667975952142567259, guid: 7ba77105f48cbd0428f8fccb7c6437dc,
         type: 3}
       propertyPath: isVR
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7667975952142567259, guid: 7ba77105f48cbd0428f8fccb7c6437dc,
         type: 3}

@@ -20,8 +20,6 @@ namespace KCore
                 writer = new StreamWriter(filePath, append: true);
                 writer.AutoFlush = true;
                 mIsOpen = true;
-
-                Write($"==== Log started at {DateTime.Now:yyyy-MM-dd HH:mm:ss} ====");
             }
             catch (Exception ex)
             {
@@ -96,7 +94,6 @@ namespace KCore
         {
             if (mIsOpen)
             {
-                Write("==== Log closed ====");
                 writer.Close();
                 writer.Dispose();
                 mIsOpen = false;

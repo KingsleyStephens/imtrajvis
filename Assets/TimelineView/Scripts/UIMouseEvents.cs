@@ -44,22 +44,32 @@ namespace KingsleyPhD
             if ((isVR && OVRInput.GetDown(OVRInput.Button.Start)) || (!isVR && Input.GetKeyDown(KeyCode.Escape)))
             {
                 OnEsc?.Invoke();
+
+                KCore.Logger.LogMessage("On ESCAPE");
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow))
             {
                 OnTimeForward?.Invoke();
+
+                KCore.Logger.LogMessage("On Time Forward");
             }
             else if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 OnTimeBackward?.Invoke();
+
+                KCore.Logger.LogMessage("On Time Backward");
             }
             else if (Input.GetKeyDown(KeyCode.RightBracket) || (isVR && OVRInput.GetDown(OVRInput.Button.One)))
             {
                 OnViewForward?.Invoke();
+
+                KCore.Logger.LogMessage("On View Forward");
             }
             else if (Input.GetKeyDown(KeyCode.LeftBracket) || (isVR && OVRInput.GetDown(OVRInput.Button.Two)))
             {
                 OnViewBackward?.Invoke();
+
+                KCore.Logger.LogMessage("On View Backward");
             }
         }
 

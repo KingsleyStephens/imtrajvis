@@ -105,10 +105,15 @@ namespace KCore
             }
         }
 
-        public static void LogTelemetry(string id, Vector3 position, Vector3 rotation)
+        public static void LogTelemetryHeader(string message, params object[] args)
         {
-            string message = "{0},{1},{2},{3},{4},{5},{6}";
-            object[] args = new object[] { id, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z };
+            DebugLog((uint)LogType.Telemetry, message, args);
+        }
+
+        public static void LogTelemetry(string time, float simTime, string id, Vector3 position, Vector3 rotation)
+        {
+            string message = "{0},{1},{2},{3},{4},{5},{6},{7},{8}";
+            object[] args = new object[] { time, simTime, id, position.x, position.y, position.z, rotation.x, rotation.y, rotation.z };
 
             DebugLog((uint)LogType.Telemetry, message, args);
         }

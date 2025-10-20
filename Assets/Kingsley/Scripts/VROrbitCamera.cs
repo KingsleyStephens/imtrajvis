@@ -177,10 +177,14 @@ namespace Oculus.Interaction.Locomotion
             if (mPanning)
             {
                 PanUp();
+
+                KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} PanUp");
             }
             else
             {
                 ZoomIn();
+
+                KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} ZoomIn");
             }
         }
 
@@ -189,10 +193,14 @@ namespace Oculus.Interaction.Locomotion
             if (mPanning)
             {
                 PanDown();
+
+                KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} PanDown");
             }
             else
             {
                 ZoomOut();
+
+                KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} ZoomOut");
             }
         }
 
@@ -202,10 +210,16 @@ namespace Oculus.Interaction.Locomotion
             if (mPanning)
             {
                 PanRight();
+
+                KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} PanRight");
+
             }
             else
             {
                 OrbitRight();
+
+                KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} OrbitRight");
+
             }
         }
 
@@ -214,10 +228,16 @@ namespace Oculus.Interaction.Locomotion
             if (mPanning)
             {
                 PanLeft();
+
+                KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} PanLeft");
+
             }
             else
             {
                 OrbitLeft();
+
+                KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} OrbitLeft");
+
             }
         }
 
@@ -227,6 +247,8 @@ namespace Oculus.Interaction.Locomotion
             StopPan();
             StopZoom();
             StopOrbit();
+
+            KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} Stop");
         }
 
 
@@ -641,6 +663,8 @@ namespace Oculus.Interaction.Locomotion
         public void LeftThumbClick()
         {
             TogglePanning();
+
+            KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} TogglePanning");
         }
 
         public void LeftThumbUp(float stickValue)
@@ -671,6 +695,8 @@ namespace Oculus.Interaction.Locomotion
         public void LeftPrimaryButtonDown()
         {
             RaiseUp();
+
+            KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} Raise");
         }
 
         public void LeftPrimaryButtonUp()
@@ -681,6 +707,8 @@ namespace Oculus.Interaction.Locomotion
         public void LeftSecondaryButtonDown()
         {
             RaiseDown();
+
+            KCore.Logger.LogMessage($"OrbitCamera {gameObject.name} Lower");
         }
 
         public void LeftSecondaryButtonUp()

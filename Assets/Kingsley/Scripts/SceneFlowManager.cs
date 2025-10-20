@@ -1,6 +1,5 @@
 using KController;
 using KVisualisation;
-using NUnit.Framework;
 using Oculus.Interaction.Locomotion;
 using SATestbed;
 using System;
@@ -8,7 +7,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -203,6 +201,8 @@ public class SceneFlowManager : MonoBehaviour
                                                         {
                                                             clientConfigs[mCurrentClient].objectScale = new Vector3(0.01f, 0.01f, 0.01f);
                                                             clientConfigs[mCurrentClient].densityUpdateFrequence = 0.1f;
+
+                                                            KCore.Logger.LogMessage("Design space: Data::Scale::Room Scale");
                                                         }
                                                         break;
                                                     }
@@ -214,6 +214,8 @@ public class SceneFlowManager : MonoBehaviour
                                                         {
                                                             clientConfigs[mCurrentClient].objectScale = Vector3.one;
                                                             clientConfigs[mCurrentClient].densityUpdateFrequence = 2.0f;
+
+                                                            KCore.Logger.LogMessage("Design space: Data::Scale::World Scale");
                                                         }
                                                         break;
                                                     }
@@ -243,11 +245,23 @@ public class SceneFlowManager : MonoBehaviour
                                                 case "Direct":
                                                     {
                                                         mFreeFly = dim.choices[index];
+
+                                                        if (mFreeFly)
+                                                        {
+                                                            KCore.Logger.LogMessage("Design space: Interaction::Navigate::Direct");
+                                                        }
+
                                                         break;
                                                     }
                                                 case "Indirect":
                                                     {
                                                         mFreeFly = !dim.choices[index];
+
+                                                        if (!mFreeFly)
+                                                        {
+                                                            KCore.Logger.LogMessage("Design space: Interaction::Navigate::Indirect");
+                                                        }
+
                                                         break;
                                                     }
                                             }
@@ -276,11 +290,23 @@ public class SceneFlowManager : MonoBehaviour
                                                 case "None":
                                                     {
                                                         Mesh = !dim.choices[index];
+
+                                                        if (!Mesh)
+                                                        {
+                                                            KCore.Logger.LogMessage("Design space: Trajectories::Object::None");
+                                                        }
+
                                                         break;
                                                     }
                                                 case "Glyph":
                                                     {
                                                         Mesh = dim.choices[index];
+
+                                                        if (Mesh)
+                                                        {
+                                                            KCore.Logger.LogMessage("Design space: Trajectories::Object::Glyph");
+                                                        }
+
                                                         break;
                                                     }
                                             }
@@ -299,16 +325,34 @@ public class SceneFlowManager : MonoBehaviour
                                                 case "Trail":
                                                     {
                                                         Trails = dim.choices[index];
+
+                                                        if (Trails)
+                                                        {
+                                                            KCore.Logger.LogMessage("Design space: Trajectories::Path::Trail");
+                                                        }
+
                                                         break;
                                                     }
                                                 case "Glyph":
                                                     {
                                                         Ghosting = dim.choices[index];
+
+                                                        if (Ghosting)
+                                                        {
+                                                            KCore.Logger.LogMessage("Design space: Trajectories::Path::Glyph");
+                                                        }
+
                                                         break;
                                                     }
                                                 case "Density":
                                                     {
                                                         Density = dim.choices[index];
+
+                                                        if (Density)
+                                                        {
+                                                            KCore.Logger.LogMessage("Design space: Trajectories::Path::Density");
+                                                        }
+
                                                         break;
                                                     }
                                             }
@@ -339,6 +383,8 @@ public class SceneFlowManager : MonoBehaviour
                                                         if (dim.choices[index])
                                                         {
                                                             TimeType = (int)VisClient.MovingObjectSettings.TimeType.Static;
+
+                                                            KCore.Logger.LogMessage("Design space: Space/Time::Time::Static");
                                                         }
                                                         break;
                                                     }
@@ -351,6 +397,8 @@ public class SceneFlowManager : MonoBehaviour
                                                         if (dim.choices[index])
                                                         {
                                                             TimeType = (int)VisClient.MovingObjectSettings.TimeType.Dynamic;
+
+                                                            KCore.Logger.LogMessage("Design space: Space/Time::Time::+ 1D animation");
                                                         }
                                                         break;
                                                     }
@@ -575,6 +623,8 @@ public class SceneFlowManager : MonoBehaviour
             mPrevPlaybackSpeed[mCurrentClient] = PlaybackSpeed;
             PlaybackSpeed = 0.0f;
         }
+
+        KCore.Logger.LogMessage("Time pause");
     }
 
     public void SyncTime()
