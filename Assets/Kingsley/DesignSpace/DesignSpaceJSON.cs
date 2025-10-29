@@ -11,6 +11,7 @@ namespace KingsleyPhD
         public string name;
         public bool singular;
         public string[] options;
+        public int defaultOption;
     }
 
     [Serializable]

@@ -4,11 +4,13 @@
           "dimensions": [
             { "name": "Environment Objects",
               "singular": false,
-              "options": ["None", "Static"]
+              "options": ["None", "Static"],
+              "defaultOption": 0
             },
             { "name": "Scale",
               "singular": false,
-              "options": ["Room Scale", "World Scale"]
+              "options": ["Room Scale", "World Scale"],
+              "defaultOption": 0
             }
           ]
         },
@@ -16,15 +18,18 @@
           "dimensions": [
             { "name": "Viewpoint",
               "singular": false,
-              "options": ["Egocentric", "Exocentric", "Object-centric"]
+              "options": ["Egocentric", "Exocentric", "Object-centric"],
+              "defaultOption": 0
             },
             { "name": "Navigate",
               "singular": false,
-              "options": ["Direct", "Indirect"]
+              "options": ["Direct", "Indirect"],
+              "defaultOption": 0
             },
             { "name": "Manipulate",
               "singular": true,
-              "options": ["Time", "Traj Selection", "Data Views"]
+              "options": ["Time", "Traj Selection", "Data Views"],
+              "defaultOption": 0
             }
           ]
         },
@@ -32,15 +37,18 @@
           "dimensions": [
             { "name": "Object",
               "singular": false,
-              "options": ["None", "Glyph"]
+              "options": ["None", "Glyph"],
+              "defaultOption": 1
             },
             { "name": "Path",
               "singular": true,
-              "options": ["Trail", "Glyph", "Density"]
+              "options": ["Trail", "Glyph", "Density"],
+              "defaultOption": 0
             },
             { "name": "Colour",
               "singular": false,
-              "options": ["Uniform", "Data driven"]
+              "options": ["Uniform", "Data driven"],
+              "defaultOption": 0
             }
           ]
         },
@@ -48,11 +56,13 @@
           "dimensions": [
             { "name": "Dimensionality",
               "singular": false,
-              "options": ["2D", "3D"]
+              "options": ["2D", "3D"],
+              "defaultOption": 1
             },
             { "name": "Time",
               "singular": false,
-              "options": ["Static", "+ 1D position", "+ 1D animation"]
+              "options": ["Static", "+ 1D position", "+ 1D animation"],
+              "defaultOption": 2
             }
           ]
         }

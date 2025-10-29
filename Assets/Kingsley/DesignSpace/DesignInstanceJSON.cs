@@ -80,7 +80,7 @@ namespace KingsleyPhD
                     dimensions.choices = new bool[dimensions.options.Length];
                     for (int i = 0; i < dimensions.choices.Length; i++)
                     {
-                        if (i == 0)
+                        if (i == d.defaultOption)
                         {
                             dimensions.choices[i] = true;
                         }
