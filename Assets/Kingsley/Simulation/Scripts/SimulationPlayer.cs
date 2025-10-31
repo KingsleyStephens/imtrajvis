@@ -80,6 +80,8 @@ namespace KSimulation
                 onTimeScrubbed(Id, oldValue, mSimTime);
             } }
 
+        public Vector2 TimeExtents { get { return mTimeExtents; } }
+
         public bool Loaded { get; private set; }
 
         private void Awake()

@@ -159,6 +159,7 @@ public class SceneFlowManager : MonoBehaviour
     public float SimTime { get { return Controller.Players[mCurrentClient].SimTime; } set { Controller.Players[mCurrentClient].SimTime = value; } }
     public float ScrubTime { set { Controller.Players[mCurrentClient].ScrubTime(value); } }
 
+
     [SerializeField]
     private float speedChangeDeltaRoom = 0.01f;
     [SerializeField]
@@ -383,6 +384,7 @@ public class SceneFlowManager : MonoBehaviour
                                                         if (dim.choices[index])
                                                         {
                                                             TimeType = (int)VisClient.MovingObjectSettings.TimeType.Static;
+                                                            IsSTC = false;
 
                                                             KCore.Logger.LogMessage("Design space: Space/Time::Time::Static");
                                                         }
@@ -390,6 +392,13 @@ public class SceneFlowManager : MonoBehaviour
                                                     }
                                                 case "+ 1D position":
                                                     {
+                                                        if (dim.choices[index])
+                                                        {
+                                                            TimeType = (int)VisClient.MovingObjectSettings.TimeType.Static;
+                                                            IsSTC = true;
+
+                                                            KCore.Logger.LogMessage("Design space: Space/Time::Time::+ 1D position");
+                                                        }
                                                         break;
                                                     }
                                                 case "+ 1D animation":
@@ -397,6 +406,7 @@ public class SceneFlowManager : MonoBehaviour
                                                         if (dim.choices[index])
                                                         {
                                                             TimeType = (int)VisClient.MovingObjectSettings.TimeType.Dynamic;
+                                                            IsSTC = false;
 
                                                             KCore.Logger.LogMessage("Design space: Space/Time::Time::+ 1D animation");
                                                         }
@@ -1210,6 +1220,7 @@ public class SceneFlowManager : MonoBehaviour
     public bool Ghosting { get { return clientConfigs[mCurrentClient].ghosting; } set { clientConfigs[mCurrentClient].ghosting = value; ApplyCurrentConfig(); } }
     public bool Density { get { return clientConfigs[mCurrentClient].density; } set { clientConfigs[mCurrentClient].density = value; ApplyCurrentConfig(); } }
     public int TimeType { get { return (int)clientConfigs[mCurrentClient].timeType; } set { clientConfigs[mCurrentClient].timeType = (VisClient.MovingObjectSettings.TimeType)value; ApplyCurrentConfig(); } }
+    public bool IsSTC{ get { return clientConfigs[mCurrentClient].isSTC; } set { clientConfigs[mCurrentClient].isSTC = value; ApplyCurrentConfig(); } }
 
 
     public void ApplyFilter(VisClient.MovingObjectSettings.FilterType filter)

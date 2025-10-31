@@ -27,6 +27,10 @@ namespace KVisualisation
         [SerializeField]
         private GameObject weaponPrefab;
 
+        [Header("STC")]
+        [SerializeField]
+        private GameObject stcMapPlane;
+
         [SerializeField]
         private Color[] agentColours;
 
@@ -59,6 +63,9 @@ namespace KVisualisation
 
         public float SimTime {  get { return mVisSimController.Players[mId].SimTime; } }
         public bool IsPaused { get { return mVisSimController.Players[mId].PlaybackSpeed == 0.0f; } }
+        public Vector2 TimeExtents { get { return mVisSimController.Players[mId].TimeExtents; } }
+
+        public bool IsSTC { get; set; }
 
         private int NumPlayers { get { return mVisSimController.Players.Count; } }
 
@@ -175,6 +182,11 @@ namespace KVisualisation
                             obj.transform.localPosition = update.position;
                             obj.transform.localRotation = update.orientation;
 
+                            if (IsSTC)
+                            {
+                                MapSTC(obj.transform, SimTime, TimeExtents.y - TimeExtents.x);
+                            }
+
                             if (updateDensity && !IsFiltered(id))
                             {
                                 densityMap3D.UpdatePosition(obj.transform.position, SimTime);
@@ -207,6 +219,50 @@ namespace KVisualisation
                 }
             }
         }
+
+        private void MapSTC(Transform movingObject, float time, float totalTime)
+        {
+            if (stcMapPlane == null)
+            {
+                return;
+            }
+
+            Vector3 localPlanePos = stcMapPlane.transform.InverseTransformPoint(movingObject.position);
+            Vector3 localPlaneDir = stcMapPlane.transform.InverseTransformDirection(movingObject.forward);
+
+            localPlanePos.y = (time / totalTime) * movingObjectSettings.stcTimeToZ;
+            localPlaneDir.y = 0.0f;
+
+            Vector3 pos = stcMapPlane.transform.TransformPoint(localPlanePos);
+            Vector3 dir = stcMapPlane.transform.TransformDirection(localPlaneDir);
+
+            movingObject.position = pos;
+            movingObject.LookAt(movingObject.position + dir);
+        }
+
+        private void MapSTC(Vector3 position, Vector3 forward, float time, float totalTime, out Vector3 outPos, out Vector3 outDir)
+        {
+            if (stcMapPlane == null)
+            {
+                outPos = Vector3.zero;
+                outDir = Vector3.zero;
+
+                return;
+            }
+
+            Vector3 localPlanePos = stcMapPlane.transform.InverseTransformPoint(position);
+            Vector3 localPlaneDir = stcMapPlane.transform.InverseTransformDirection(forward);
+
+            localPlanePos.y = (time / totalTime) * movingObjectSettings.stcTimeToZ;
+            localPlaneDir.y = 0.0f;
+
+            Vector3 pos = stcMapPlane.transform.TransformPoint(localPlanePos);
+            Vector3 dir = stcMapPlane.transform.TransformDirection(localPlaneDir);
+
+            outPos = pos;
+            outDir = dir;
+        }
+
 
         public override void OnTimeScrub(int playerId, float fromTime, float toTime)
         {
@@ -601,6 +657,8 @@ namespace KVisualisation
             {
                 clientIdLabel.text = (mId + 1).ToString();
             }
+
+            IsSTC = movingObjectSettings.isSTC;
         }
 
         private bool IsFiltered(Vector2Int objectId)
@@ -662,9 +720,25 @@ namespace KVisualisation
                     if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
                     {
                         pathTimeStep = 0.5f;
-                        path = mVisSimController.Players[mId].SampleObjectPath(agentData.id, 0.0f, 60.0f * 10.0f, pathTimeStep);
+                        float totalTime = 60.0f * 10.0f;
+                        path = mVisSimController.Players[mId].SampleObjectPath(agentData.id, 0.0f, totalTime, pathTimeStep);
                         if (path != null && path.Length > 0)
                         {
+                            if (IsSTC)
+                            {
+                                float time = 0.0f;
+                                foreach (var p in path)
+                                {
+                                    Vector3 newPos;
+                                    Vector3 newDir;
+                                    MapSTC(p.position, p.orientation * Vector3.forward, time, totalTime, out newPos, out newDir);
+                                    p.position = newPos;
+                                    p.orientation = Quaternion.LookRotation(newDir);
+
+                                    time += pathTimeStep;
+                                }
+                            }
+
                             movingObject.transform.localPosition = path[path.Length - 1].position;
                             movingObject.transform.localRotation = path[path.Length - 1].orientation;
                         }
@@ -675,7 +749,23 @@ namespace KVisualisation
 
                         pathStartTime = data.timePeriod.x;
                         pathTimeStep = 0.1f;
-                        path = mVisSimController.Players[mId].SampleObjectPath(agentData.id, pathStartTime, Mathf.Min(data.timePeriod.y, SimTime), pathTimeStep);
+                        float totalTime = Mathf.Min(data.timePeriod.y, SimTime);
+                        path = mVisSimController.Players[mId].SampleObjectPath(agentData.id, pathStartTime, totalTime, pathTimeStep);
+
+                        if (IsSTC)
+                        {
+                            float time = data.timePeriod.x;
+                            foreach (var p in path)
+                            {
+                                Vector3 newPos;
+                                Vector3 newDir;
+                                MapSTC(p.position, p.orientation * Vector3.forward, time, totalTime,out newPos, out newDir);
+                                p.position = newPos;
+                                p.orientation = Quaternion.LookRotation(newDir);
+
+                                time += pathTimeStep;
+                            }
+                        }
                     }
 
                     if (movingObjectSettings.mesh)
@@ -776,15 +866,32 @@ namespace KVisualisation
                             SimulationPlayer.MovingObjectUpdate[] ghostPath = null;
                             if (ghostSpawner.ghostingDropType == MovingObjectSettings.GhostingDrop.Distance)
                             {
-                                ghostPath = mVisSimController.Players[mId].SampleObjectPathDistance(agentData.id, startTime, data.timePeriod.y, 0.5f, movingObjectSettings.ghostingDropValue);
+                                pathTimeStep = 0.5f;
+                                ghostPath = mVisSimController.Players[mId].SampleObjectPathDistance(agentData.id, startTime, data.timePeriod.y, pathTimeStep, movingObjectSettings.ghostingDropValue);
                             }
                             else
                             {
-                                ghostPath = mVisSimController.Players[mId].SampleObjectPath(agentData.id, startTime, data.timePeriod.y, movingObjectSettings.ghostingDropValue);
+                                pathTimeStep = movingObjectSettings.ghostingDropValue;
+                                ghostPath = mVisSimController.Players[mId].SampleObjectPath(agentData.id, startTime, data.timePeriod.y, pathTimeStep);
                             }
 
                             if (ghostPath != null && ghostPath.Length > 0)
-                            { 
+                            {
+                                if (IsSTC)
+                                {
+                                    float time = data.timePeriod.x;
+                                    foreach (var p in path)
+                                    {
+                                        Vector3 newPos;
+                                        Vector3 newDir;
+                                        MapSTC(p.position, p.orientation * Vector3.forward, time, data.timePeriod.y, out newPos, out newDir);
+                                        p.position = newPos;
+                                        p.orientation = Quaternion.LookRotation(newDir);
+
+                                        time += pathTimeStep;
+                                    }
+                                }
+
                                 foreach (var p in ghostPath)
                                 {
                                     ghostSpawner.Spawn(p.position, p.orientation, movingObjectSettings.objectScale, p.time, -1.0f);
@@ -793,19 +900,36 @@ namespace KVisualisation
                         }
                         else
                         {
-
+                            float totalTime = Mathf.Min(data.timePeriod.y, SimTime);
                             SimulationPlayer.MovingObjectUpdate[] ghostPath = null;
                             if (ghostSpawner.ghostingDropType == MovingObjectSettings.GhostingDrop.Distance)
                             {
-                                ghostPath = mVisSimController.Players[mId].SampleObjectPathDistance(agentData.id, startTime, Mathf.Min(data.timePeriod.y, SimTime), 0.5f, movingObjectSettings.ghostingDropValue);
+                                pathTimeStep = 0.5f;
+                                ghostPath = mVisSimController.Players[mId].SampleObjectPathDistance(agentData.id, startTime, totalTime, pathTimeStep, movingObjectSettings.ghostingDropValue);
                             }
                             else
                             {
-                                ghostPath = mVisSimController.Players[mId].SampleObjectPath(agentData.id, startTime, Mathf.Min(data.timePeriod.y, SimTime), movingObjectSettings.ghostingDropValue);
+                                pathTimeStep = movingObjectSettings.ghostingDropValue;
+                                ghostPath = mVisSimController.Players[mId].SampleObjectPath(agentData.id, startTime, pathTimeStep, pathTimeStep);
                             }
 
                             if (ghostPath != null && ghostPath.Length > 0)
                             {
+                                if (IsSTC)
+                                {
+                                    float time = data.timePeriod.x;
+                                    foreach (var p in path)
+                                    {
+                                        Vector3 newPos;
+                                        Vector3 newDir;
+                                        MapSTC(p.position, p.orientation * Vector3.forward, time, pathTimeStep, out newPos, out newDir);
+                                        p.position = newPos;
+                                        p.orientation = Quaternion.LookRotation(newDir);
+
+                                        time += pathTimeStep;
+                                    }
+                                }
+
                                 foreach (var p in ghostPath)
                                 {
                                     ghostSpawner.Spawn(p.position, p.orientation, movingObjectSettings.objectScale, p.time, -1.0f);

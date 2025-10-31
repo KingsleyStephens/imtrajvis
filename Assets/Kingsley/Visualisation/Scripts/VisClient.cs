@@ -48,6 +48,8 @@ namespace KVisualisation
 
             public Vector3 objectScale = Vector3.one;
 
+            public bool isSTC = false;
+            public float stcTimeToZ = 300.0f;
 
             public MovingObjectSettings() { }
             public MovingObjectSettings(MovingObjectSettings other)
@@ -65,6 +67,8 @@ namespace KVisualisation
                 overrideGhostColour = other.overrideGhostColour;
                 ghostColour = other.ghostColour;
                 objectScale = other.objectScale;
+                isSTC = other.isSTC;
+                stcTimeToZ = other.stcTimeToZ;
             }
         }
 
