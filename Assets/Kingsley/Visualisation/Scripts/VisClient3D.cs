@@ -27,10 +27,6 @@ namespace KVisualisation
         [SerializeField]
         private GameObject weaponPrefab;
 
-        [Header("STC")]
-        [SerializeField]
-        private GameObject stcMapPlane;
-
         [SerializeField]
         private Color[] agentColours;
 
@@ -222,19 +218,9 @@ namespace KVisualisation
 
         private void MapSTC(Transform movingObject, float time, float totalTime)
         {
-            if (stcMapPlane == null)
-            {
-                return;
-            }
-
-            Vector3 localPlanePos = stcMapPlane.transform.InverseTransformPoint(movingObject.position);
-            Vector3 localPlaneDir = stcMapPlane.transform.InverseTransformDirection(movingObject.forward);
-
-            localPlanePos.y = (time / totalTime) * movingObjectSettings.stcTimeToZ;
-            localPlaneDir.y = 0.0f;
-
-            Vector3 pos = stcMapPlane.transform.TransformPoint(localPlanePos);
-            Vector3 dir = stcMapPlane.transform.TransformDirection(localPlaneDir);
+            Vector3 pos;
+            Vector3 dir;
+            MapSTC(movingObject.position, movingObject.forward, time, totalTime, out pos, out dir);
 
             movingObject.position = pos;
             movingObject.LookAt(movingObject.position + dir);
@@ -242,22 +228,24 @@ namespace KVisualisation
 
         private void MapSTC(Vector3 position, Vector3 forward, float time, float totalTime, out Vector3 outPos, out Vector3 outDir)
         {
-            if (stcMapPlane == null)
+            if (movingObjectSettings.stc == null)
             {
+                Debug.LogWarning("movingObjectSettings.stc is null");
+
                 outPos = Vector3.zero;
                 outDir = Vector3.zero;
 
                 return;
             }
 
-            Vector3 localPlanePos = stcMapPlane.transform.InverseTransformPoint(position);
-            Vector3 localPlaneDir = stcMapPlane.transform.InverseTransformDirection(forward);
+            Vector3 localPlanePos = movingObjectSettings.stc.transform.InverseTransformPoint(position);
+            Vector3 localPlaneDir = movingObjectSettings.stc.transform.InverseTransformDirection(forward);
 
-            localPlanePos.y = (time / totalTime) * movingObjectSettings.stcTimeToZ;
+            localPlanePos.y = (time / totalTime) * movingObjectSettings.stc.size.y * movingObjectSettings.stc.transform.localScale.y;
             localPlaneDir.y = 0.0f;
 
-            Vector3 pos = stcMapPlane.transform.TransformPoint(localPlanePos);
-            Vector3 dir = stcMapPlane.transform.TransformDirection(localPlaneDir);
+            Vector3 pos = movingObjectSettings.stc.transform.TransformPoint(localPlanePos);
+            Vector3 dir = movingObjectSettings.stc.transform.TransformDirection(localPlaneDir);
 
             outPos = pos;
             outDir = dir;
@@ -583,8 +571,11 @@ namespace KVisualisation
                 }
             }
 
-            if (!movingObjectSettings.trail || movingObjectSettings.filter != MovingObjectSettings.FilterType.None)
+            if (!movingObjectSettings.trail || movingObjectSettings.filter != MovingObjectSettings.FilterType.None || 
+                (oldMovingObjectSettings == null || oldMovingObjectSettings.isSTC != movingObjectSettings.isSTC))
             {
+                Debug.Log("Destroying trails and lines");
+
                 if (mLineParent != null)
                 {
                     foreach (Transform child in mLineParent)
@@ -719,21 +710,23 @@ namespace KVisualisation
                     SimulationPlayer.MovingObjectUpdate[] path = null;
                     if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
                     {
+                        var data = mVisSimController.Players[mId].GetSimObjectData(agentData.id);
+
                         pathTimeStep = 0.5f;
-                        float totalTime = 60.0f * 10.0f;
+                        float totalTime = data.timePeriod.y - data.timePeriod.x;
                         path = mVisSimController.Players[mId].SampleObjectPath(agentData.id, 0.0f, totalTime, pathTimeStep);
                         if (path != null && path.Length > 0)
                         {
                             if (IsSTC)
                             {
-                                float time = 0.0f;
+                                float time = data.timePeriod.x;
                                 foreach (var p in path)
                                 {
                                     Vector3 newPos;
                                     Vector3 newDir;
-                                    MapSTC(p.position, p.orientation * Vector3.forward, time, totalTime, out newPos, out newDir);
-                                    p.position = newPos;
-                                    p.orientation = Quaternion.LookRotation(newDir);
+                                    MapSTC(movingObject.transform.TransformPoint(p.position), movingObject.transform.TransformDirection(p.orientation * Vector3.forward), time, totalTime, out newPos, out newDir);
+                                    p.position = movingObject.transform.InverseTransformPoint(newPos);
+                                    p.orientation = Quaternion.LookRotation(movingObject.transform.InverseTransformDirection(newDir));
 
                                     time += pathTimeStep;
                                 }

@@ -141,7 +141,7 @@ namespace SATestbed
             //}
         }
 
-        public void ApplyConfig(VisClient.MovingObjectSettings settings)
+        public void ApplyConfig(VisClient.MovingObjectSettings settings, bool reset = false)
         {
             GameObject[] dimensions = new GameObject[] { oneD, twoD, twoPointFiveD, threeD };
             for (int i = 0; i < dimensions.Length; i++)
@@ -151,7 +151,7 @@ namespace SATestbed
                     VisClient visClient = dimensions[i].GetComponent<VisClient>();
                     if (visClient != null)
                     {
-                        visClient.ApplySettings(instanceId, settings);
+                        visClient.ApplySettings(instanceId, settings, reset);
                     }
                 }
             }

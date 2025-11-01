@@ -49,7 +49,7 @@ namespace KVisualisation
             public Vector3 objectScale = Vector3.one;
 
             public bool isSTC = false;
-            public float stcTimeToZ = 300.0f;
+            public BoxCollider stc;
 
             public MovingObjectSettings() { }
             public MovingObjectSettings(MovingObjectSettings other)
@@ -68,10 +68,12 @@ namespace KVisualisation
                 ghostColour = other.ghostColour;
                 objectScale = other.objectScale;
                 isSTC = other.isSTC;
-                stcTimeToZ = other.stcTimeToZ;
+                stc = other.stc;
             }
         }
 
+
+        protected MovingObjectSettings oldMovingObjectSettings;
         [SerializeField]
         protected MovingObjectSettings movingObjectSettings = new MovingObjectSettings();
 
@@ -94,9 +96,10 @@ namespace KVisualisation
         { 
         }
 
-        public void ApplySettings(int id, MovingObjectSettings settings)
+        public void ApplySettings(int id, MovingObjectSettings settings, bool reset = false)
         {
             mId = id;
+            oldMovingObjectSettings = (!reset) ? movingObjectSettings : null;
             movingObjectSettings = new MovingObjectSettings(settings);
             OnSettingsUpdate();
         }

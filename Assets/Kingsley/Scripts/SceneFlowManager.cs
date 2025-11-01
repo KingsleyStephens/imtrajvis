@@ -202,6 +202,7 @@ public class SceneFlowManager : MonoBehaviour
                                                         {
                                                             clientConfigs[mCurrentClient].objectScale = new Vector3(0.01f, 0.01f, 0.01f);
                                                             clientConfigs[mCurrentClient].densityUpdateFrequence = 0.1f;
+                                                            clientConfigs[mCurrentClient].stc = GetSceneSTC();
 
                                                             KCore.Logger.LogMessage("Design space: Data::Scale::Room Scale");
                                                         }
@@ -215,6 +216,7 @@ public class SceneFlowManager : MonoBehaviour
                                                         {
                                                             clientConfigs[mCurrentClient].objectScale = Vector3.one;
                                                             clientConfigs[mCurrentClient].densityUpdateFrequence = 2.0f;
+                                                            clientConfigs[mCurrentClient].stc = GetSceneSTC();
 
                                                             KCore.Logger.LogMessage("Design space: Data::Scale::World Scale");
                                                         }
@@ -429,6 +431,25 @@ public class SceneFlowManager : MonoBehaviour
         ApplyCurrentConfig();
     }
 
+    private BoxCollider GetSceneSTC()
+    {
+        VisClient3D visClient = VisClient3D;
+        if (visClient != null)
+        {
+            SceneTag sceneTag = visClient.transform.GetComponentInChildren<SceneTag>();
+            if (sceneTag != null)
+            {
+                BoxCollider collider = sceneTag.transform.GetComponent<BoxCollider>();
+                if (collider != null)
+                {
+                    return collider;
+                }
+            }
+        }
+
+        return null;
+    }
+
     private void ApplyViewConfig(ViewConfigType config)
     {
         if (visRoot == null)
@@ -544,7 +565,7 @@ public class SceneFlowManager : MonoBehaviour
         }
 
         ApplyViewChange();
-        ApplyConfigAll();
+        ApplyConfigAll(true);
 
         var mult = GetMultipleConfig(visClients.Count);
         if (mult != null)
@@ -1230,19 +1251,19 @@ public class SceneFlowManager : MonoBehaviour
         clientConfigs[mCurrentClient].filter = VisClient.MovingObjectSettings.FilterType.None;
     }
 
-    public void ApplyCurrentConfig()
+    public void ApplyCurrentConfig(bool reset = false)
     {
         if (mCurrentClient >= 0 && mCurrentClient < visClients.Count)
         {
-            ApplyClientConfig(visClients[mCurrentClient].GetComponent<Visualisation>(), clientConfigs[mCurrentClient]);
+            ApplyClientConfig(visClients[mCurrentClient].GetComponent<Visualisation>(), clientConfigs[mCurrentClient], reset);
         }
     }
 
-    public void ApplyConfigAll()
+    public void ApplyConfigAll(bool reset = false)
     {
         for (int i = 0; i < visClients.Count; i++)
         {
-            ApplyClientConfig(visClients[i].GetComponent<Visualisation>(), clientConfigs[i]);
+            ApplyClientConfig(visClients[i].GetComponent<Visualisation>(), clientConfigs[i], true);
         }
     }
 
@@ -1398,11 +1419,11 @@ public class SceneFlowManager : MonoBehaviour
         }
     }
 
-    private void ApplyClientConfig(Visualisation vis, VisClient.MovingObjectSettings config)
+    private void ApplyClientConfig(Visualisation vis, VisClient.MovingObjectSettings config, bool reset = false)
     {
         if (vis != null)
         {
-            vis.ApplyConfig(config);
+            vis.ApplyConfig(config, reset);
         }
     }
 
