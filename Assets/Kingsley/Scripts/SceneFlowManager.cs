@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using static OVRHaptics;
 
 public class SceneFlowManager : MonoBehaviour
 {
@@ -204,6 +205,9 @@ public class SceneFlowManager : MonoBehaviour
                                                             clientConfigs[mCurrentClient].densityUpdateFrequence = 0.1f;
                                                             clientConfigs[mCurrentClient].stc = GetSceneSTC();
 
+                                                            Debug.Log("FOUND STC BOUNDS Room Scale " + ((clientConfigs[mCurrentClient].stc) ? "true" : "false"));
+
+
                                                             KCore.Logger.LogMessage("Design space: Data::Scale::Room Scale");
                                                         }
                                                         break;
@@ -217,6 +221,8 @@ public class SceneFlowManager : MonoBehaviour
                                                             clientConfigs[mCurrentClient].objectScale = Vector3.one;
                                                             clientConfigs[mCurrentClient].densityUpdateFrequence = 2.0f;
                                                             clientConfigs[mCurrentClient].stc = GetSceneSTC();
+                                                            
+                                                            Debug.Log("FOUND STC BOUNDS World Scale " + ((clientConfigs[mCurrentClient].stc) ? "true" : "false"));
 
                                                             KCore.Logger.LogMessage("Design space: Data::Scale::World Scale");
                                                         }
@@ -431,12 +437,12 @@ public class SceneFlowManager : MonoBehaviour
         ApplyCurrentConfig();
     }
 
-    private BoxCollider GetSceneSTC()
+    private BoxCollider GetSceneSTC(GameObject obj = null)
     {
-        VisClient3D visClient = VisClient3D;
+        Transform visClient = obj ? obj.transform : (VisClient3D) ? VisClient3D.transform : null;
         if (visClient != null)
         {
-            SceneTag sceneTag = visClient.transform.GetComponentInChildren<SceneTag>();
+            SceneTag sceneTag = visClient.GetComponentInChildren<SceneTag>();
             if (sceneTag != null)
             {
                 BoxCollider collider = sceneTag.transform.GetComponent<BoxCollider>();
@@ -444,7 +450,19 @@ public class SceneFlowManager : MonoBehaviour
                 {
                     return collider;
                 }
+                else
+                {
+                    Debug.LogWarning("GetSceneSTC BoxCollider is null");
+                }
             }
+            else
+            {
+                Debug.LogWarning("GetSceneSTC SceneTag is null");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("GetSceneSTC VisClient3D is null");
         }
 
         return null;
@@ -1263,6 +1281,7 @@ public class SceneFlowManager : MonoBehaviour
     {
         for (int i = 0; i < visClients.Count; i++)
         {
+            clientConfigs[i].stc = GetSceneSTC();
             ApplyClientConfig(visClients[i].GetComponent<Visualisation>(), clientConfigs[i], true);
         }
     }
@@ -1402,6 +1421,7 @@ public class SceneFlowManager : MonoBehaviour
 
                     VisClient.MovingObjectSettings config = new VisClient.MovingObjectSettings();
                     clientConfigs.Add(config);
+
                     Visualisation visComponent = vis.GetComponent<Visualisation>();
                     if (visComponent != null)
                     {
@@ -1411,6 +1431,11 @@ public class SceneFlowManager : MonoBehaviour
 
                         visComponent.ActivateVis();
                     }
+
+                    config.stc = GetSceneSTC(vis);
+
+                    Debug.Log("FOUND STC BOUNDS " + ((config.stc) ? "true" : "false"));
+
                     mPrevPlaybackSpeed.Add(1.0f);
                 }
             }

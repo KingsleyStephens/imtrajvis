@@ -595,6 +595,8 @@ namespace KVisualisation
             {
                 if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Static)
                 {
+                    Debug.Log("Destroying trails");
+
                     if (mTrailParent != null)
                     {
                         foreach (Transform child in mTrailParent)
@@ -602,9 +604,24 @@ namespace KVisualisation
                             Destroy(child.gameObject);
                         }
                     }
+
+                    //if (oldMovingObjectSettings == null || oldMovingObjectSettings.isSTC != movingObjectSettings.isSTC)
+                    //{
+                        Debug.Log("Destroying lines");
+
+                        if (mLineParent != null)
+                        {
+                            foreach (Transform child in mLineParent)
+                            {
+                                Destroy(child.gameObject);
+                            }
+                        }
+                    //}
                 }
                 else
                 {
+                    Debug.Log("Destroying just lines");
+
                     if (mLineParent != null)
                     {
                         foreach (Transform child in mLineParent)
