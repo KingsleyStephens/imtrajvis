@@ -7,7 +7,7 @@ namespace KingsleyPhD
     [RequireComponent(typeof(SphereCollider))]
     public class TrackballControl : MonoBehaviour
     {
-        public UIMouseEvents inputEvents;
+        public InputEventManager inputEvents;
 
         [Header("Rotation Settings")]
         public float rotationSpeed = 200.0f;

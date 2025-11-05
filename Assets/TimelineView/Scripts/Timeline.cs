@@ -65,7 +65,7 @@ namespace KingsleyPhD
         [SerializeField]
         private SnapshotCamera snapshotCamera;
         [SerializeField]
-        private UIMouseEvents inputEvents;
+        private InputEventManager inputEvents;
 
         // PRIVATE DATA
 

@@ -6,7 +6,7 @@ using static KVisualisation.DemoKeys;
 
 namespace KingsleyPhD
 {
-    public class UIMouseEvents : MonoBehaviour
+    public class InputEventManager : MonoBehaviour
     {
         [SerializeField]
         private bool isVR = false;
