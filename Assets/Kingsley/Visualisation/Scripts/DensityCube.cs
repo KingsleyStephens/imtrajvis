@@ -41,11 +41,6 @@ namespace KVisualisation
             Density = mDensityTimestamps.Count;
         }
 
-        private void Start()
-        {
-            meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        }
-
         private void UpdateCube(float density)
         {
             if (density == 0.0f)
@@ -54,6 +49,11 @@ namespace KVisualisation
             }
             else
             {
+                if (meshRenderer == null)
+                {
+                    meshRenderer = gameObject.GetComponent<MeshRenderer>();
+                }
+
                 if (meshRenderer != null)
                 {
                     Material mat = meshRenderer.material;
@@ -72,7 +72,7 @@ namespace KVisualisation
         {
             float step = 1.0f / colours.Length;
             int bucket = (int)(percent / step);
-            float bucketPercent = percent % step * colours.Length;
+            float bucketPercent = percent % step;
 
             if (bucket >= colours.Length - 1)
             {

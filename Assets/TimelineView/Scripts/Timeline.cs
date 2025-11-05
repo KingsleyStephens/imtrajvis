@@ -703,19 +703,20 @@ namespace KingsleyPhD
 
         private void CellActivation(int cellButtonIndex, TimelineView.CellData cellData, bool selected)
         {
-            int i = 0;
-            while (i < mWorkspaces.Count)
-            {
-                if (!mWorkspaces[i].Pinned)
-                {
-                    Destroy(mWorkspaces[i].gameObject);
-                    mWorkspaces.RemoveAt(i);
-                }
-                else
-                {
-                    ++i;
-                }
-            }
+            //// Pinning
+            //int i = 0;
+            //while (i < mWorkspaces.Count)
+            //{
+            //    if (!mWorkspaces[i].Pinned)
+            //    {
+            //        Destroy(mWorkspaces[i].gameObject);
+            //        mWorkspaces.RemoveAt(i);
+            //    }
+            //    else
+            //    {
+            //        ++i;
+            //    }
+            //}
 
             Workspace ws = mWorkspaces.Find(x => x.Id == cellData.id);
             if (ws == null)

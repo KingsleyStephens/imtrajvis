@@ -101,10 +101,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   colours:
-  - {r: 1, g: 1, b: 1, a: 1}
-  - {r: 0, g: 1, b: 0, a: 1}
-  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 1, g: 1, b: 0, a: 1}
   - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
   maxDensity: 10
 --- !u!114 &7446296999234333423
 MonoBehaviour:

@@ -6469,15 +6469,15 @@ MonoBehaviour:
   _playerEyes: {fileID: 421945462}
   _pivotMarkerPrefab: {fileID: 1315512768075282996, guid: eba7bf4b982542e40bcd088a3a3cc95a,
     type: 3}
-  moveSpeed: 10
-  orbitDistance: 5
-  orbitHeight: 1
+  moveSpeed: 20
+  orbitDistance: 10
+  orbitHeight: 40
   minZoom: 1
-  maxZoom: 40
+  maxZoom: 80
   orbitSpeed: 15
-  zoomSpeed: 10
-  panSpeed: 10
-  verticleSpeed: 0.25
+  zoomSpeed: 20
+  panSpeed: 20
+  verticleSpeed: 2.5
 --- !u!4 &1488173620
 Transform:
   m_ObjectHideFlags: 0

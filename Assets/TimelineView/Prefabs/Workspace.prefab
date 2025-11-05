@@ -389,6 +389,10 @@ MonoBehaviour:
   ui: {fileID: 4729300597757625111}
   designViewAnchor: {fileID: 963769554734910567}
   snapshotAnchor: {fileID: 8540802137787145595}
+  telemetryLogDelta: 0.1
+  mainCamera: {fileID: 0}
+  leftController: {fileID: 0}
+  rightController: {fileID: 0}
 --- !u!1 &6703485195695258102
 GameObject:
   m_ObjectHideFlags: 0
@@ -746,6 +750,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 192671720114885116, guid: 8e65a0183bc7c0942aec94947d8e56de,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1984474814713866660, guid: 8e65a0183bc7c0942aec94947d8e56de,
         type: 3}
