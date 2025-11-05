@@ -1,4 +1,5 @@
 using KVisualisation;
+using Oculus.Interaction.Locomotion;
 using SpatioTemporalDatabase;
 using System;
 using System.Collections.Generic;
@@ -66,6 +67,8 @@ namespace KingsleyPhD
         private SnapshotCamera snapshotCamera;
         [SerializeField]
         private InputEventManager inputEvents;
+        [SerializeField]
+        private GameObject viewpointUI;
 
         // PRIVATE DATA
 
@@ -93,6 +96,12 @@ namespace KingsleyPhD
         private bool mSwitchingScene = false;
 
         private static Timeline instance;
+
+        private VRCameraSwitcher.CameraType mPrevCamType = VRCameraSwitcher.CameraType.Menu;
+        private VRCameraSwitcher.CameraCollection.CameraModeType mPrevCamMode = VRCameraSwitcher.CameraCollection.CameraModeType.Static;
+
+        private bool mIsObjectView = false;
+        private MeshRenderer mObjectMesh;
 
         // PUBLIC
 
@@ -354,6 +363,7 @@ namespace KingsleyPhD
             workspace.Scene.Vis.localPosition = Vector3.zero;
             workspace.Scene.Vis.localScale = Vector3.one;
             workspace.Scene.Vis.localRotation = Quaternion.identity;
+            mFPVWorkspace.SceneFlowManager.viewpointUI = viewpointUI;
 
             if (!mSwitchingScene)
             {
@@ -366,9 +376,11 @@ namespace KingsleyPhD
 
             if (cameraSwitcher != null)
             {
+
                 VRCameraSwitcher.CameraType camType = (workspace.SceneFlowManager.FullScale) ? VRCameraSwitcher.CameraType.WorldScale : VRCameraSwitcher.CameraType.RoomScale;
                 VRCameraSwitcher.CameraCollection.CameraModeType camMode = (workspace.SceneFlowManager.FreeFly) ? VRCameraSwitcher.CameraCollection.CameraModeType.FreeFly : VRCameraSwitcher.CameraCollection.CameraModeType.Orbit;
                 cameraSwitcher.ActivateCamera(camType, camMode);
+                mIsObjectView = false;
             }
 
             workspace.Grow();
@@ -980,6 +992,53 @@ namespace KingsleyPhD
                 mFPVWorkspace.Scene.SceneFlowManager.TimeControlToggle();
 
                 KCore.Logger.LogMessage($"Time toggle at SimTime {mFPVWorkspace.SceneFlowManager.SimTime} for {mFPVWorkspace.Id}");
+            }
+        }
+
+        public void ObjectCentricView()
+        {
+            if (cameraSwitcher != null)
+            {
+                mPrevCamType = cameraSwitcher.CurrentType;
+                mPrevCamMode = cameraSwitcher.CurrentMode;
+
+                cameraSwitcher.ActivateCamera(mPrevCamType, VRCameraSwitcher.CameraCollection.CameraModeType.Object);
+                mIsObjectView = true;
+
+                GameObject currentCam = cameraSwitcher.CurrentCamera;
+                if (currentCam != null)
+                {
+                    VRObjectCamera objCamera = currentCam.GetComponent<VRObjectCamera>();
+                    if (objCamera != null)
+                    {
+                        GameObject selectedObj = VisClient3D.SelectedObject;
+                        if (selectedObj != null)
+                        {
+                            objCamera.objectTarget = selectedObj.transform;
+
+                            mObjectMesh = selectedObj.GetComponentInChildren<MeshRenderer>();
+                            if (mObjectMesh != null)
+                            {
+                                mObjectMesh.gameObject.SetActive(false);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void PersonCentricView()
+        {
+            if (cameraSwitcher != null)
+            {
+                cameraSwitcher.ActivateCamera(mPrevCamType, mPrevCamMode);
+                mIsObjectView = false;
+
+                if (mObjectMesh != null)
+                {
+                    mObjectMesh.gameObject.SetActive(true);
+                    mObjectMesh = null;
+                }
             }
         }
     }

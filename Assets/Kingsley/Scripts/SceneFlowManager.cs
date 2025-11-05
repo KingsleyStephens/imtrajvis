@@ -11,7 +11,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
-using static OVRHaptics;
 
 public class SceneFlowManager : MonoBehaviour
 {
@@ -53,6 +52,8 @@ public class SceneFlowManager : MonoBehaviour
 
     [SerializeField]
     private GameObject cameraRig;
+
+    public GameObject viewpointUI;
 
     [SerializeField]
     private Camera mainCamera;
@@ -244,6 +245,63 @@ public class SceneFlowManager : MonoBehaviour
                         {
                             switch (dim.name)
                             {
+                                case "Viewpoint":
+                                    {
+                                        int index = 0;
+                                        foreach (var opt in dim.options)
+                                        {
+                                            switch (opt)
+                                            {
+                                                case "Egocentric":
+                                                    {
+                                                        bool ego = dim.choices[index];
+
+                                                        if (ego)
+                                                        {
+                                                            //if (viewpointUI != null)
+                                                            //{
+                                                            //    viewpointUI.SetActive(false);
+
+                                                            //    ViewpointUI ui = viewpointUI.GetComponent<ViewpointUI>();
+                                                            //    if (ui != null)
+                                                            //    {
+                                                            //        ui.ViewPoint = 1;
+                                                            //    }
+                                                            //}
+
+                                                            KCore.Logger.LogMessage("Design space: Interaction::Viewpoint::Egocentric");
+                                                        }
+
+                                                        break;
+                                                    }
+                                                case "Object-centric":
+                                                    {
+                                                        bool objCentric = dim.choices[index];
+
+                                                        if (viewpointUI != null)
+                                                        {
+                                                            viewpointUI.SetActive(objCentric);
+
+                                                            ViewpointUI ui = viewpointUI.GetComponent<ViewpointUI>();
+                                                            if (ui != null)
+                                                            {
+                                                                ui.ViewPoint = 1;
+                                                            }
+                                                        }
+
+                                                        if (objCentric)
+                                                        {
+                                                            KCore.Logger.LogMessage("Design space: Interaction::Viewpoint::Object-centric");
+                                                        }
+
+                                                        break;
+                                                    }
+                                            }
+
+                                            index++;
+                                        }
+                                        break;
+                                    }
                                 case "Navigate":
                                     {
                                         int index = 0;
@@ -1066,6 +1124,20 @@ public class SceneFlowManager : MonoBehaviour
             }
 
             lastPositionCheckTime = Time.time;
+        }
+
+
+        if (viewpointUI != null)
+        {
+            ViewpointUI ui = viewpointUI.GetComponent<ViewpointUI>();
+            if (ui != null && VisClient3D != null)
+            {
+                ui.ObjectSelected = VisClient3D.SelectedObject;
+            }
+        }
+        else
+        {
+            Debug.LogWarning("viewpointUI is null");
         }
     }
 

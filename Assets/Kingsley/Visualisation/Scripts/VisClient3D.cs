@@ -57,6 +57,29 @@ namespace KVisualisation
         private MovingObjectSettings.FilterType mFilterType = MovingObjectSettings.FilterType.None;
         private Dictionary<Vector2Int, bool> mFilterState= new Dictionary<Vector2Int, bool>();
 
+        public GameObject SelectedObject
+        {
+            get
+            {
+                foreach (var id in mMovingObjects.Keys)
+                {
+                    GameObject movingObject = mMovingObjects[id];
+
+                    SelectableObject selectable = movingObject.GetComponent<SelectableObject>();
+                    if (selectable != null)
+                    {
+                        if (selectable.State == SelectableObject.StateType.Selected)
+                        {
+                            return movingObject;
+                        }
+                    }
+                }
+
+                return null;
+            }
+        }
+
+
         public float SimTime {  get { return mVisSimController.Players[mId].SimTime; } }
         public bool IsPaused { get { return mVisSimController.Players[mId].PlaybackSpeed == 0.0f; } }
         public Vector2 TimeExtents { get { return mVisSimController.Players[mId].TimeExtents; } }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static KVisualisation.VRCameraSwitcher.CameraCollection;
 
 namespace KVisualisation
 {
@@ -21,7 +22,8 @@ namespace KVisualisation
             {
                 Static,
                 FreeFly,
-                Orbit
+                Orbit,
+                Object
             }
 
             [SerializeField]
@@ -30,6 +32,8 @@ namespace KVisualisation
             private GameObject freefly;
             [SerializeField]
             private GameObject orbit;
+            [SerializeField]
+            private GameObject objectCam;
 
             private GameObject[] mAllCameras;
 
@@ -69,7 +73,7 @@ namespace KVisualisation
             {
                 if (mAllCameras == null)
                 {
-                    mAllCameras = new GameObject[] { staticCamera, freefly, orbit };
+                    mAllCameras = new GameObject[] { staticCamera, freefly, orbit, objectCam };
                 }
 
                 return mAllCameras;
@@ -100,6 +104,9 @@ namespace KVisualisation
 
         public GameObject CurrentCamera { get { return mCurrentCamera; } }
 
+        public CameraType CurrentType { get; set; }
+        public CameraModeType CurrentMode { get; set; }
+
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -117,7 +124,11 @@ namespace KVisualisation
             int index = (int)cameraType;
             if (index < cols.Length)
             {
+                Debug.Log("Activation camera " + mode.ToString());
                 mCurrentCamera = cols[index].ActivateMode(mode);
+
+                CurrentType = cameraType;
+                CurrentMode = mode;
             }
         }
 

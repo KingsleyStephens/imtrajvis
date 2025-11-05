@@ -2,11 +2,6 @@
     "categories": [
         { "name": "Data", 
           "dimensions": [
-            { "name": "Environment Objects",
-              "singular": false,
-              "options": ["None", "Static"],
-              "defaultOption": 0
-            },
             { "name": "Scale",
               "singular": false,
               "options": ["Room Scale", "World Scale"],
@@ -17,8 +12,8 @@
         { "name": "Interaction", 
           "dimensions": [
             { "name": "Viewpoint",
-              "singular": false,
-              "options": ["Egocentric", "Exocentric", "Object-centric"],
+              "singular": true,
+              "options": ["Egocentric", "Object-centric"],
               "defaultOption": 0
             },
             { "name": "Navigate",
@@ -28,7 +23,7 @@
             },
             { "name": "Manipulate",
               "singular": true,
-              "options": ["Time", "Traj Selection", "Data Views"],
+              "options": ["Time", "Traj Selection"],
               "defaultOption": 0
             }
           ]
@@ -54,11 +49,6 @@
         },
         { "name": "Space/Time", 
           "dimensions": [
-            { "name": "Dimensionality",
-              "singular": false,
-              "options": ["2D", "3D"],
-              "defaultOption": 1
-            },
             { "name": "Time",
               "singular": false,
               "options": ["Static", "+ 1D position", "+ 1D animation"],
