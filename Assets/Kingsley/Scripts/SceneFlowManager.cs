@@ -282,11 +282,11 @@ public class SceneFlowManager : MonoBehaviour
                                                         {
                                                             viewpointUI.SetActive(objCentric);
 
-                                                            ViewpointUI ui = viewpointUI.GetComponent<ViewpointUI>();
-                                                            if (ui != null)
-                                                            {
-                                                                ui.ViewPoint = 1;
-                                                            }
+                                                            //ViewpointUI ui = viewpointUI.GetComponent<ViewpointUI>();
+                                                            //if (ui != null)
+                                                            //{
+                                                            //    ui.ViewPoint = 1;
+                                                            //}
                                                         }
 
                                                         if (objCentric)

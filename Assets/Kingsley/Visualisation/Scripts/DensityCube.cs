@@ -13,7 +13,13 @@ namespace KVisualisation
         private float density = 0.0f;
         private MeshRenderer meshRenderer;
 
-        private List<float> mDensityTimestamps = new List<float>();
+        public class DensityData
+        {
+            public GameObject obj;
+            public float time;
+        }
+
+        private List<DensityData> mDensityTimestamps = new List<DensityData>();
 
         public float Density
         {
@@ -23,22 +29,23 @@ namespace KVisualisation
 
         public void SpliceDensity(float time)
         {
-            mDensityTimestamps = mDensityTimestamps.Where(x => x <= time).ToList();
+            mDensityTimestamps = mDensityTimestamps.Where(x => x.time <= time).ToList();
             CalculateDensity();
         }
 
-        public void UpdateDensity(float time)
+        public void UpdateDensity(GameObject obj, float time)
         {
-            if (mDensityTimestamps.Count == 0 || (mDensityTimestamps.Count > 0 && time > mDensityTimestamps[mDensityTimestamps.Count - 1]))
+            if (mDensityTimestamps.Count == 0 || (mDensityTimestamps.Count > 0 && time > mDensityTimestamps[mDensityTimestamps.Count - 1].time))
             {
-                mDensityTimestamps.Add(time);
+                mDensityTimestamps.Add(new DensityData() { obj = obj, time = time });
                 CalculateDensity();
             }
         }
 
-        private void CalculateDensity()
+        public void CalculateDensity()
         {
-            Density = mDensityTimestamps.Count;
+            List<DensityData> notFiltered = mDensityTimestamps.Where(x => !x.obj.GetComponent<Filterable>().Filtered ).ToList();
+            Density = notFiltered.Count;
         }
 
         private void UpdateCube(float density)

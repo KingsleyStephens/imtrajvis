@@ -208,7 +208,7 @@ namespace KVisualisation
 
                             if (updateDensity && !IsFiltered(id))
                             {
-                                densityMap3D.UpdatePosition(obj.transform.position, SimTime);
+                                densityMap3D.UpdatePosition(obj, obj.transform.position, SimTime);
                             }
 
                             if (movingObjectSettings.trail)
@@ -279,6 +279,28 @@ namespace KVisualisation
         {
             if (movingObjectSettings.timeType == MovingObjectSettings.TimeType.Dynamic)
             {
+                // Special condition when all moving objects have finished in the sim and have destructed leaving their trails
+                if (toTime < fromTime && fromTime >= TimeExtents.y)
+                {
+                    if (mMovingObjects.Count == 0)
+                    {
+                        if (mLineParent != null)
+                        {
+                            foreach (Transform child in mLineParent)
+                            {
+                                Destroy(child.gameObject);
+                            }
+                        }
+                        if (mTrailParent != null)
+                        {
+                            foreach (Transform child in mTrailParent)
+                            {
+                                Destroy(child.gameObject);
+                            }
+                        }
+                    }
+                }
+
                 foreach (Vector2Int id in mAllObjectIds)
                 {
                     GameObject obj;
@@ -504,6 +526,7 @@ namespace KVisualisation
                             {
                                 mFilterState[k] = false;
                             }
+
                             break;
                         }
                     case MovingObjectSettings.FilterType.Selection:
@@ -541,6 +564,7 @@ namespace KVisualisation
                                     mFilterState[k] = mFilterState[k] || !mFilterSelection.Contains(k);
                                 }
                             }
+
                             break;
                         }
                     default:
@@ -690,6 +714,16 @@ namespace KVisualisation
             }
 
             IsSTC = movingObjectSettings.isSTC;
+
+            if (densityMap != null)
+            {
+                densityMap.SetActive(movingObjectSettings.density);
+
+                if (movingObjectSettings.density)
+                {
+                    densityMap3D.UpdateCubes();
+                }
+            }
         }
 
         private bool IsFiltered(Vector2Int objectId)
@@ -709,11 +743,19 @@ namespace KVisualisation
             {
                 agentData.ClearUpdatables();
 
+                Filterable filterable = movingObject.GetComponent<Filterable>();
+
                 if (IsFiltered(new Vector2Int(agentData.playerId, agentData.id)))
                 {
+                    if (filterable != null)
+                    {
+                        filterable.Filtered = true;
+                    }
                     return;
                 }
-                
+
+                filterable.Filtered = false;
+
                 if (agentData.agentClass == VisAgent.AgentClass.MovingObject)
                 {
                     movingObject.transform.localScale = movingObjectSettings.objectScale;

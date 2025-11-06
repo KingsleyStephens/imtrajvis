@@ -363,7 +363,11 @@ namespace KingsleyPhD
             workspace.Scene.Vis.localPosition = Vector3.zero;
             workspace.Scene.Vis.localScale = Vector3.one;
             workspace.Scene.Vis.localRotation = Quaternion.identity;
-            mFPVWorkspace.SceneFlowManager.viewpointUI = viewpointUI;
+            
+            if (mFPVWorkspace.SceneFlowManager != null)
+            {
+                mFPVWorkspace.SceneFlowManager.viewpointUI = viewpointUI;
+            }
 
             if (!mSwitchingScene)
             {
@@ -376,7 +380,6 @@ namespace KingsleyPhD
 
             if (cameraSwitcher != null)
             {
-
                 VRCameraSwitcher.CameraType camType = (workspace.SceneFlowManager.FullScale) ? VRCameraSwitcher.CameraType.WorldScale : VRCameraSwitcher.CameraType.RoomScale;
                 VRCameraSwitcher.CameraCollection.CameraModeType camMode = (workspace.SceneFlowManager.FreeFly) ? VRCameraSwitcher.CameraCollection.CameraModeType.FreeFly : VRCameraSwitcher.CameraCollection.CameraModeType.Orbit;
                 cameraSwitcher.ActivateCamera(camType, camMode);
@@ -756,7 +759,7 @@ namespace KingsleyPhD
                             workspace.leftController = leftController;
                             workspace.rightController = rightController;
 
-                            workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "simulation" ? underwaterPrefab : scenePrefab, mainCamera);
+                            workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "AUVSim" ? underwaterPrefab : scenePrefab, mainCamera);
 
                             workspace.Scene.transform.GetComponent<TrackballControl>().inputEvents = inputEvents;
 
@@ -995,49 +998,51 @@ namespace KingsleyPhD
             }
         }
 
-        public void ObjectCentricView()
+        public bool ObjectCentricView
         {
-            if (cameraSwitcher != null)
+            set
             {
-                mPrevCamType = cameraSwitcher.CurrentType;
-                mPrevCamMode = cameraSwitcher.CurrentMode;
-
-                cameraSwitcher.ActivateCamera(mPrevCamType, VRCameraSwitcher.CameraCollection.CameraModeType.Object);
-                mIsObjectView = true;
-
-                GameObject currentCam = cameraSwitcher.CurrentCamera;
-                if (currentCam != null)
+                if (cameraSwitcher != null)
                 {
-                    VRObjectCamera objCamera = currentCam.GetComponent<VRObjectCamera>();
-                    if (objCamera != null)
+                    if (value)
                     {
-                        GameObject selectedObj = VisClient3D.SelectedObject;
-                        if (selectedObj != null)
-                        {
-                            objCamera.objectTarget = selectedObj.transform;
+                        mPrevCamType = cameraSwitcher.CurrentType;
+                        mPrevCamMode = cameraSwitcher.CurrentMode;
 
-                            mObjectMesh = selectedObj.GetComponentInChildren<MeshRenderer>();
-                            if (mObjectMesh != null)
+                        cameraSwitcher.ActivateCamera(mPrevCamType, VRCameraSwitcher.CameraCollection.CameraModeType.Object);
+                        mIsObjectView = true;
+
+                        GameObject currentCam = cameraSwitcher.CurrentCamera;
+                        if (currentCam != null)
+                        {
+                            VRObjectCamera objCamera = currentCam.GetComponent<VRObjectCamera>();
+                            if (objCamera != null)
                             {
-                                mObjectMesh.gameObject.SetActive(false);
+                                GameObject selectedObj = VisClient3D.SelectedObject;
+                                if (selectedObj != null)
+                                {
+                                    objCamera.objectTarget = selectedObj.transform;
+
+                                    mObjectMesh = selectedObj.GetComponentInChildren<MeshRenderer>();
+                                    if (mObjectMesh != null)
+                                    {
+                                        mObjectMesh.gameObject.SetActive(false);
+                                    }
+                                }
                             }
                         }
                     }
-                }
-            }
-        }
+                    else
+                    {
+                        cameraSwitcher.ActivateCamera(mPrevCamType, mPrevCamMode);
+                        mIsObjectView = false;
 
-        public void PersonCentricView()
-        {
-            if (cameraSwitcher != null)
-            {
-                cameraSwitcher.ActivateCamera(mPrevCamType, mPrevCamMode);
-                mIsObjectView = false;
-
-                if (mObjectMesh != null)
-                {
-                    mObjectMesh.gameObject.SetActive(true);
-                    mObjectMesh = null;
+                        if (mObjectMesh != null)
+                        {
+                            mObjectMesh.gameObject.SetActive(true);
+                            mObjectMesh = null;
+                        }
+                    }
                 }
             }
         }

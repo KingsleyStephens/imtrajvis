@@ -52,12 +52,34 @@ namespace KVisualisation
             }
         }
 
+        public void UpdateCubes()
+        {
+            foreach (var x in cubes.Keys)
+            {
+                foreach (var y in cubes[x].Keys)
+                {
+                    foreach (var z in cubes[x][y].Keys)
+                    {
+                        GameObject cubeObj = cubes[x][y][z];
+                        if (cubeObj != null)
+                        {
+                            DensityCube dc = cubeObj.GetComponent<DensityCube>();
+                            if (dc != null)
+                            {
+                                dc.CalculateDensity();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         /**
          * Update an agent's position
          * 
          * @param position Position of the agent in world space
          */
-        public void UpdatePosition(Vector3 position, float simTime)
+        public void UpdatePosition(GameObject obj, Vector3 position, float simTime)
         {
             Vector3 localPos = transform.InverseTransformPoint(position);
 
@@ -131,7 +153,7 @@ namespace KVisualisation
                 DensityCube dc = cubeObj.GetComponent<DensityCube>();
                 if (dc != null)
                 {
-                    dc.UpdateDensity(simTime);
+                    dc.UpdateDensity(obj, simTime);
                 }
             }
         }
