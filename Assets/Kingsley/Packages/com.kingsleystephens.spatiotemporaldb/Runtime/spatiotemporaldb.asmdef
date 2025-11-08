@@ -1,0 +1,16 @@
+{
+    "name": "spatiotemporaldb",
+    "rootNamespace": "",
+    "references": [
+        "GUID:ee041b51ca9574a4aac2acc2b5b352b5"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

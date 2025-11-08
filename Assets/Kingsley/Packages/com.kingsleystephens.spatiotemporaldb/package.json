@@ -1,0 +1,15 @@
+{
+  "name": "com.kingsleystephens.spatiotemporaldb",
+  "version": "1.0.0",
+  "displayName": "Spatio-temporal Database Package",
+  "description": "A spatio-temporal database.",
+  "unity": "6000.1",
+  "author": {
+    "name": "Kingsley Stephens",
+    "email": "kingsley.stephens@gmail.com",
+    "url": "https://www.kingsleystephens.com"
+  },
+  "dependencies": {
+        "com.kingsleystephens.math": "1.0.0"
+  }
+}

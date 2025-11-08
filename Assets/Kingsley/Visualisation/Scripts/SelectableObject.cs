@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using KingsleyStephens.Core;
 
 namespace KVisualisation
 {
@@ -38,7 +39,7 @@ namespace KVisualisation
                     VisAgent data = gameObject.GetComponent<VisAgent>();
                     if (data != null)
                     {
-                        KCore.Logger.LogMessage($"Object {gameObject.name} Id ({data.playerId},{data.id}) at SimTime {data.VisClient3D.SimTime} selection state {value.ToString()}");
+                        Log.LogMessage($"Object {gameObject.name} Id ({data.playerId},{data.id}) at SimTime {data.VisClient3D.SimTime} selection state {value.ToString()}");
                     }
                 }
             } 

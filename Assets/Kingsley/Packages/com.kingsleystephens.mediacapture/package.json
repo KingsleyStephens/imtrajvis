@@ -1,0 +1,14 @@
+{
+  "name": "com.kingsleystephens.mediacapture",
+  "version": "1.0.0",
+  "displayName": "Media Capture Package",
+  "description": "Media capture utilities.",
+  "unity": "6000.1",
+  "author": {
+    "name": "Kingsley Stephens",
+    "email": "kingsley.stephens@gmail.com",
+    "url": "https://www.kingsleystephens.com"
+  },
+  "dependencies": {
+  }
+}

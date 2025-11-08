@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
+using KingsleyStephens.Core;
 
 public class SceneFlowManager : MonoBehaviour
 {
@@ -209,7 +210,7 @@ public class SceneFlowManager : MonoBehaviour
                                                             Debug.Log("FOUND STC BOUNDS Room Scale " + ((clientConfigs[mCurrentClient].stc) ? "true" : "false"));
 
 
-                                                            KCore.Logger.LogMessage("Design space: Data::Scale::Room Scale");
+                                                            Log.LogMessage("Design space: Data::Scale::Room Scale");
                                                         }
                                                         break;
                                                     }
@@ -225,7 +226,7 @@ public class SceneFlowManager : MonoBehaviour
                                                             
                                                             Debug.Log("FOUND STC BOUNDS World Scale " + ((clientConfigs[mCurrentClient].stc) ? "true" : "false"));
 
-                                                            KCore.Logger.LogMessage("Design space: Data::Scale::World Scale");
+                                                            Log.LogMessage("Design space: Data::Scale::World Scale");
                                                         }
                                                         break;
                                                     }
@@ -269,7 +270,7 @@ public class SceneFlowManager : MonoBehaviour
                                                             //    }
                                                             //}
 
-                                                            KCore.Logger.LogMessage("Design space: Interaction::Viewpoint::Egocentric");
+                                                            Log.LogMessage("Design space: Interaction::Viewpoint::Egocentric");
                                                         }
 
                                                         break;
@@ -291,7 +292,7 @@ public class SceneFlowManager : MonoBehaviour
 
                                                         if (objCentric)
                                                         {
-                                                            KCore.Logger.LogMessage("Design space: Interaction::Viewpoint::Object-centric");
+                                                            Log.LogMessage("Design space: Interaction::Viewpoint::Object-centric");
                                                         }
 
                                                         break;
@@ -315,7 +316,7 @@ public class SceneFlowManager : MonoBehaviour
 
                                                         if (mFreeFly)
                                                         {
-                                                            KCore.Logger.LogMessage("Design space: Interaction::Navigate::Direct");
+                                                            Log.LogMessage("Design space: Interaction::Navigate::Direct");
                                                         }
 
                                                         break;
@@ -326,7 +327,7 @@ public class SceneFlowManager : MonoBehaviour
 
                                                         if (!mFreeFly)
                                                         {
-                                                            KCore.Logger.LogMessage("Design space: Interaction::Navigate::Indirect");
+                                                            Log.LogMessage("Design space: Interaction::Navigate::Indirect");
                                                         }
 
                                                         break;
@@ -360,7 +361,7 @@ public class SceneFlowManager : MonoBehaviour
 
                                                         if (!Mesh)
                                                         {
-                                                            KCore.Logger.LogMessage("Design space: Trajectories::Object::None");
+                                                            Log.LogMessage("Design space: Trajectories::Object::None");
                                                         }
 
                                                         break;
@@ -371,7 +372,7 @@ public class SceneFlowManager : MonoBehaviour
 
                                                         if (Mesh)
                                                         {
-                                                            KCore.Logger.LogMessage("Design space: Trajectories::Object::Glyph");
+                                                            Log.LogMessage("Design space: Trajectories::Object::Glyph");
                                                         }
 
                                                         break;
@@ -395,7 +396,7 @@ public class SceneFlowManager : MonoBehaviour
 
                                                         if (Trails)
                                                         {
-                                                            KCore.Logger.LogMessage("Design space: Trajectories::Path::Trail");
+                                                            Log.LogMessage("Design space: Trajectories::Path::Trail");
                                                         }
 
                                                         break;
@@ -406,7 +407,7 @@ public class SceneFlowManager : MonoBehaviour
 
                                                         if (Ghosting)
                                                         {
-                                                            KCore.Logger.LogMessage("Design space: Trajectories::Path::Glyph");
+                                                            Log.LogMessage("Design space: Trajectories::Path::Glyph");
                                                         }
 
                                                         break;
@@ -417,7 +418,7 @@ public class SceneFlowManager : MonoBehaviour
 
                                                         if (Density)
                                                         {
-                                                            KCore.Logger.LogMessage("Design space: Trajectories::Path::Density");
+                                                            Log.LogMessage("Design space: Trajectories::Path::Density");
                                                         }
 
                                                         break;
@@ -452,7 +453,7 @@ public class SceneFlowManager : MonoBehaviour
                                                             TimeType = (int)VisClient.MovingObjectSettings.TimeType.Static;
                                                             IsSTC = false;
 
-                                                            KCore.Logger.LogMessage("Design space: Space/Time::Time::Static");
+                                                            Log.LogMessage("Design space: Space/Time::Time::Static");
                                                         }
                                                         break;
                                                     }
@@ -463,7 +464,7 @@ public class SceneFlowManager : MonoBehaviour
                                                             TimeType = (int)VisClient.MovingObjectSettings.TimeType.Static;
                                                             IsSTC = true;
 
-                                                            KCore.Logger.LogMessage("Design space: Space/Time::Time::+ 1D position");
+                                                            Log.LogMessage("Design space: Space/Time::Time::+ 1D position");
                                                         }
                                                         break;
                                                     }
@@ -474,7 +475,7 @@ public class SceneFlowManager : MonoBehaviour
                                                             TimeType = (int)VisClient.MovingObjectSettings.TimeType.Dynamic;
                                                             IsSTC = false;
 
-                                                            KCore.Logger.LogMessage("Design space: Space/Time::Time::+ 1D animation");
+                                                            Log.LogMessage("Design space: Space/Time::Time::+ 1D animation");
                                                         }
                                                         break;
                                                     }
@@ -731,7 +732,7 @@ public class SceneFlowManager : MonoBehaviour
             PlaybackSpeed = 0.0f;
         }
 
-        KCore.Logger.LogMessage("Time pause");
+        Log.LogMessage("Time pause");
     }
 
     public void SyncTime()

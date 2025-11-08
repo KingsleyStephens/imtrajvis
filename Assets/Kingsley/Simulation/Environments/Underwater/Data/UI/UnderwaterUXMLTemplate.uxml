@@ -1,4 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Label tabindex="-1" text="0" parse-escape-sequences="true" display-tooltip-when-elided="true" name="currentTime" style="color: rgb(255, 255, 255); font-size: 30px;" />
-    <ui:ListView name="narrative" selection-type="None" style="height: 398px; color: rgb(255, 255, 255); font-size: 30px; position: relative; left: 0; top: 60%; right: 0; bottom: 0;" />
-</ui:UXML>

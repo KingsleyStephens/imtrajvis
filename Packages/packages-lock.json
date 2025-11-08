@@ -1,5 +1,51 @@
 {
   "dependencies": {
+    "com.kingsleystephens.core": {
+      "version": "file:../Assets/Kingsley/Packages/com.kingsleystephens.core",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.kingsleystephens.gameobjecthelpers": {
+      "version": "file:../Assets/Kingsley/Packages/com.kingsleystephens.gameobjecthelpers",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.kingsleystephens.geometry": {
+      "version": "file:../Assets/Kingsley/Packages/com.kingsleystephens.geometry",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.kingsleystephens.math": {
+      "version": "file:../Assets/Kingsley/Packages/com.kingsleystephens.math",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.kingsleystephens.mediacapture": {
+      "version": "file:../Assets/Kingsley/Packages/com.kingsleystephens.mediacapture",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
+    "com.kingsleystephens.spatiotemporaldb": {
+      "version": "file:../Assets/Kingsley/Packages/com.kingsleystephens.spatiotemporaldb",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.kingsleystephens.math": "1.0.0"
+      }
+    },
+    "com.kingsleystephens.vrui": {
+      "version": "file:../Assets/Kingsley/Packages/com.kingsleystephens.vrui",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.kingsleystephens.core": "1.0.0"
+      }
+    },
     "com.meta.xr.sdk.core": {
       "version": "77.0.0",
       "depth": 0,

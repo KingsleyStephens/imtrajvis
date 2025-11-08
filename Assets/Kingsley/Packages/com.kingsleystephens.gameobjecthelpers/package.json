@@ -1,0 +1,14 @@
+{
+  "name": "com.kingsleystephens.gameobjecthelpers",
+  "version": "1.0.0",
+  "displayName": "GameObjectHelpers Package",
+  "description": "GameObject utilities.",
+  "unity": "6000.1",
+  "author": {
+    "name": "Kingsley Stephens",
+    "email": "kingsley.stephens@gmail.com",
+    "url": "https://www.kingsleystephens.com"
+  },
+  "dependencies": {
+  }
+}

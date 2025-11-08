@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
-using KCore;
+using KingsleyStephens.Core;
+
 
 namespace KVis
 {
@@ -25,7 +26,7 @@ namespace KVis
          */
         public override void Init()
         {
-            KCore.Logger.LogMessage("ThreeDEnvironment LOAD");
+            Log.LogMessage("ThreeDEnvironment LOAD");
             Enabled = true;
         }
 
@@ -34,7 +35,7 @@ namespace KVis
         */
         public override void BeginUpdating()
         {
-            KCore.Logger.LogMessage("ThreeDEnvironment now exists");
+            Log.LogMessage("ThreeDEnvironment now exists");
 
 
             foreach (string s in scenes)

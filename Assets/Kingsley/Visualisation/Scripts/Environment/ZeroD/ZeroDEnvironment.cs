@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using KCore;
+using KingsleyStephens.Core;
 
 namespace KVis
 {
@@ -23,7 +23,7 @@ namespace KVis
          */
         public override void Init()
         {
-            KCore.Logger.LogMessage("ZeroDEnvironment LOAD");
+            Log.LogMessage("ZeroDEnvironment LOAD");
             Enabled = true;
         }
 
@@ -32,7 +32,7 @@ namespace KVis
         */
         public override void BeginUpdating()
         {
-            KCore.Logger.LogMessage("ZeroDEnvironment now exists");
+            Log.LogMessage("ZeroDEnvironment now exists");
 
             mUI = Instantiate(uiPrefab);
             UIDocument doc = mUI.GetComponent<UIDocument>();

@@ -8,6 +8,7 @@ using UnityEngine;
 using static KVisualisation.VisClient;
 using static Oculus.Interaction.Context;
 using static OVRPlugin;
+using KingsleyStephens.Geometry;
 
 
 namespace KVisualisation

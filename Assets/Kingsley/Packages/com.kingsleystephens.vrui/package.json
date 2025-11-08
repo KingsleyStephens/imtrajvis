@@ -1,0 +1,15 @@
+{
+  "name": "com.kingsleystephens.vrui",
+  "version": "1.0.0",
+  "displayName": "Virtual Reality UI Package",
+  "description": "Virtual reality UI utilities.",
+  "unity": "6000.1",
+  "author": {
+    "name": "Kingsley Stephens",
+    "email": "kingsley.stephens@gmail.com",
+    "url": "https://www.kingsleystephens.com"
+  },
+  "dependencies": {
+    "com.kingsleystephens.core": "1.0.0"
+  }
+}
