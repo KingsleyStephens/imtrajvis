@@ -45,9 +45,6 @@ namespace KController
         }
 
         [SerializeField]
-        private SimConfig simConfig;
-        
-        [SerializeField]
         private GameObject simPlayerPrefab;
 
         private List<SimulationPlayer> mSimPlayers = new List<SimulationPlayer>();
@@ -94,30 +91,11 @@ namespace KController
          */
         public void LoadSim(string dataset = null, string[] session = null)
         {
-            if (simConfig != null)
+            for (int i = 0; i < session.Length; ++i)
             {
-                switch (simConfig.simType)
-                {
-                    case SimType.LocalRecord:
-                        {
-                            LoadScene((simConfig as LocalSim).scene);
-                            break;
-                        }
-                    case SimType.LocalPlayback:
-                        {
-                            for (int i = 0; i < session.Length; ++i)
-                            {
-                                LoadSimPlayer(i, dataset, session[i]);
-                            }
-                            Loaded = true;
-                            break;
-                        }
-                    default:
-                        {
-                            break;
-                        }
-                }
+                LoadSimPlayer(i, dataset, session[i]);
             }
+            Loaded = true;
         }
 
         public void UnloadSim()
