@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5019150237671184949}
   - component: {fileID: 6085025873923338425}
   - component: {fileID: 1821817956219805737}
-  - component: {fileID: 4026950218941404892}
+  - component: {fileID: 6647756966015224094}
   m_Layer: 9
   m_Name: Toggle
   m_TagString: Untagged
@@ -103,7 +103,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &4026950218941404892
+--- !u!114 &6647756966015224094
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -112,10 +112,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 192671720114885116}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea936c545aceaaa4ea32a9e8cb1041e7, type: 3}
+  m_Script: {fileID: 11500000, guid: 4671dd21db4b4e0479785a6fbcf28fbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  toggle: {fileID: 7321895078368307801}
+  toggle: {fileID: 0}
 --- !u!1 &1984474814713866660
 GameObject:
   m_ObjectHideFlags: 0
