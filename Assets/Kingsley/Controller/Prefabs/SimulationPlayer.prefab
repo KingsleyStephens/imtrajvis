@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6834762713225817633}
-  - component: {fileID: 7122867438627392245}
+  - component: {fileID: 2109869088798463415}
   m_Layer: 0
   m_Name: SimulationPlayer
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7122867438627392245
+--- !u!114 &2109869088798463415
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7315901037866473299}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44a0c87f56bf8e44f9e81d2cc1d96dfe, type: 3}
+  m_Script: {fileID: 11500000, guid: f5a1c5765b36b7b41b2e035d3e4a58ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dbName: simulation
