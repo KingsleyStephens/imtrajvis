@@ -735,7 +735,11 @@ namespace KingsleyPhD
             //}
 
             Workspace ws = mWorkspaces.Find(x => x.Id == cellData.id);
-            if (ws == null)
+            if (ws != null)
+            {
+                WorkspaceClose(ws);
+            }
+            else
             {
                 if (cellButtonIndex < workspaceRoots.Length)
                 {

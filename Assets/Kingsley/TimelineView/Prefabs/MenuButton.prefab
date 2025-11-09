@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5370100902924885477}
   - component: {fileID: 8281248999233434695}
   - component: {fileID: 5067447932465292433}
-  - component: {fileID: 1852260884589314032}
+  - component: {fileID: 5598465297321913263}
   m_Layer: 9
   m_Name: MenuButton
   m_TagString: Untagged
@@ -126,7 +126,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 25, y: 25, z: 0.01}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1852260884589314032
+--- !u!114 &5598465297321913263
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -135,7 +135,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1454514580378336969}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2ee6cbfcc2a18b642994b3ccc2d7c963, type: 3}
+  m_Script: {fileID: 11500000, guid: f2d1cb72db9d7a844abb1a0f392fb25c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   panel: {fileID: 2357839742437570628}
