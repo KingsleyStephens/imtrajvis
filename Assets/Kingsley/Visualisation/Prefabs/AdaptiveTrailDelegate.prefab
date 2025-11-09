@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5416942407419194889}
   - component: {fileID: 1333723559457805901}
-  - component: {fileID: -3719122316161070773}
+  - component: {fileID: 5205833596119993861}
   m_Layer: 0
   m_Name: AdaptiveTrailDelegate
   m_TagString: Untagged
@@ -138,7 +138,7 @@ LineRenderer:
   m_UseWorldSpace: 0
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
---- !u!114 &-3719122316161070773
+--- !u!114 &5205833596119993861
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -147,6 +147,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 2627913536600491904}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb02f21ad06575449aa91781bbc11394, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d54bde88136c0d479a60a65f4d3e45b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

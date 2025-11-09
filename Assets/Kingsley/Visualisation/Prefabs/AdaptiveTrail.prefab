@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5416942407419194889}
-  - component: {fileID: -2251077746751897176}
   - component: {fileID: -7850897982097011831}
+  - component: {fileID: 5974564461533436302}
   m_Layer: 0
   m_Name: AdaptiveTrail
   m_TagString: Untagged
@@ -33,20 +33,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-2251077746751897176
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2627913536600491904}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6fd6f85ab65e81242ade275b4f95244a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  delegateTrailPrefab: {fileID: 2627913536600491904, guid: 3ed71cc4fac336543ab0548073f64202,
-    type: 3}
 --- !u!114 &-7850897982097011831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59,5 +45,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeddbb2630e12d942873168c89bb5a9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentPlayer: -1
   parentId: -1
   spawnTime: 0
+--- !u!114 &5974564461533436302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2627913536600491904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8961519ff6e2f7148a8df18e9ec34667, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delegateTrailPrefab: {fileID: 2627913536600491904, guid: 3ed71cc4fac336543ab0548073f64202,
+    type: 3}
