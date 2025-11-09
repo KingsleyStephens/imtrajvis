@@ -69,8 +69,6 @@ namespace KingsleyPhD
         [SerializeField]
         private SnapshotCamera snapshotCamera;
         [SerializeField]
-        private InputEventManager inputEvents;
-        [SerializeField]
         private GameObject viewpointUI;
 
         // PRIVATE DATA
@@ -763,8 +761,6 @@ namespace KingsleyPhD
                             workspace.rightController = rightController;
 
                             workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "AUVSim" ? underwaterPrefab : scenePrefab, mainCamera);
-
-                            workspace.Scene.transform.GetComponent<TrackballControl>().inputEvents = inputEvents;
 
                             if (mTimelineJSON != null)
                             {

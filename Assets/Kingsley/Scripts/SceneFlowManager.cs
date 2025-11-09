@@ -1035,47 +1035,47 @@ public class SceneFlowManager : MonoBehaviour
     {
         return; // Disabled
 
-        if (launchUI != null && launchUI.activeSelf)
-        {
-            return;
-        }
+        //if (launchUI != null && launchUI.activeSelf)
+        //{
+        //    return;
+        //}
         
-        if (trajConfigUI != null && trajConfigUI.activeSelf)
-        {
-            trajConfigUI.SetActive(false);
+        //if (trajConfigUI != null && trajConfigUI.activeSelf)
+        //{
+        //    trajConfigUI.SetActive(false);
 
-            RoomView = true;
-        }
+        //    RoomView = true;
+        //}
 
-        if (player != null)
-        {
-            Controller = player.GetComponent<VisSimController>();
+        //if (player != null)
+        //{
+        //    Controller = player.GetComponent<VisSimController>();
 
-            if (Controller != null)
-            {
-                Controller.StopPlay();
-                Controller.UnloadSim();
-            }
-            player.SetActive(false);
-        }
+        //    if (Controller != null)
+        //    {
+        //        Controller.StopPlay();
+        //        Controller.UnloadSim();
+        //    }
+        //    player.SetActive(false);
+        //}
 
-        foreach (var vis in visClients)
-        {
-            Destroy(vis);
-        }
-        visClients.Clear();
-        clientConfigs.Clear();
-        mCurrentClient = 0;
+        //foreach (var vis in visClients)
+        //{
+        //    Destroy(vis);
+        //}
+        //visClients.Clear();
+        //clientConfigs.Clear();
+        //mCurrentClient = 0;
 
-        if (leftControllerUI != null)
-        {
-            leftControllerUI.SetActive(false);
-        }
+        //if (leftControllerUI != null)
+        //{
+        //    leftControllerUI.SetActive(false);
+        //}
 
-        if (launchUI != null)
-        {
-            launchUI.SetActive(true);
-        }
+        //if (launchUI != null)
+        //{
+        //    launchUI.SetActive(true);
+        //}
     }
 
     public void Launch()

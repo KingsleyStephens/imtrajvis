@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace KingsleyStephens
 {
@@ -9,8 +8,6 @@ namespace KingsleyStephens
         [RequireComponent(typeof(SphereCollider))]
         public class TrackballControl : MonoBehaviour
         {
-            public InputEventManager inputEvents;
-
             [Header("Rotation Settings")]
             public float rotationSpeed = 200.0f;
             public float damping = 5.0f;
@@ -56,15 +53,15 @@ namespace KingsleyStephens
 
             void Update()
             {
-                if (inputEvents != null && !inputEvents.SliderSelected)
+                if (!InputEventManager.Instance.SliderSelected)
                 {
-                    Ray ray = inputEvents.GetRay();
+                    Ray[] rays = InputEventManager.Instance.Input.GetPointerRays();
                     RaycastHit hit;
-                    if (Physics.Raycast(ray, out hit, 100.0f, 1 << gameObject.layer))
+                    if (Physics.Raycast(rays[0], out hit, 100.0f, 1 << gameObject.layer))
                     {
                         colliderHover = (hit.collider == sphereCollider);
 
-                        mCurrControlPos = ray.origin;
+                        mCurrControlPos = rays[0].origin;
                     }
                     else
                     {
@@ -78,62 +75,56 @@ namespace KingsleyStephens
 
             void HandleRotation()
             {
-                if (inputEvents != null)
+                if (InputEventManager.Instance.Input.GetSelectDown())
                 {
-                    if (inputEvents.GetSelectDown())
+                    if (colliderHover)
                     {
-                        if (colliderHover)
-                        {
-                            isDragging = true;
-                            mLastControlPos = mCurrControlPos;
-                        }
-                    }
-                    else if (inputEvents.GetSelectUp())
-                    {
-                        isDragging = false;
-                    }
-
-                    if (isDragging)
-                    {
-                        Vector3 delta = (mCurrControlPos - mLastControlPos);
+                        isDragging = true;
                         mLastControlPos = mCurrControlPos;
-
-                        // Calculate rotation based on movement
-                        float rotX = -delta.y * rotationSpeed * Time.deltaTime;
-                        float rotY = -delta.x * rotationSpeed * Time.deltaTime;
-
-                        Ray ray = inputEvents.GetRay();
-
-                        Quaternion xQuat = Quaternion.AngleAxis(rotX, Vector3.Cross(ray.direction, Vector3.up));
-                        Quaternion yQuat = Quaternion.AngleAxis(rotY, Vector3.up);
-
-                        targetRotation = yQuat * xQuat * targetRotation;
                     }
-
-                    // Smooth rotation interpolation
-                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * damping);
                 }
+                else if (InputEventManager.Instance.Input.GetSelectUp())
+                {
+                    isDragging = false;
+                }
+
+                if (isDragging)
+                {
+                    Vector3 delta = (mCurrControlPos - mLastControlPos);
+                    mLastControlPos = mCurrControlPos;
+
+                    // Calculate rotation based on movement
+                    float rotX = -delta.y * rotationSpeed * Time.deltaTime;
+                    float rotY = -delta.x * rotationSpeed * Time.deltaTime;
+
+                    Ray[] rays = InputEventManager.Instance.Input.GetPointerRays();
+
+                    Quaternion xQuat = Quaternion.AngleAxis(rotX, Vector3.Cross(rays[0].direction, Vector3.up));
+                    Quaternion yQuat = Quaternion.AngleAxis(rotY, Vector3.up);
+
+                    targetRotation = yQuat * xQuat * targetRotation;
+                }
+
+                // Smooth rotation interpolation
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * damping);
             }
 
             void HandleZoom()
             {
-                if (inputEvents != null)
+                if (colliderHover)
                 {
-                    if (colliderHover)
+                    float scroll = InputEventManager.Instance.Input.GetScroll();
+                    if (Mathf.Abs(scroll) > 0.01f)
                     {
-                        float scroll = inputEvents.GetScroll();
-                        if (Mathf.Abs(scroll) > 0.01f)
-                        {
-                            currentZoomDistance -= scroll * zoomSpeed;
-                            currentZoomDistance = Mathf.Clamp(currentZoomDistance, minZoomDistance, maxZoomDistance);
-                        }
-
-                        // Move camera along its forward axis to zoom
-                        //Vector3 direction = (targetCamera.transform.position - targetTransform.position).normalized;
-                        //targetCamera.transform.position = targetTransform.position + direction * currentZoomDistance;
-
-                        ApplyZoom(currentZoomDistance);
+                        currentZoomDistance -= scroll * zoomSpeed;
+                        currentZoomDistance = Mathf.Clamp(currentZoomDistance, minZoomDistance, maxZoomDistance);
                     }
+
+                    // Move camera along its forward axis to zoom
+                    //Vector3 direction = (targetCamera.transform.position - targetTransform.position).normalized;
+                    //targetCamera.transform.position = targetTransform.position + direction * currentZoomDistance;
+
+                    ApplyZoom(currentZoomDistance);
                 }
             }
 

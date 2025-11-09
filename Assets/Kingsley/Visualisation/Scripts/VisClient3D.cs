@@ -1,5 +1,4 @@
 using KController;
-using KSimulation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +7,7 @@ using UnityEngine;
 using static KVisualisation.VisClient;
 using static Oculus.Interaction.Context;
 using static OVRPlugin;
+using KingsleyStephens.ImTrajVis;
 using KingsleyStephens.Geometry;
 
 

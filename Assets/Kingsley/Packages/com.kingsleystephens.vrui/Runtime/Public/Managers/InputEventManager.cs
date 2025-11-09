@@ -1,4 +1,6 @@
+using KingsleyStephens.Core;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -9,12 +11,22 @@ namespace KingsleyStephens
     namespace VRUI
     {
 
-        public class InputEventManager : MonoBehaviour
+        /**
+         * Manager class for input devices and UI
+         */
+        public class InputEventManager : SingletonMonoBehaviour<InputEventManager>
         {
+            // FIELDS
+
             [SerializeField]
-            private bool isVR = false;
-            [SerializeField]
-            private Transform rightController;
+            private InputInterfaceMonoBehaviour inputInterface;
+
+            //[SerializeField]
+            //private Transform rightController;
+
+            // PRIVATE
+
+            private Vector2 mLastDragPosition;
 
             private Button mCurrCloseButton;
             private CellView mCurrentlySelectedCellView;
@@ -23,26 +35,25 @@ namespace KingsleyStephens
             private UIEventHandler mCurrEventHandler;
             private Vector2 mCurrControlPos = Vector2.zero;
 
-            public UnityEvent OnEsc;
-            public UnityEvent OnTimeForward;
-            public UnityEvent OnTimeBackward;
-            public UnityEvent OnViewForward;
-            public UnityEvent OnViewBackward;
-
-            private Vector2 mLastDragPosition;
+            // PUBLIC
 
             public bool SliderSelected { get { return mCurrSlider != null; } }
 
-            // Start is called once before the first execution of Update after the MonoBehaviour is created
-            void Start()
+            public IInputInterface Input { get { return inputInterface; } }
+
+            // PRIVATE
+
+            private void Start()
             {
             }
 
-            // Update is called once per frame
+            /**
+             * Update
+             */
             void Update()
             {
-                MouseRaycast();
-                MouseClick();
+                Raycast();
+                TestSelect();
 
                 //if ((isVR && OVRInput.GetDown(OVRInput.Button.Start)) || (!isVR && Input.GetKeyDown(KeyCode.Escape)))
                 //{
@@ -76,9 +87,17 @@ namespace KingsleyStephens
                 //}
             }
 
-            private void MouseClick()
+            /**
+             * Test for a select input
+             */
+            private void TestSelect()
             {
-                if (GetSelectDown())
+                if (inputInterface == null)
+                {
+                    return;
+                }
+
+                if (inputInterface.GetSelectDown())
                 {
                     if (mCurrCloseButton != null)
                     {
@@ -96,13 +115,13 @@ namespace KingsleyStephens
                     {
                         mCurrEventHandler.Click();
                     }
-                    else if (mCurrSlider != null && !isVR)
+                    else if (mCurrSlider != null)
                     {
                         mCurrSlider.OnActivate(mCurrControlPos.x);
                     }
                 }
 
-                if (GetSelectUp())
+                if (inputInterface.GetSelectUp())
                 {
                     if (mCurrCloseButton != null)
                     {
@@ -115,25 +134,28 @@ namespace KingsleyStephens
                 }
             }
 
-            public bool GetSelectDown()
-            {
-                return (isVR);// && OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger)) || (!isVR && Input.GetMouseButtonDown(0));
-            }
+            //public bool GetSelectDown()
+            //{
+            //   // return (isVR);// && OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger)) || (!isVR && Input.GetMouseButtonDown(0));
 
-            public bool GetSelectUp()
-            {
-                return (isVR);// && OVRInput.GetUp(OVRInput.Button.SecondaryIndexTrigger)) || (!isVR && Input.GetMouseButtonUp(0));
-            }
+            //    return inputInterface != null && inputInterface.GetSelectDown();
+            //}
 
-            public Ray GetRay()
-            {
-                return (isVR) ? new Ray(rightController.position, rightController.forward) : Camera.main.ScreenPointToRay(Input.mousePosition);
-            }
+            //public bool GetSelectUp()
+            //{
+            //    // return (isVR);// && OVRInput.GetUp(OVRInput.Button.SecondaryIndexTrigger)) || (!isVR && Input.GetMouseButtonUp(0));
+            //    return inputInterface != null && inputInterface.GetSelectUp();
+            //}
 
-            public float GetScroll()
-            {
-                return 0.0f;// (isVR) ? OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y * 0.5f : Input.GetAxis("Mouse ScrollWheel");
-            }
+            //public Ray GetRay()
+            //{
+            //    return (isVR) ? new Ray(rightController.position, rightController.forward) : Camera.main.ScreenPointToRay(Input.mousePosition);
+            //}
+
+            //public float GetScroll()
+            //{
+            //    return 0.0f;// (isVR) ? OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y * 0.5f : Input.GetAxis("Mouse ScrollWheel");
+            //}
 
             public void BeginDrag()
             {
@@ -145,11 +167,16 @@ namespace KingsleyStephens
                 return mCurrControlPos - mLastDragPosition;
             }
 
-            private void MouseRaycast()
+            private void Raycast()
             {
-                Ray ray = GetRay();
+                if (inputInterface == null)
+                {
+                    return;
+                }
+
+                Ray[] rays = inputInterface.GetPointerRays();
                 RaycastHit hit;
-                if (Physics.Raycast(ray, out hit, 100.0f, 1 << gameObject.layer))
+                if (Physics.Raycast(rays[0], out hit, 100.0f, 1 << gameObject.layer))
                 {
                     // Check if the object has a BoxCollider
                     BoxCollider box = hit.collider as BoxCollider;
