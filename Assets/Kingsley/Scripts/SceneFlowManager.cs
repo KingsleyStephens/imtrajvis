@@ -1138,7 +1138,7 @@ public class SceneFlowManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("viewpointUI is null");
+            //Debug.LogWarning("viewpointUI is null");
         }
     }
 
