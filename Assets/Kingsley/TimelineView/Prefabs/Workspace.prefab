@@ -50,12 +50,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d48c57038eab79748bd0ccc3bf00056a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  closeButton: {fileID: 0}
-  menuButton: {fileID: 0}
-  fpvButton: {fileID: 0}
+  closeButton: {fileID: 5760536865754468321}
+  menuButton: {fileID: 5488923938122396730}
+  fpvButton: {fileID: 4147917769988744360}
   pinToggle: {fileID: 0}
-  timeSlider: {fileID: 0}
-  timePlayButton: {fileID: 0}
+  timeSlider: {fileID: 2137077150631368307}
+  timePlayButton: {fileID: 4593181706549600726}
   designSpace: {fileID: 8355588575375382722}
 --- !u!1 &1269091042156707345
 GameObject:
@@ -286,7 +286,7 @@ MonoBehaviour:
   rotationSpeed: 200000
   damping: 10
   targetCamera: {fileID: 0}
-  zoomSpeed: 0.1
+  zoomSpeed: 0.3
   minZoomDistance: 0.25
   maxZoomDistance: 2
 --- !u!114 &1472336952028187273
