@@ -44,7 +44,7 @@ namespace KingsleyPhD
         /**
          * Init
          */
-        public void Init(string dataset, string[] sessions, GameObject scenePrefab)
+        public void Init(string dataset, string[] sessions, GameObject scenePrefab, GameObject leftControllerUI)
         {
             if (vis != null)
             {
@@ -52,7 +52,7 @@ namespace KingsleyPhD
                 mSceneFlowManager = sceneFlowManagerGameObject.GetComponent<SceneFlowManager>();
                 if (mSceneFlowManager != null)
                 {
-                    mSceneFlowManager.Launch(vis, dataset, sessions, scenePrefab);
+                    mSceneFlowManager.Launch(vis, dataset, sessions, scenePrefab, leftControllerUI);
                     mSceneFlowManager.SimTime = 0.0f;
                     Pause = true;
                 }

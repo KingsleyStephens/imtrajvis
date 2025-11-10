@@ -35,6 +35,8 @@ namespace KingsleyPhD
         [SerializeField]
         private Transform rightController;
         [SerializeField]
+        private Transform leftUI;
+        [SerializeField]
         private GameObject workspacePrototype;
         [SerializeField]
         private Transform[] workspaceRoots;
@@ -770,7 +772,7 @@ namespace KingsleyPhD
                             workspace.leftController = leftController;
                             workspace.rightController = rightController;
 
-                            workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "AUVSim" ? underwaterPrefab : scenePrefab, mainCamera);
+                            workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "AUVSim" ? underwaterPrefab : scenePrefab, mainCamera, leftUI.gameObject);
 
                             if (mTimelineJSON != null)
                             {

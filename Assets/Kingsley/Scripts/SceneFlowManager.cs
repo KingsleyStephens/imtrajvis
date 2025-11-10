@@ -338,6 +338,46 @@ public class SceneFlowManager : MonoBehaviour
                                         }
                                         break;
                                     }
+                                case "Manipulate":
+                                    {
+                                        int index = 0;
+                                        foreach (var opt in dim.options)
+                                        {
+                                            switch (opt)
+                                            {
+                                                case "Time":
+                                                    {
+                                                        bool time = dim.choices[index];
+
+                                                        if (time)
+                                                        {
+                                                            Log.LogMessage("Design space: Interaction::Manipulate::Time");
+                                                        }
+ 
+                                                        break;
+                                                    }
+                                                case "Traj Selection":
+                                                    {
+                                                        bool trajSelection = dim.choices[index];
+
+                                                        if (leftControllerUI)
+                                                        {
+                                                            leftControllerUI.SetActive(trajSelection);
+                                                        }
+
+                                                        if (trajSelection)
+                                                        {
+                                                            Log.LogMessage("Design space: Interaction::Manipulate::Traj Selection");
+                                                        }
+
+                                                        break;
+                                                    }
+                                            }
+
+                                            index++;
+                                        }
+                                        break;
+                                    }
                             }
                         }
                         break;
@@ -1028,7 +1068,6 @@ public class SceneFlowManager : MonoBehaviour
         }
 
         mCurrentClient = toClient;
-        UpdateControllerUI();
     }
 
     public void ActivateLaunchMenu()
@@ -1083,9 +1122,10 @@ public class SceneFlowManager : MonoBehaviour
         LaunchSim();
     }
 
-    public void Launch(Transform root, string dataset, string[] sessions, GameObject scenePrefab)
+    public void Launch(Transform root, string dataset, string[] sessions, GameObject scenePrefab, GameObject leftControllerUI)
     {
         visRoot = root;
+        this.leftControllerUI = leftControllerUI;
 
         if (player != null)
         {
@@ -1121,7 +1161,6 @@ public class SceneFlowManager : MonoBehaviour
             if (mCurrentClient != newClient)
             {
                 mCurrentClient = newClient;
-                UpdateControllerUI();
             }
 
             lastPositionCheckTime = Time.time;
@@ -1144,24 +1183,6 @@ public class SceneFlowManager : MonoBehaviour
 
 
     public int CurrentClientConfig { get { return mCurrentClient; } set { SetClientConfigUI(value, false);  } }
-
-    private void UpdateControllerUI()
-    {
-        if (leftControllerUI != null)
-        { 
-            leftControllerUI.SetActive(true);
-
-            TextMeshProUGUI[] labels = leftControllerUI.GetComponentsInChildren<TextMeshProUGUI>();
-            if (labels.Length > 0)
-            {
-                var currentConfigLabel = labels.First((t) => t.name == "InstanceLabel");
-                if (currentConfigLabel != null)
-                {
-                    currentConfigLabel.text = (mCurrentClient + 1).ToString();
-                }
-            }
-        }
-    }
 
     public void ShowConfigScreen()
     {
@@ -1260,8 +1281,6 @@ public class SceneFlowManager : MonoBehaviour
     {
         MoveToClient(client);
         mCurrentClient = client;
-
-        UpdateControllerUI();
 
         TMP_Dropdown[] dropDowns = trajConfigUI.GetComponentsInChildren<TMP_Dropdown>();
         if (dropDowns.Length > 0)
@@ -1428,7 +1447,6 @@ public class SceneFlowManager : MonoBehaviour
 
         // Configure current view
         ActivateCurrentViewConfig();
-        UpdateControllerUI();
 
         // Start the simulation and playback running
         if (Controller != null)
