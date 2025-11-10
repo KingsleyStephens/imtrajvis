@@ -21,12 +21,9 @@ namespace KingsleyStephens
             [SerializeField]
             private InputInterfaceMonoBehaviour inputInterface;
 
-            //[SerializeField]
-            //private Transform rightController;
-
             // PRIVATE
 
-            private Vector2 mLastDragPosition;
+            public Vector2 mLastDragPosition;
 
             private Button mCurrCloseButton;
             private CellView mCurrentlySelectedCellView;
@@ -34,6 +31,8 @@ namespace KingsleyStephens
             private Slider mCurrSlider;
             private UIEventHandler mCurrEventHandler;
             private Vector2 mCurrControlPos = Vector2.zero;
+                       
+            private bool mSelectDown = false;
 
             // PUBLIC
 
@@ -43,10 +42,6 @@ namespace KingsleyStephens
 
             // PRIVATE
 
-            private void Start()
-            {
-            }
-
             /**
              * Update
              */
@@ -54,37 +49,6 @@ namespace KingsleyStephens
             {
                 Raycast();
                 TestSelect();
-
-                //if ((isVR && OVRInput.GetDown(OVRInput.Button.Start)) || (!isVR && Input.GetKeyDown(KeyCode.Escape)))
-                //{
-                //    OnEsc?.Invoke();
-
-                //    KCore.Log.LogMessage("On ESCAPE");
-                //}
-                //else if (Input.GetKeyDown(KeyCode.RightArrow))
-                //{
-                //    OnTimeForward?.Invoke();
-
-                //    KCore.Log.LogMessage("On Time Forward");
-                //}
-                //else if (Input.GetKeyDown(KeyCode.LeftArrow))
-                //{
-                //    OnTimeBackward?.Invoke();
-
-                //    KCore.Log.LogMessage("On Time Backward");
-                //}
-                //else if (Input.GetKeyDown(KeyCode.RightBracket) || (isVR && OVRInput.GetDown(OVRInput.Button.One)))
-                //{
-                //    OnViewForward?.Invoke();
-
-                //    KCore.Log.LogMessage("On View Forward");
-                //}
-                //else if (Input.GetKeyDown(KeyCode.LeftBracket) || (isVR && OVRInput.GetDown(OVRInput.Button.Two)))
-                //{
-                //    OnViewBackward?.Invoke();
-
-                //    KCore.Log.LogMessage("On View Backward");
-                //}
             }
 
             /**
@@ -99,30 +63,37 @@ namespace KingsleyStephens
 
                 if (inputInterface.GetSelectDown())
                 {
-                    if (mCurrCloseButton != null)
+                    if (!mSelectDown)
                     {
-                        mCurrCloseButton.OnActivate();
-                    }
-                    else if (mCurrentlySelectedCellView != null)
-                    {
-                        mCurrentlySelectedCellView.OnActivate();
-                    }
-                    else if (mCurrToggleButton != null)
-                    {
-                        mCurrToggleButton.OnActivate();
-                    }
-                    else if (mCurrEventHandler != null)
-                    {
-                        mCurrEventHandler.Click();
-                    }
-                    else if (mCurrSlider != null)
-                    {
-                        mCurrSlider.OnActivate(mCurrControlPos.x);
+                        if (mCurrCloseButton != null)
+                        {
+                            mCurrCloseButton.OnActivate();
+                        }
+                        else if (mCurrentlySelectedCellView != null)
+                        {
+                            mCurrentlySelectedCellView.OnActivate();
+                        }
+                        else if (mCurrToggleButton != null)
+                        {
+                            mCurrToggleButton.OnActivate();
+                        }
+                        else if (mCurrEventHandler != null)
+                        {
+                            mCurrEventHandler.Click();
+                        }
+                        else if (mCurrSlider != null)
+                        {
+                            mCurrSlider.OnActivate(mCurrControlPos.x);
+                        }
+
+                        mSelectDown = true;
                     }
                 }
 
                 if (inputInterface.GetSelectUp())
                 {
+                    mSelectDown = false;
+
                     if (mCurrCloseButton != null)
                     {
                         mCurrCloseButton.OnSelect();
@@ -133,29 +104,6 @@ namespace KingsleyStephens
                     }
                 }
             }
-
-            //public bool GetSelectDown()
-            //{
-            //   // return (isVR);// && OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger)) || (!isVR && Input.GetMouseButtonDown(0));
-
-            //    return inputInterface != null && inputInterface.GetSelectDown();
-            //}
-
-            //public bool GetSelectUp()
-            //{
-            //    // return (isVR);// && OVRInput.GetUp(OVRInput.Button.SecondaryIndexTrigger)) || (!isVR && Input.GetMouseButtonUp(0));
-            //    return inputInterface != null && inputInterface.GetSelectUp();
-            //}
-
-            //public Ray GetRay()
-            //{
-            //    return (isVR) ? new Ray(rightController.position, rightController.forward) : Camera.main.ScreenPointToRay(Input.mousePosition);
-            //}
-
-            //public float GetScroll()
-            //{
-            //    return 0.0f;// (isVR) ? OVRInput.Get(OVRInput.Axis2D.SecondaryThumbstick).y * 0.5f : Input.GetAxis("Mouse ScrollWheel");
-            //}
 
             public void BeginDrag()
             {

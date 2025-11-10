@@ -1029,55 +1029,11 @@ PrefabInstance:
     - {fileID: 8311813681313442766, guid: 3cab19552d658cb4ea5ca9400f0fef75, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1454514580378336969, guid: 3cab19552d658cb4ea5ca9400f0fef75,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5172841085218668682}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3cab19552d658cb4ea5ca9400f0fef75, type: 3}
---- !u!1 &1018854857904647112 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7456809906166318085, guid: 3cab19552d658cb4ea5ca9400f0fef75,
-    type: 3}
-  m_PrefabInstance: {fileID: 7590916138007932877}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5323501885677901705 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2357839742437570628, guid: 3cab19552d658cb4ea5ca9400f0fef75,
-    type: 3}
-  m_PrefabInstance: {fileID: 7590916138007932877}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &6640620091588141182 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3850686294595260339, guid: 3cab19552d658cb4ea5ca9400f0fef75,
     type: 3}
   m_PrefabInstance: {fileID: 7590916138007932877}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &9040733601891455236 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1454514580378336969, guid: 3cab19552d658cb4ea5ca9400f0fef75,
-    type: 3}
-  m_PrefabInstance: {fileID: 7590916138007932877}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5172841085218668682
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9040733601891455236}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2d1cb72db9d7a844abb1a0f392fb25c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  panel: {fileID: 5323501885677901705}
-  selectColor: {r: 1, g: 1, b: 1, a: 0.8}
-  activateColor: {r: 0.8, g: 0.8, b: 0.8, a: 0.8}
-  confirmDialog: {fileID: 1018854857904647112}

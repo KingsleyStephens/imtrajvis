@@ -286,6 +286,12 @@ namespace KingsleyPhD
             }
         }
 
+        public void SetDataset(int value)
+        {
+            SelectDataset = value;
+        }
+
+
         public int SelectSession
         {
             set
@@ -619,7 +625,7 @@ namespace KingsleyPhD
             {
                 mTimelineJSON.AddSlot(id);
 
-                LoadConfig();
+                //LoadConfig();
 
                 Log.LogMessage($"Add slot {id}");
             }
@@ -839,6 +845,8 @@ namespace KingsleyPhD
 
         private void CellClose(TimelineView.CellData cellData)
         {
+            Log.LogMessage($"CellClose {cellData.id}");
+
             if (mCurrCellData != null && mCurrCellData.id == cellData.id)
             {
                 Workspace ws = mWorkspaces.Find(x => x.Id == cellData.id);
@@ -860,14 +868,14 @@ namespace KingsleyPhD
                     mDesignInstances.Remove(mCurrCellData.id);
                 }
 
-                if (mTimelineJSON != null)
-                {
-                    mTimelineJSON.RemoveSlot(mCurrCellData.id);
-                }
-
                 mCurrCellData = null;
 
                 Log.LogMessage($"Remove workspace {cellData.id}");
+            }
+
+            if (mTimelineJSON != null)
+            {
+                mTimelineJSON.RemoveSlot(cellData.id);
             }
         }
 

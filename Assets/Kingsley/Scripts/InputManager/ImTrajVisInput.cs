@@ -20,6 +20,8 @@ namespace KingsleyStephens
             public UnityEvent OnTimeBackward;
             public UnityEvent OnViewForward;
             public UnityEvent OnViewBackward;
+            public UnityEvent OnNewWorkspace;
+            public UnityEvent<int> OnSelectDataset;
 
             /**
              * Update
@@ -55,6 +57,24 @@ namespace KingsleyStephens
                     Log.LogMessage("On View Backward");
 
                     OnViewBackward?.Invoke();
+                }
+                else if (Input.GetKeyDown(KeyCode.N))
+                {
+                    Log.LogMessage("On new Workspace");
+
+                    OnNewWorkspace?.Invoke();
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha1))
+                {
+                    Log.LogMessage("On select dataset 1");
+
+                    OnSelectDataset?.Invoke(0);
+                }
+                else if (Input.GetKeyDown(KeyCode.Alpha2))
+                {
+                    Log.LogMessage("On select dataset 2");
+
+                    OnSelectDataset?.Invoke(1);
                 }
             }
         }

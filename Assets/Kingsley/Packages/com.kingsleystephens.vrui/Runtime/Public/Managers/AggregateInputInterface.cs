@@ -13,6 +13,9 @@ namespace KingsleyStephens
             [SerializeField]
             private InputInterfaceMonoBehaviour[] inputInterfaces;
 
+            private List<Ray> mPrevRayList = new List<Ray>();
+
+
             // POINTING
 
             /**
@@ -31,7 +34,35 @@ namespace KingsleyStephens
                     }
                 }
 
-                return rayList.ToArray();
+                int rayIndex = 0;
+                if (mPrevRayList.Count > 0)
+                {
+                    foreach (var r in rayList)
+                    {
+                        if (Vector3.Distance(r.origin, mPrevRayList[rayIndex].origin) < 0.001f)
+                        {
+                            rayIndex++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (rayIndex >= mPrevRayList.Count)
+                    {
+                        rayIndex = 0;
+                    }
+                }
+                else
+                {
+                    foreach (var r in rayList)
+                    {
+                        mPrevRayList.Add(r);
+                    }
+                }
+
+                return new Ray[1] { rayList[rayIndex] };
             }
 
             // SELECTION
