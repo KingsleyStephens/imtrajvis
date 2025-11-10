@@ -732,7 +732,7 @@ public class SceneFlowManager : MonoBehaviour
             PlaybackSpeed = 0.0f;
         }
 
-        Log.LogMessage("Time pause");
+        Log.LogMessage("Time pause " + pause.ToString());
     }
 
     public void SyncTime()
@@ -1418,6 +1418,7 @@ public class SceneFlowManager : MonoBehaviour
         // Load the simulation players
         if (Controller != null)
         {
+            Log.LogMessage("LaunchSim activate controller and load sim");
             Controller.gameObject.SetActive(true);
             Controller.LoadSim(dataset, sessions);
         }
@@ -1438,6 +1439,8 @@ public class SceneFlowManager : MonoBehaviour
                 VisClient vc = c.GetComponentInChildren<VisClient>();
                 if (vc != null)
                 {
+                    Log.LogMessage("LaunchSim start vis client");
+
                     vc.OnStart();
                 }
             }
@@ -1485,6 +1488,8 @@ public class SceneFlowManager : MonoBehaviour
                 if (i < smallMultipleConfigs.Count)
                 {
                     SmallMultipleConfig smConfig = smallMultipleConfigs[i];
+
+                    Log.LogMessage("SpawnClients create vis client " + i.ToString());
 
                     GameObject vis = Instantiate(visPrefab, root);
                     vis.transform.localPosition = smConfig.position;
