@@ -13,9 +13,13 @@ namespace KVisualisation
         private float density = 0.0f;
         private MeshRenderer meshRenderer;
 
+        public delegate bool IsFilteredFunction(Vector2Int objectId);
+        
+        public IsFilteredFunction IsFilteredCallback { get; set; }
+
         public class DensityData
         {
-            public GameObject obj;
+            public Vector2Int objectId;
             public float time;
         }
 
@@ -33,19 +37,23 @@ namespace KVisualisation
             CalculateDensity();
         }
 
-        public void UpdateDensity(GameObject obj, float time)
+        public void UpdateDensity(Vector2Int objectId, float time)
         {
             if (mDensityTimestamps.Count == 0 || (mDensityTimestamps.Count > 0 && time > mDensityTimestamps[mDensityTimestamps.Count - 1].time))
             {
-                mDensityTimestamps.Add(new DensityData() { obj = obj, time = time });
+                mDensityTimestamps.Add(new DensityData() { objectId = objectId, time = time });
                 CalculateDensity();
             }
         }
 
         public void CalculateDensity()
         {
-            List<DensityData> notFiltered = mDensityTimestamps.Where(x => !x.obj.GetComponent<Filterable>().Filtered ).ToList();
-            Density = notFiltered.Count;
+            if (IsFilteredCallback != null)
+            {
+
+                List<DensityData> notFiltered = mDensityTimestamps.Where(x => !IsFilteredCallback(x.objectId)).ToList();
+                Density = notFiltered.Count;
+            }
         }
 
         private void UpdateCube(float density)

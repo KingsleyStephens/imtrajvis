@@ -17,6 +17,8 @@ namespace KVisualisation
 
         private Dictionary<int, Dictionary<int, Dictionary<int, GameObject>>> cubes = new Dictionary<int, Dictionary<int, Dictionary<int, GameObject>>>();
 
+        public DensityCube.IsFilteredFunction IsFilteredCallback { get; set; }
+
         //private int nextCubeId = 0;
         //private Dictionary<int, GameObject> cubeLookup = new Dictionary<int, GameObject>();
 
@@ -80,7 +82,7 @@ namespace KVisualisation
          * 
          * @param position Position of the agent in world space
          */
-        public void UpdatePosition(GameObject obj, Vector3 position, float simTime)
+        public void UpdatePosition(Vector2Int objId, Vector3 position, float simTime)
         {
             Vector3 localPos = transform.InverseTransformPoint(position);
 
@@ -129,6 +131,7 @@ namespace KVisualisation
                 if (densityCube != null)
                 {
                     densityCube.maxDensity = maxDensity;
+                    densityCube.IsFilteredCallback = IsFilteredCallback;
                 }
                 DeactivateTimer timer = cube.GetComponent<DeactivateTimer>();
                 if (timer != null)
@@ -154,7 +157,7 @@ namespace KVisualisation
                 DensityCube dc = cubeObj.GetComponent<DensityCube>();
                 if (dc != null)
                 {
-                    dc.UpdateDensity(obj, simTime);
+                    dc.UpdateDensity(objId, simTime);
                 }
             }
         }

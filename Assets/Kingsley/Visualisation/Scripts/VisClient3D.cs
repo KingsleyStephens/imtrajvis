@@ -204,12 +204,12 @@ namespace KVisualisation
 
                             if (IsSTC)
                             {
-                                MapSTC(obj.transform, SimTime, TimeExtents.y - TimeExtents.x);
+                                MapSTC(obj.transform, SimTime, TimeExtents.y);
                             }
 
                             if (updateDensity && !IsFiltered(id))
                             {
-                                densityMap3D.UpdatePosition(obj, obj.transform.position, SimTime);
+                                densityMap3D.UpdatePosition(id, obj.transform.position, SimTime);
                             }
 
                             if (movingObjectSettings.trail)
@@ -583,6 +583,7 @@ namespace KVisualisation
                 {
                     densityMap3D = densityMap.GetComponent<DensityMap3D>();
                     //densityMap3D.duration = movingObjectSettings.trailTime;
+                    densityMap3D.IsFilteredCallback = IsFiltered;
 
                     densityMap.transform.localScale = movingObjectSettings.objectScale;
                 }
@@ -807,7 +808,7 @@ namespace KVisualisation
                                 {
                                     Vector3 newPos;
                                     Vector3 newDir;
-                                    MapSTC(movingObject.transform.TransformPoint(p.position), movingObject.transform.TransformDirection(p.orientation * Vector3.forward), time, totalTime, out newPos, out newDir);
+                                    MapSTC(movingObject.transform.TransformPoint(p.position), movingObject.transform.TransformDirection(p.orientation * Vector3.forward), time, TimeExtents.y, out newPos, out newDir);
                                     p.position = movingObject.transform.InverseTransformPoint(newPos);
                                     p.orientation = Quaternion.LookRotation(movingObject.transform.InverseTransformDirection(newDir));
 
@@ -815,8 +816,15 @@ namespace KVisualisation
                                 }
                             }
 
-                            movingObject.transform.localPosition = path[path.Length - 1].position;
-                            movingObject.transform.localRotation = path[path.Length - 1].orientation;
+                            if (data.timePeriod.y >= TimeExtents.y)
+                            {
+                                movingObject.transform.localPosition = path[path.Length - 1].position;
+                                movingObject.transform.localRotation = path[path.Length - 1].orientation;
+                            }
+                            else
+                            {
+                                movingObject.SetActive(false);
+                            }
                         }
                     }
                     else if (movingObjectSettings.trail)
@@ -835,7 +843,7 @@ namespace KVisualisation
                             {
                                 Vector3 newPos;
                                 Vector3 newDir;
-                                MapSTC(p.position, p.orientation * Vector3.forward, time, totalTime,out newPos, out newDir);
+                                MapSTC(p.position, p.orientation * Vector3.forward, time, TimeExtents.y, out newPos, out newDir);
                                 p.position = newPos;
                                 p.orientation = Quaternion.LookRotation(newDir);
 
@@ -960,7 +968,7 @@ namespace KVisualisation
                                     {
                                         Vector3 newPos;
                                         Vector3 newDir;
-                                        MapSTC(p.position, p.orientation * Vector3.forward, time, data.timePeriod.y, out newPos, out newDir);
+                                        MapSTC(p.position, p.orientation * Vector3.forward, time, TimeExtents.y, out newPos, out newDir);
                                         p.position = newPos;
                                         p.orientation = Quaternion.LookRotation(newDir);
 
@@ -998,7 +1006,7 @@ namespace KVisualisation
                                     {
                                         Vector3 newPos;
                                         Vector3 newDir;
-                                        MapSTC(p.position, p.orientation * Vector3.forward, time, pathTimeStep, out newPos, out newDir);
+                                        MapSTC(p.position, p.orientation * Vector3.forward, time, TimeExtents.y, out newPos, out newDir);
                                         p.position = newPos;
                                         p.orientation = Quaternion.LookRotation(newDir);
 
