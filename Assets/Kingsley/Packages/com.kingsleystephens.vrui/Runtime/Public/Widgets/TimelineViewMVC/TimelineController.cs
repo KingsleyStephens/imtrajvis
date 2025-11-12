@@ -72,9 +72,14 @@ namespace KingsleyStephens
                                 cellType = TimelineView.CellData.CellType.Radio;
                                 break;
                             }
+                        case TimelineModel.Cell.CellType.IconStatic:
+                            {
+                                cellType = TimelineView.CellData.CellType.IconLabel;
+                                break;
+                            }
                     }
 
-                    cellData.Add(new TimelineView.CellData(cell.id, cellType, cell.label, cell.selected, cell.image));
+                    cellData.Add(new TimelineView.CellData(cell.id, cellType, cell.label, cell.selected, cell.image, cell.icon));
                 }
 
                 if (cellData.Count < mView.NumCells)

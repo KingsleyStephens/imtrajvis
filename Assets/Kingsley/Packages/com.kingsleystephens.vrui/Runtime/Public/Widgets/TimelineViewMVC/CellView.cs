@@ -39,7 +39,8 @@ namespace KingsleyStephens
             private GameObject toggle;
             [SerializeField]
             private GameObject radio;
-
+            [SerializeField]
+            private Image iconImage;
 
             public delegate void ActivateCell(int index, TimelineView.CellData cellData, bool selected);
             public event ActivateCell OnActivateCell;
@@ -49,12 +50,17 @@ namespace KingsleyStephens
 
 
 
+            private bool IsLabel()
+            {
+                return mCellData.type == TimelineView.CellData.CellType.Label || mCellData.type == TimelineView.CellData.CellType.IconLabel;
+            }
+
 
             // PUBLIC
 
             public void OnSelect()
             {
-                if (mCellData.type != TimelineView.CellData.CellType.Label)
+                if (!IsLabel())
                 {
                     if (panel != null)
                     {
@@ -65,7 +71,7 @@ namespace KingsleyStephens
 
             public void OnActivate()
             {
-                if (mCellData.type != TimelineView.CellData.CellType.Label)
+                if (!IsLabel())
                 {
                     if (panel != null)
                     {
@@ -119,7 +125,7 @@ namespace KingsleyStephens
 
             public void ResetState()
             {
-                if (mCellData.type != TimelineView.CellData.CellType.Label)
+                if (!IsLabel())
                 {
                     if (panel != null)
                     {
@@ -165,6 +171,7 @@ namespace KingsleyStephens
                     {
                         case TimelineView.CellData.CellType.Data:
                         case TimelineView.CellData.CellType.Label:
+                        case TimelineView.CellData.CellType.IconLabel:
                         case TimelineView.CellData.CellType.Radio:
                         case TimelineView.CellData.CellType.Toggle:
                             {
@@ -173,7 +180,7 @@ namespace KingsleyStephens
                                     label.text = mCellData.name;
                                 }
 
-                                if (mCellData.type == TimelineView.CellData.CellType.Data || mCellData.type == TimelineView.CellData.CellType.Label)
+                                if (mCellData.type == TimelineView.CellData.CellType.Data || IsLabel())
                                 {
                                     if (toggle != null)
                                     {
@@ -183,6 +190,18 @@ namespace KingsleyStephens
                                     if (radio != null)
                                     {
                                         radio.gameObject.SetActive(false);
+                                    }
+
+                                    if (iconImage != null)
+                                    {
+                                        if (mCellData.type == TimelineView.CellData.CellType.IconLabel)
+                                        {
+                                            iconImage.sprite = mCellData.icon;
+                                        }
+                                        else
+                                        {
+                                            iconImage.gameObject.SetActive(false);
+                                        }
                                     }
                                 }
                                 else if (mCellData.type == TimelineView.CellData.CellType.Radio)
@@ -199,6 +218,11 @@ namespace KingsleyStephens
                                         {
                                             toggle.gameObject.SetActive(false);
                                         }
+
+                                        if (iconImage != null)
+                                        {
+                                            iconImage.gameObject.SetActive(false);
+                                        }
                                     }
                                 }
                                 else if (mCellData.type == TimelineView.CellData.CellType.Toggle)
@@ -212,6 +236,10 @@ namespace KingsleyStephens
                                     if (radio != null)
                                     {
                                         radio.gameObject.SetActive(false);
+                                    }
+                                    if (iconImage != null)
+                                    {
+                                        iconImage.gameObject.SetActive(false);
                                     }
                                 }
 

@@ -1,7 +1,15 @@
 {
   "dependencies": {
+    "com.kingsleystephens.core": "file:../Assets/Kingsley/Packages/com.kingsleystephens.core",
+    "com.kingsleystephens.gameobjecthelpers": "file:../Assets/Kingsley/Packages/com.kingsleystephens.gameobjecthelpers",
+    "com.kingsleystephens.geometry": "file:../Assets/Kingsley/Packages/com.kingsleystephens.geometry",
+    "com.kingsleystephens.math": "file:../Assets/Kingsley/Packages/com.kingsleystephens.math",
+    "com.kingsleystephens.mediacapture": "file:../Assets/Kingsley/Packages/com.kingsleystephens.mediacapture",
+    "com.kingsleystephens.spatiotemporaldb": "file:../Assets/Kingsley/Packages/com.kingsleystephens.spatiotemporaldb",
+    "com.kingsleystephens.vrui": "file:../Assets/Kingsley/Packages/com.kingsleystephens.vrui",
     "com.meta.xr.sdk.core": "77.0.0",
     "com.meta.xr.sdk.interaction.ovr": "77.0.0",
+    "com.unity.2d.sprite": "1.0.0",
     "com.unity.ide.visualstudio": "2.0.23",
     "com.unity.inputsystem": "1.14.1",
     "com.unity.multiplayer.center": "1.0.0",
@@ -41,13 +49,6 @@
     "com.unity.modules.video": "1.0.0",
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
-    "com.unity.modules.xr": "1.0.0",
-    "com.kingsleystephens.core": "file:../Assets/Kingsley/Packages/com.kingsleystephens.core",
-    "com.kingsleystephens.gameobjecthelpers": "file:../Assets/Kingsley/Packages/com.kingsleystephens.gameobjecthelpers",
-    "com.kingsleystephens.geometry": "file:../Assets/Kingsley/Packages/com.kingsleystephens.geometry",
-    "com.kingsleystephens.math": "file:../Assets/Kingsley/Packages/com.kingsleystephens.math",
-    "com.kingsleystephens.mediacapture": "file:../Assets/Kingsley/Packages/com.kingsleystephens.mediacapture",
-    "com.kingsleystephens.spatiotemporaldb": "file:../Assets/Kingsley/Packages/com.kingsleystephens.spatiotemporaldb",
-    "com.kingsleystephens.vrui": "file:../Assets/Kingsley/Packages/com.kingsleystephens.vrui"
+    "com.unity.modules.xr": "1.0.0"
   }
 }

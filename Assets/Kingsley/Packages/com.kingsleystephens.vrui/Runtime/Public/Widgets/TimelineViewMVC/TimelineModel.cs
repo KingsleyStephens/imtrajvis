@@ -24,7 +24,8 @@ namespace KingsleyStephens
                     Static,
                     Button,
                     Toggle,
-                    Radio
+                    Radio,
+                    IconStatic
                 }
 
                 public CellType type = CellType.Static;
@@ -33,17 +34,19 @@ namespace KingsleyStephens
                 public string label;
                 public bool selected;
                 public string image;
+                public Sprite icon;
 
                 /**
                  * Constructor
                  */
-                public Cell(CellType type, string id, string label = "", bool selected = false, string image = "")
+                public Cell(CellType type, string id, string label = "", bool selected = false, string image = "", Sprite icon = null)
                 {
                     this.type = type;
                     this.id = id;
                     this.label = label;
                     this.selected = selected;
                     this.image = image;
+                    this.icon = icon;
                 }
             }
 
@@ -73,16 +76,16 @@ namespace KingsleyStephens
             /**
              * Add a new cell
              */
-            public string AddCell(Cell.CellType type, string label = "", bool selected = false, string image = "")
+            public string AddCell(Cell.CellType type, string label = "", bool selected = false, string image = "", Sprite icon = null)
             {
                 string id = Guid.NewGuid().ToString();
-                mCells.Add(new Cell(type, id, label, selected, image));
+                mCells.Add(new Cell(type, id, label, selected, image, icon));
                 return id;
             }
 
-            public void AddCell(string id, Cell.CellType type, string label = "", bool selected = false, string image = "")
+            public void AddCell(string id, Cell.CellType type, string label = "", bool selected = false, string image = "", Sprite icon = null)
             {
-                mCells.Add(new Cell(type, id, label, selected, image));
+                mCells.Add(new Cell(type, id, label, selected, image, icon));
             }
 
             /**

@@ -1,6 +1,7 @@
 {
     "categories": [
-        { "name": "Data", 
+        { "name": "Data",
+          "icon": "Data_0",
           "dimensions": [
             { "name": "Scale",
               "singular": false,
@@ -10,6 +11,7 @@
           ]
         },
         { "name": "Interaction", 
+          "icon": "Interaction_0",
           "dimensions": [
             { "name": "Viewpoint",
               "singular": true,
@@ -29,6 +31,7 @@
           ]
         },
         { "name": "Trajectories", 
+          "icon": "Trajectory_0",
           "dimensions": [
             { "name": "Object",
               "singular": false,
@@ -43,6 +46,7 @@
           ]
         },
         { "name": "Space/Time", 
+          "icon": "Space_0",
           "dimensions": [
             { "name": "Time",
               "singular": false,

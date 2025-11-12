@@ -28,7 +28,8 @@ namespace KingsleyStephens
                     NewCellButton,
                     Label,
                     Toggle,
-                    Radio
+                    Radio,
+                    IconLabel
                 }
 
                 public string id;  // Unique ID
@@ -36,17 +37,19 @@ namespace KingsleyStephens
                 public string name;
                 public bool selected;
                 public string image;
+                public Sprite icon;
 
                 /**
                  * Constructor
                  */
-                public CellData(string id, CellType type, string name = "", bool selected = false, string image = "")
+                public CellData(string id, CellType type, string name = "", bool selected = false, string image = "", Sprite icon = null)
                 {
                     this.id = id;
                     this.type = type;
                     this.name = name;
                     this.selected = selected;
                     this.image = image;
+                    this.icon = icon;
                 }
             }
 
@@ -149,7 +152,7 @@ namespace KingsleyStephens
                         RectTransform rt = c.GetComponent<RectTransform>();
                         if (rt != null)
                         {
-                            if (rt.name == "Toggle" || rt.name == "Radio")
+                            if (rt.name == "Toggle" || rt.name == "Radio" || rt.name == "Image")
                             {
                                 rt.localPosition = rt.localPosition + new Vector3(50.0f, 0.0f, 0.0f);
 

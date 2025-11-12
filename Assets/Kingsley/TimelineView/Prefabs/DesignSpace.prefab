@@ -53,4 +53,9 @@ MonoBehaviour:
     anchorRotation: {x: 0, y: 0, z: 0, w: 0}
     cellSize: {x: 8, y: 2}
   categoriesBuffer: 1
+  icons:
+  - {fileID: 29498321, guid: 1d78a10a71f058740866bb208660dd4d, type: 3}
+  - {fileID: -461689197, guid: 4b9fc160253de7f428b504c026855d90, type: 3}
+  - {fileID: 425927345, guid: 48f9d6038d2e4cd44b0b2a7b31d88f8b, type: 3}
+  - {fileID: 797644730, guid: 31a15efd472da1c4c966bb3a161980e0, type: 3}
   jsonFile: ITVDesignSpace.json

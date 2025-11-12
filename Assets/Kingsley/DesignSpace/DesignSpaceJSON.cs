@@ -18,6 +18,7 @@ namespace KingsleyPhD
     public class DesignSpaceCategory
     {
         public string name;
+        public string icon;
         public DesignSpaceDimensions[] dimensions;
     }
 

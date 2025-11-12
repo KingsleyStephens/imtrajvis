@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using KingsleyStephens.VRUI;
 using static KingsleyStephens.VRUI.TimelineModel;
 using static KingsleyStephens.VRUI.TimelineView;
+using System.Linq;
+using Mono.Cecil;
 
 namespace KingsleyPhD
 {
@@ -23,11 +25,16 @@ namespace KingsleyPhD
         private TimelineView.CellConfig cellConfig;
         [SerializeField]
         float categoriesBuffer = 5.0f;
+        [SerializeField]
+        Sprite[] icons;
+
 
         [SerializeField]
         private string jsonFile;
 
         // PRIVATE DATA
+
+        private List<Sprite> iconSprites;
 
         private class CellLine
         {
@@ -82,6 +89,8 @@ namespace KingsleyPhD
                 return;
             }
 
+            iconSprites = new List<Sprite>(icons);
+ 
             DesignSpaceJSON designSpaceJSON = DesignSpaceJSON.Load(Path.Combine(Application.streamingAssetsPath,jsonFile));
             if (designSpaceJSON != null)
             {
@@ -106,7 +115,8 @@ namespace KingsleyPhD
                     CellLine catRow = new CellLine();
 
                     catRow.model = new TimelineModel();
-                    catRow.model.AddCell(TimelineModel.Cell.CellType.Static, category.name);
+
+                    catRow.model.AddCell(TimelineModel.Cell.CellType.IconStatic, category.name, false, "", iconSprites.Find((x) => x.name == category.icon));
 
                     catRow.view = new TimelineView(cellPrototype, lineBatcherPrototype, catParent.transform, cellConfig);
                     catRow.view.SetLayout(LayoutType.HorizontalLine, 1);
