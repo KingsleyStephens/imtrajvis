@@ -237,6 +237,8 @@ namespace KingsleyPhD
         {
             set 
             {
+                Log.LogMessage("Try select workspace root folder");
+
                 if (WorkspaceRoots.Length > 0)
                 {
                     WorkspaceRoot = WorkspaceRoots[value];
@@ -643,8 +645,11 @@ namespace KingsleyPhD
 
                 if (roots.Length > 0)
                 {
+                    Log.LogMessage("UpdateWorkspaceDropdowns");
+
                     WorkspaceRoot = roots[roots.Length - 1];
                     workspaceRootDropdown.value = roots.Length - 1;
+                    workspaceRootDropdown.onValueChanged.Invoke(workspaceRootDropdown.value);
                 }
             }
 
@@ -772,6 +777,7 @@ namespace KingsleyPhD
                             workspace.leftController = leftController;
                             workspace.rightController = rightController;
 
+                            Log.LogMessage("Dataset {0}", Dataset);
                             workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "AUVSim" ? underwaterPrefab : scenePrefab, mainCamera, leftUI.gameObject);
 
                             if (mTimelineJSON != null)

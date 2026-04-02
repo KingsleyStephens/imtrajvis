@@ -1437,7 +1437,7 @@ public class SceneFlowManager : MonoBehaviour
         // Load the simulation players
         if (Controller != null)
         {
-            Log.LogMessage("LaunchSim activate controller and load sim");
+            Log.LogMessage("LaunchSim activate controller and load sim: dataset {0}", dataset);
             Controller.gameObject.SetActive(true);
             Controller.LoadSim(dataset, sessions);
         }

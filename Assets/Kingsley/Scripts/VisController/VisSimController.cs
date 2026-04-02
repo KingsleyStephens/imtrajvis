@@ -3,6 +3,7 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using KingsleyStephens.ImTrajVis;
+using KingsleyStephens.Core;
 
 namespace KController
 {
@@ -91,6 +92,8 @@ namespace KController
          */
         public void LoadSim(string dataset = null, string[] session = null)
         {
+            Log.LogMessage("LoadSim dataset {0} session.Length {1}", dataset, session.Length);
+
             for (int i = 0; i < session.Length; ++i)
             {
                 LoadSimPlayer(i, dataset, session[i]);
