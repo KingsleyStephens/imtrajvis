@@ -300,7 +300,8 @@ namespace KingsleyStephens
 
                 Debug.Log("Loading simulation db: " + path);
 
-                JsonSpatioTemporalDB db = new JsonSpatioTemporalDB(path);
+                bool isTestData = dbName.Contains("TEST");
+                JsonSpatioTemporalDB db = new JsonSpatioTemporalDB(path, isTestData, isTestData);
                 if (db.CreateOrOpen())
                 {
                     Debug.Log("Successfully Loaded simulation db: " + path);

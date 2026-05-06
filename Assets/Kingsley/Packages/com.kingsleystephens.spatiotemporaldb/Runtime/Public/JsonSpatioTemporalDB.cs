@@ -64,13 +64,15 @@ namespace KingsleyStephens
 
             private string mJsonFilePath;
             private JsonDB mDB;
+            private bool mSwapZY = false;
+            private bool mNormalisePos = false;
 
             /**
              * Constructor
              * 
              * @param path The name of the JSON file to save DB to
              */
-            public JsonSpatioTemporalDB(string path) { mJsonFilePath = path; }
+            public JsonSpatioTemporalDB(string path, bool swapZY = false, bool normalisePos = false) { mJsonFilePath = path; mSwapZY = swapZY; mNormalisePos = normalisePos; }
 
 
             // DB OPERATIONS
@@ -84,6 +86,8 @@ namespace KingsleyStephens
                         try
                         {
                             mDB = JsonUtility.FromJson<JsonDB>(File.ReadAllText(mJsonFilePath));
+
+                            ApplyDataUpdate();
                         }
                         catch (Exception e)
                         {
@@ -360,6 +364,34 @@ namespace KingsleyStephens
 
                 return null;
             }
+
+            private float NormalisePosComponent(float x)
+            {
+                return (x - (int)x) * 100.0f;
+            }
+
+            private void ApplyDataUpdate()
+            {
+                foreach (var t in mDB.tables)
+                {
+                    foreach (var mo in t.movingObjects)
+                    {
+                        foreach (var traj in mo.trajectory)
+                        {
+                            if (mSwapZY)
+                            {
+                                traj.position = new Vector3(traj.position.x, traj.position.z, traj.position.y);
+                            }
+
+                            if (mNormalisePos)
+                            {
+                                traj.position = new Vector3(NormalisePosComponent(traj.position.x), traj.position.y, NormalisePosComponent(traj.position.z));
+                            }
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

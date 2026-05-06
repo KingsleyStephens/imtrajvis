@@ -778,7 +778,7 @@ namespace KingsleyPhD
                             workspace.rightController = rightController;
 
                             Log.LogMessage("Dataset {0}", Dataset);
-                            workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "AUVSim" ? underwaterPrefab : scenePrefab, mainCamera, leftUI.gameObject);
+                            workspace.Create(cellData.id, instance, Dataset, Session, Dataset.Substring(0, 1) == "A" ? underwaterPrefab : scenePrefab, mainCamera, leftUI.gameObject);
 
                             if (mTimelineJSON != null)
                             {
