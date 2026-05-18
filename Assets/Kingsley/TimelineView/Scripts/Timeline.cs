@@ -722,7 +722,20 @@ namespace KingsleyPhD
                 snapshotCamera.transform.position = w.SnapshotAnchor.position;
                 snapshotCamera.transform.rotation = w.SnapshotAnchor.rotation;
 
-                snapshotCamera.TakeSnapshot(Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot, Workspace, mCurrCellData.image));
+                // snapshotCamera.TakeSnapshot(Path.Combine(Application.persistentDataPath, "Workspaces", WorkspaceRoot, Workspace, mCurrCellData.image));
+                string timestamp = System.DateTime.Now.ToString("HH_mm_ss_fff");
+                string fileName = $"snapshot_{timestamp}.png";
+
+                string filePath = Path.Combine(
+                    Application.persistentDataPath,
+                    "Workspaces",
+                    WorkspaceRoot,
+                    Workspace,
+                    fileName
+                );
+
+                snapshotCamera.TakeSnapshot(filePath);
+                
                 if (mController != null)
                 {
                     mController.Dirty = true;
@@ -778,7 +791,30 @@ namespace KingsleyPhD
                             workspace.rightController = rightController;
 
                             Log.LogMessage("Dataset {0}", Dataset);
-                            workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "AUVSim" ? underwaterPrefab : scenePrefab, mainCamera, leftUI.gameObject);
+                            // workspace.Create(cellData.id, instance, Dataset, Session, Dataset == "AUVSim" ? underwaterPrefab : scenePrefab, mainCamera, leftUI.gameObject);
+                            // workspace.Create(
+                            //     cellData.id,
+                            //     instance,
+                            //     Dataset,
+                            //     Session,
+                            //     underwaterPrefab,
+                            //     mainCamera,
+                            //     leftUI.gameObject
+                            // );
+                            GameObject selectedPrefab =
+                                Dataset.StartsWith("A")
+                                ? underwaterPrefab
+                                : scenePrefab;
+
+                            workspace.Create(
+                                cellData.id,
+                                instance,
+                                Dataset,
+                                Session,
+                                selectedPrefab,
+                                mainCamera,
+                                leftUI.gameObject
+                            );
 
                             if (mTimelineJSON != null)
                             {

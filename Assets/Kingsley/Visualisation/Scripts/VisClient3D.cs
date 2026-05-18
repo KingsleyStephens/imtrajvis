@@ -147,9 +147,12 @@ namespace KVisualisation
             mAllObjectIds.Clear();
             mMovingObjects.Clear();
 
+            Debug.Log($"SpawnAll: NumPlayers={NumPlayers}");
+
             for (int i = 0; i < NumPlayers; i++)
             {
                 int[] allIds = mVisSimController.ListSimObjects(i);
+                Debug.Log($"SpawnAll: player={i}, ids={string.Join(",", allIds ?? new int[0])}");
                 foreach (int id in allIds)
                 {
                     mAllObjectIds.Add(new Vector2Int(i, id));
@@ -799,6 +802,9 @@ namespace KVisualisation
                         pathTimeStep = 0.5f;
                         float totalTime = data.timePeriod.y - data.timePeriod.x;
                         path = mVisSimController.Players[mId].SampleObjectPath(agentData.id, 0.0f, totalTime, pathTimeStep);
+
+                        Debug.Log($"Agent {agentData.id}: timePeriod={data.timePeriod}, TimeExtents={TimeExtents}, totalTime={totalTime}, pathLength={path?.Length ?? 0}");
+
                         if (path != null && path.Length > 0)
                         {
                             if (IsSTC)
@@ -881,10 +887,16 @@ namespace KVisualisation
                                     m.SetColor("_BaseColor", c);
                                     lineRenderer.material = m;
 
-                                    lineRenderer.widthMultiplier = transform.lossyScale.x * movingObjectSettings.objectScale.x;
+                                    // lineRenderer.widthMultiplier = transform.lossyScale.x * movingObjectSettings.objectScale.x;
+                                    lineRenderer.widthMultiplier = 0.3f;
+                                    Debug.Log($"Width debug: lossyScale={transform.lossyScale.x}, objectScale={movingObjectSettings.objectScale.x}, width={lineRenderer.widthMultiplier}");
+
 
                                     lineRenderer.positionCount = path.Length;
                                     lineRenderer.SetPositions(path.Select((a) => a.position).ToArray());
+
+                                    Debug.Log($"Line drawn: points={path.Length}, firstPos={path[0].position}, lastPos={path[path.Length-1].position}, width={lineRenderer.widthMultiplier}, lossyScale={transform.lossyScale}");
+                                    Debug.Log($"Line positions: first={path[0].position}, last={path[path.Length-1].position}, worldFirst={lineRenderer.transform.TransformPoint(path[0].position)}");
                                 }
                             }
                         }
